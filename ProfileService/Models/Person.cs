@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace ProfileService.Models
@@ -34,7 +35,12 @@ namespace ProfileService.Models
         /// <summary>
         /// Profile photo
         /// </summary>
-        public Guid Photo { get; set; }
+        public string Photo { get; set; }
+
+        /// <summary>
+        /// Personal interests
+        /// </summary>
+        public ICollection<Interest> Interests { get; set; }
         
     }
 }

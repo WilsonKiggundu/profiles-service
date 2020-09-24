@@ -15,8 +15,28 @@ namespace ProfileService.Data
         public ProfileServiceContext(DbContextOptions<ProfileServiceContext> options) : base(options){}
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="modelBuilder"></param>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            
+        }
+
+        /// <summary>
         /// Persons
         /// </summary>
-        public DbSet<Person> Persons { get; set; }    
+        public DbSet<Person> Persons { get; set; }
+
+        /// <summary>
+        /// Interests
+        /// </summary>
+        public DbSet<Interest> Interests { get; set; }
+
+        /// <summary>
+        /// Personal interests
+        /// </summary>
+        public DbSet<PersonInterest> PersonInterests { get; set; }
     }
 }

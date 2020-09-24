@@ -1,20 +1,22 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProfileService.Models
 {
     /// <summary>
     /// User interests
     /// </summary>
-    public class Interests : BaseModel
+    public class Interest : BaseModel
     {
         /// <summary>
         /// Category
         /// </summary>
+        [Required]
         public string Category { get; set; }
 
         /// <summary>
         /// Icon
         /// </summary>
-        public Guid? Icon { get; set; }
+        public string Icon { get; set; }
     }
 }
