@@ -1,21 +1,21 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProfileService.Data;
+using ProfileService.Exceptions;
+using ProfileService.Repositories.Implementations;
+using ProfileService.Repositories.Interfaces;
+using ProfileService.Services.Implementations;
+using ProfileService.Services.Interfaces;
 
 namespace ProfileService
 {
@@ -36,7 +36,7 @@ namespace ProfileService
         /// <summary>
         /// 
         /// </summary>
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         /// <summary>
         /// This method gets called by the runtime. Use this method to add services to the container.
@@ -44,10 +44,18 @@ namespace ProfileService
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                });
 
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ProfileServiceContext>(options => options.UseNpgsql(connectionString));
+
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped<IPersonRepository, PersonRepository>();
+            services.AddScoped<IPersonService, PersonService>();
 
             services.AddSwaggerGen(context =>
             {
@@ -55,6 +63,7 @@ namespace ProfileService
                 {
                     Version = "1.0",
                     Title = "Profiles Service",
+                    
                     Description = "A service for managing profiles",
                     Contact = new OpenApiContact
                     {
@@ -89,10 +98,7 @@ namespace ProfileService
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseExceptionHandler(error => error.UseCustomErrors(env));
 
             app.UseHttpsRedirection();
 
@@ -101,6 +107,12 @@ namespace ProfileService
             {
                 context.SwaggerEndpoint("/swagger/v1/swagger.json", "Version 1.0");
                 context.RoutePrefix = string.Empty;
+            });
+
+            app.UseReDoc(options =>
+            {
+                options.SpecUrl("/swagger/v1/swagger.json");
+                options.RoutePrefix = "docs";
             });
 
             app.UseRouting();

@@ -7,7 +7,7 @@ namespace ProfileService.Models
     /// <summary>
     /// Base model
     /// </summary>
-    public class BaseModel
+    public class BaseModel : IEntity
     {
         /// <summary>
         /// Primary key
