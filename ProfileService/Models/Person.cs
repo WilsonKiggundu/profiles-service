@@ -40,7 +40,22 @@ namespace ProfileService.Models
         /// <summary>
         /// Personal interests
         /// </summary>
-        public ICollection<Interest> Interests { get; set; }
+        public IEnumerable<Interest> Interests { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<PersonCategory> Categories { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<PersonSkill> Skills { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<PersonAward> Awards { get; set; }
         
     }
 }

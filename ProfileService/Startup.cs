@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +50,8 @@ namespace ProfileService
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 });
+
+            services.AddAutoMapper(typeof(Startup));
 
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ProfileServiceContext>(options => options.UseNpgsql(connectionString));

@@ -30,6 +30,21 @@ namespace ProfileService.Data
         public DbSet<PersonInterest> PersonInterests { get; set; }
 
         /// <summary>
+        /// Personal skills
+        /// </summary>
+        public DbSet<PersonSkill> PersonSkills { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DbSet<PersonCategory> PersonCategories { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DbSet<PersonAward> PersonAwards { get; set; }
+
+        /// <summary>
         /// Contacts
         /// </summary>
         public DbSet<Contact> Contacts { get; set; }
