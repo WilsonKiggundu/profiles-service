@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using ProfileService.Models;
+using ProfileService.Models.Common;
 using Tests.Helpers;
 using Xunit;
 
