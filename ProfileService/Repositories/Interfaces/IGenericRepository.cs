@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ProfileService.Models;
+using ProfileService.Models.Common;
 
 namespace ProfileService.Repositories.Interfaces
 {

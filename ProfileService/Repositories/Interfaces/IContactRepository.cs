@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ProfileService.Contracts.Contact;
-using ProfileService.Contracts.Person;
-using ProfileService.Models;
+using ProfileService.Models.Common;
 
 namespace ProfileService.Repositories.Interfaces
 {

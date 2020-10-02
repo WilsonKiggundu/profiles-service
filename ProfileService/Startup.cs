@@ -8,11 +8,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProfileService.Data;
 using ProfileService.Exceptions;
+using ProfileService.Extensions;
 using ProfileService.Repositories.Implementations;
 using ProfileService.Repositories.Interfaces;
 using ProfileService.Services.Implementations;
@@ -56,9 +56,9 @@ namespace ProfileService
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ProfileServiceContext>(options => options.UseNpgsql(connectionString));
 
-            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            services.AddScoped<IPersonRepository, PersonRepository>();
-            services.AddScoped<IPersonService, PersonService>();
+            
+
+            services.AddDependencyInjection();
 
             services.AddSwaggerGen(context =>
             {
@@ -109,13 +109,13 @@ namespace ProfileService
             app.UseSwaggerUI(context =>
             {
                 context.SwaggerEndpoint("/swagger/v1/swagger.json", "Version 1.0");
-                context.RoutePrefix = string.Empty;
+                context.RoutePrefix = "docs";
             });
 
             app.UseReDoc(options =>
             {
                 options.SpecUrl("/swagger/v1/swagger.json");
-                options.RoutePrefix = "docs";
+                options.RoutePrefix = string.Empty;
             });
 
             app.UseRouting();

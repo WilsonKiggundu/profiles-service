@@ -12,10 +12,10 @@ namespace ProfileService.Contracts.Person
         /// </summary>
         public PersonMapper()
         {
-            CreateMap<Models.Person, GetPerson>();
-            CreateMap<NewPerson, Models.Person>()
+            CreateMap<Models.Person.Person, GetPerson>();
+            CreateMap<NewPerson, Models.Person.Person>()
                 .ReverseMap();
-            CreateMap<UpdatePerson, Models.Person>()
+            CreateMap<UpdatePerson, Models.Person.Person>()
                 .ReverseMap();
         }
     }

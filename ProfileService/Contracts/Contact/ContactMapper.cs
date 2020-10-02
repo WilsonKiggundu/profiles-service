@@ -1,4 +1,5 @@
 using AutoMapper;
+using ProfileService.Contracts.Business;
 
 namespace ProfileService.Contracts.Contact
 {
@@ -12,10 +13,10 @@ namespace ProfileService.Contracts.Contact
         /// </summary>
         public ContactMapper()
         {
-            CreateMap<Models.Contact, GetContact>();
-            CreateMap<NewContact, Models.Contact>()
+            CreateMap<Models.Common.Contact, GetContact>();
+            CreateMap<NewContact, Models.Common.Contact>()
                 .ReverseMap();
-            CreateMap<UpdateContact, Models.Contact>()
+            CreateMap<UpdateContact, Models.Common.Contact>()
                 .ReverseMap();
         }
     }

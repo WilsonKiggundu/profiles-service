@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProfileService.Data;
-using ProfileService.Models;
+using ProfileService.Models.Common;
 using ProfileService.Repositories.Interfaces;
 
 namespace ProfileService.Repositories.Implementations

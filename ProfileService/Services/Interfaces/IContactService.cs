@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ProfileService.Contracts.Business;
 using ProfileService.Contracts.Contact;
 
 namespace ProfileService.Services.Interfaces
@@ -8,7 +9,7 @@ namespace ProfileService.Services.Interfaces
     /// <summary>
     /// 
     /// </summary>
-    public interface IContactService
+    public interface IContactService : IService
     {
         /// <summary>
         /// Search Contacts

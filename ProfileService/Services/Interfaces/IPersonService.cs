@@ -2,46 +2,60 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ProfileService.Contracts.Person;
+using ProfileService.Contracts.Person.Awards;
+using ProfileService.Contracts.Person.Categories;
+using ProfileService.Contracts.Person.Interests;
+using ProfileService.Contracts.Person.Skills;
 
 namespace ProfileService.Services.Interfaces
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public interface IPersonService
+    public interface IPersonService : IService
     {
-        /// <summary>
-        /// Search persons
-        /// </summary>
-        /// <returns></returns>    
+        #region Person
+
         Task<ICollection<GetPerson>> SearchAsync(SearchPerson request);
-        
-        /// <summary>
-        /// Get by ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         Task<GetPerson> GetByIdAsync(Guid id);
-        
-        /// <summary>
-        /// Insert 
-        /// </summary>
-        /// <param name="person"></param>
-        /// <returns></returns>
         Task InsertAsync(NewPerson person);
-        
-        /// <summary>
-        /// Update
-        /// </summary>
-        /// <param name="person"></param>
-        /// <returns></returns>
         Task UpdateAsync(UpdatePerson person);
-        
-        /// <summary>
-        /// Delete
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         Task DeleteAsync(Guid id);
+
+        #endregion
+
+        #region PersonAwards
+
+        Task<IEnumerable<GetPersonAward>> GetAwardsAsync(Guid personId);
+        Task AddAwardAsync(NewPersonAward award);
+        Task UpdateAwardAsync(UpdatePersonAward award);    
+        Task DeleteAwardAsync(Guid awardId);    
+
+        #endregion
+        
+        #region PersonInterests
+
+        Task<IEnumerable<GetPersonInterest>> GetInterestsAsync(Guid investorId);
+        Task AddInterestAsync(NewPersonInterest award);
+        Task UpdateInterestAsync(UpdatePersonInterest award);    
+        Task DeleteInterestAsync(Guid awardId);    
+
+        #endregion
+        
+        #region PersonSkills
+
+        Task<IEnumerable<GetPersonSkill>> GetSkillsAsync(Guid investorId);
+        Task AddSkillAsync(NewPersonSkill award);
+        Task UpdateSkillAsync(UpdatePersonSkill award);    
+        Task DeleteSkillAsync(Guid awardId);    
+
+        #endregion
+        
+        #region PersonCategories
+
+        Task<IEnumerable<GetPersonCategory>> GetCategoriesAsync(Guid investorId);
+        Task AddCategoryAsync(NewPersonCategory award);
+        Task UpdateCategoryAsync(UpdatePersonCategory award);    
+        Task DeleteCategoryAsync(Guid awardId);    
+
+        #endregion
+        
     }
 }

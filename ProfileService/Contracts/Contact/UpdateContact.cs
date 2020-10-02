@@ -1,15 +1,15 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace ProfileService.Contracts.Contact
+namespace ProfileService.Contracts.Business
 {
     /// <summary>
-    /// Update Contact
+    /// Update Business
     /// </summary>
     public class UpdateContact
     {
         /// <summary>
-        /// Contact Id
+        /// Business Id
         /// </summary>
         public Guid Id { get; set; }
 
@@ -21,14 +21,14 @@ namespace ProfileService.Contracts.Contact
         public string Type { get; set; }
         
         /// <summary>
-        /// Contact
+        /// Business
         /// </summary>
         /// <example>someone@domain.com</example>
         [Required]
         public string Value { get; set; }
         
         /// <summary>
-        /// Contact details
+        /// Business details
         /// </summary>
         /// <example>Personal</example>
         public string Details { get; set; }

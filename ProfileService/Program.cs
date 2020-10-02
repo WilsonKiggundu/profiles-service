@@ -19,7 +19,7 @@ namespace ProfileService
         {
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
-                .WriteTo.Console(new RenderedCompactJsonFormatter())
+                .WriteTo.Console()
                 .CreateLogger();
             
             try

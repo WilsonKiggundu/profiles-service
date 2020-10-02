@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using ProfileService.Models;
+using ProfileService.Models.Business;
+using ProfileService.Models.Common;
+using ProfileService.Models.Investor;
+using ProfileService.Models.Person;
 
 namespace ProfileService.Data
 {
@@ -14,39 +17,56 @@ namespace ProfileService.Data
         /// <param name="options"></param>
         public ProfileServiceContext(DbContextOptions<ProfileServiceContext> options) : base(options){}
 
-        /// <summary>
-        /// Persons
-        /// </summary>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Business>()
+                .HasAlternateKey(b => b.Name)
+                .HasName("AlternateKey_Name");
+
+            base.OnModelCreating(modelBuilder);
+        }
+
+        #region Common
+        
+        public DbSet<Interest> LookupInterests { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Category> LookupCategories { get; set; }
+        public DbSet<Upload> LookupUploads { get; set; }
+        public DbSet<Need> LookupNeeds { get; set; }
+        
+        #endregion
+    
+        
+        #region Person
+        
         public DbSet<Person> Persons { get; set; }
-
-        /// <summary>
-        /// Interests
-        /// </summary>
-        public DbSet<Interest> Interests { get; set; }
-
-        /// <summary>
-        /// Personal interests
-        /// </summary>
         public DbSet<PersonInterest> PersonInterests { get; set; }
-
-        /// <summary>
-        /// Personal skills
-        /// </summary>
         public DbSet<PersonSkill> PersonSkills { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public DbSet<PersonCategory> PersonCategories { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public DbSet<PersonAward> PersonAwards { get; set; }
 
-        /// <summary>
-        /// Contacts
-        /// </summary>
-        public DbSet<Contact> Contacts { get; set; }
+        #endregion
+
+        #region Business
+
+        public DbSet<Business> Businesses { get; set; }
+        public DbSet<BusinessRole> BusinessRoles { get; set; }
+        public DbSet<BusinessAddress> BusinessAddresses { get; set; }
+        public DbSet<BusinessInterest> BusinessInterests { get; set; }
+        public DbSet<BusinessNeed> BusinessNeeds { get; set; }
+        public DbSet<BusinessProduct> BusinessProducts { get; set; }
+        public DbSet<BusinessContact> BusinessContacts { get; set; }
+
+        #endregion
+
+        #region Investor
+
+        public DbSet<Investor> Investors { get; set; }
+        public DbSet<InvestorAddress> InvestorAddresses { get; set; }
+        public DbSet<InvestorPortfolio> InvestorPortfolios { get; set; }
+        public DbSet<InvestorInterest> InvestorInterests { get; set; }
+        public DbSet<InvestorContact> InvestorContacts { get; set; }
+
+        #endregion
     }
 }
