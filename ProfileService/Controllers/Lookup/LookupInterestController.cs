@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProfileService.Contracts.Lookup.Interest;
@@ -13,6 +14,7 @@ namespace ProfileService.Controllers.Lookup
     /// LookupInterest controller
     /// </summary>
     [Route("api/lookup/interests")]
+    [AllowAnonymous]
     public class LookupInterestController : BaseController
     {
         private readonly ILookupInterestService _service;

@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using ProfileService.Contracts.Lookup.Category;
 using ProfileService.Data;
 using ProfileService.Models.Common;
@@ -11,11 +13,22 @@ namespace ProfileService.Repositories.Implementations
 {
     public class LookupCategoryRepository : GenericRepository<Category>, ILookupCategoryRepository
     {
-        public LookupCategoryRepository(ProfileServiceContext context) : base(context) { }
+        private readonly ProfileServiceContext _context;
+        public LookupCategoryRepository(ProfileServiceContext context) : base(context)
+        {
+            _context = context;
+        }
 
         public async Task<ICollection<Category>> SearchAsync(SearchLookupCategory request)
         {
-            throw new NotImplementedException();
+            IQueryable<Category> query = _context.LookupCategories;
+            
+            if (!string.IsNullOrEmpty(request.Name))
+            {
+                query = query.Where(q => q.Name.ToLower().Contains(request.Name.ToLower()));
+            }
+
+            return await query.ToListAsync();
         }
     }
 }
