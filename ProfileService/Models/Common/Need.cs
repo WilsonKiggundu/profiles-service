@@ -6,7 +6,7 @@ namespace ProfileService.Models.Common
     {
         public string Category { get; set; }
         
-        public Guid? UploadId { get; set; }
-        public Upload Upload { get; set; }
+        public Guid? IconId { get; set; }    
+        public Upload Icon { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 using ProfileService.Contracts.Lookup.Category;
 using ProfileService.Data;
 using ProfileService.Models.Common;
@@ -15,11 +16,13 @@ namespace ProfileService.Services.Implementations
     {
         private readonly ILookupCategoryRepository _repository;
         private readonly IMapper _mapper;
+        private ILogger<LookupCategoryService> _logger;
 
-        public LookupCategoryService(ILookupCategoryRepository repository, IMapper mapper)
+        public LookupCategoryService(ILookupCategoryRepository repository, IMapper mapper, ILogger<LookupCategoryService> logger)
         {
             _repository = repository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<ICollection<GetLookupCategory>> SearchAsync(SearchLookupCategory request)
@@ -51,6 +54,7 @@ namespace ProfileService.Services.Implementations
         {
             try
             {
+                _logger.LogInformation($"{category}");
                 var model = _mapper.Map<Category>(category);
                 await _repository.UpdateAsync(model);
             }

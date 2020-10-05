@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProfileService.Contracts.Lookup.Upload;
@@ -11,8 +12,9 @@ namespace ProfileService.Controllers.Lookup
 {
     /// <summary>
     /// LookupUpload controller
-    /// </summary>
+    /// </summary>16c89a4e-03cc-4736-adc8-2ade45e15ac5
     [Route("api/lookup/uploads")]
+    [AllowAnonymous]
     public class LookupUploadController : BaseController
     {
         private readonly ILookupUploadService _service;

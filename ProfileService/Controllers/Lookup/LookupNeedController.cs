@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProfileService.Contracts.Lookup.Need;
@@ -13,6 +14,7 @@ namespace ProfileService.Controllers.Lookup
     /// LookupNeed controller
     /// </summary>
     [Route("api/lookup/needs")]
+    [AllowAnonymous]
     public class LookupNeedController : BaseController
     {
         private readonly ILookupNeedService _service;

@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace ProfileService.Models.Common
 {
@@ -18,6 +19,7 @@ namespace ProfileService.Models.Common
         /// <summary>
         /// Flag indicating is the record is deleted
         /// </summary>
+        [JsonIgnore]
         public bool IsDeleted { get; set; } = false;
 
         /// <summary>

@@ -23,6 +23,18 @@ namespace ProfileService.Data
                 .HasAlternateKey(b => b.Name)
                 .HasName("AlternateKey_Name");
 
+            modelBuilder.Entity<Category>()
+                .HasQueryFilter(q => !q.IsDeleted);
+            
+            modelBuilder.Entity<Upload>()
+                .HasQueryFilter(q => !q.IsDeleted);
+            
+            modelBuilder.Entity<Interest>()
+                .HasQueryFilter(q => !q.IsDeleted);
+            
+            modelBuilder.Entity<Need>()
+                .HasQueryFilter(q => !q.IsDeleted);
+            
             base.OnModelCreating(modelBuilder);
         }
 
