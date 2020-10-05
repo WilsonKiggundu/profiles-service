@@ -1,4 +1,5 @@
 using System;
+using ProfileService.Contracts.Lookup.Upload;
 
 namespace ProfileService.Contracts.Lookup.Category
 {
@@ -6,6 +7,6 @@ namespace ProfileService.Contracts.Lookup.Category
     {
         public Guid Id { get; set; }    
         public string Name { get; set; }
-        public Guid? IconId { get; set; }
+        public GetLookupUpload Icon { get; set; }
     }
 }
