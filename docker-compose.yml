@@ -1,0 +1,34 @@
+version: '3.4'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ProfileService/Dockerfile
+    container_name: profile-service-admin
+    environment:
+      - VIRTUAL_HOST=profiles-test.innovationvillage.co.ug
+      - 'ConnectionStrings__DefaultConnection=Server=db; User Id=sa; Database=auth_dev_db; Port=5432; Password=sw33th0m3; SSL Mode=Prefer; Trust Server Certificate=true'
+      - AdminConfiguration__RequireHttpsMetadata=false
+      - DockerConfiguration__UpdateCaCertificate=true
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - '44404:80'
+    depends_on:
+      - db
+    volumes:
+      - './shared/serilog.json:/app/serilog.json'
+      - './shared/identitydata.json:/app/identitydata.json'
+      - './shared/identityserverdata.json:/app/identityserverdata.json'
+      - './shared/nginx/certs/cacerts.crt:/usr/local/share/ca-certificates/cacerts.crt'
+  db:
+    image: postgres:12.1
+    container_name: profile-service-db
+    environment:
+      SA_PASSWORD: '${DB_PASSWORD:-Password_123}'
+      ACCEPT_EULA: 'Y'
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+volumes:
+  dbdata:
+    driver: local
