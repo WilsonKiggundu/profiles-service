@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace ProfileService.Contracts.Business
+namespace ProfileService.Contracts.Contact
 {
     /// <summary>
     /// Update Business

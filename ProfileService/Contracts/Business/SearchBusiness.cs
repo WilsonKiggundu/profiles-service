@@ -6,11 +6,10 @@ namespace ProfileService.Contracts.Business
     /// 
     /// </summary>
     public class SearchBusiness
-    {   
+    {
         /// <summary>
-        /// 
+        /// Name of the business
         /// </summary>
-        public Guid Id { get; set; }
-        
+        public string Name { get; set; }
     }
 }

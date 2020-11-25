@@ -3,7 +3,7 @@ using ProfileService.Models.Common;
 
 namespace ProfileService.Contracts.Lookup.Upload
 {
-    public class GetLookupUpload
+    public class GetLookupUpload : BaseModel
     {
         public Guid OwnerId { get; set; }
         public string FileName { get; set; }

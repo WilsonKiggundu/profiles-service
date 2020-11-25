@@ -17,7 +17,7 @@ namespace ProfileService.Models.Common
         public Guid Id { get; set; }
 
         /// <summary>
-        /// Flag indicating is the record is deleted
+        /// Flag indicating if the record is deleted
         /// </summary>
         [JsonIgnore]
         public bool IsDeleted { get; set; } = false;

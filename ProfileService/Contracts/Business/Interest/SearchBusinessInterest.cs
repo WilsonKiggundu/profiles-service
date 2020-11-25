@@ -7,10 +7,6 @@ namespace ProfileService.Contracts.Business.Interest
     /// </summary>
     public class SearchBusinessInterest
     {   
-        /// <summary>
-        /// 
-        /// </summary>
-        public Guid Id { get; set; }
         
     }
 }

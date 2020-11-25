@@ -11,6 +11,8 @@ namespace ProfileService.Contracts.Contact
         /// 
         /// </summary>
         public Guid Id { get; set; }
+
+        public Guid OwnerId { get; set; }
         
     }
 }

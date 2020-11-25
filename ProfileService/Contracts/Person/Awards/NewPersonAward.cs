@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using ProfileService.Contracts.Lookup.Upload;
-using ProfileService.Models.Common;
 
 namespace ProfileService.Contracts.Person.Awards
 {
-    public class GetPersonAward : BaseModel
+    public class NewPersonAward    
     {
         public Guid PersonId { get; set; }
         public string AwardedBy { get; set; }

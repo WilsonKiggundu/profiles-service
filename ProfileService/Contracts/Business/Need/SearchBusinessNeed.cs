@@ -6,11 +6,7 @@ namespace ProfileService.Contracts.Business.Need
     /// 
     /// </summary>
     public class SearchBusinessNeed
-    {   
-        /// <summary>
-        /// 
-        /// </summary>
-        public Guid Id { get; set; }
-        
+    {
+
     }
 }

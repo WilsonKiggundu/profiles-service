@@ -1,3 +1,5 @@
+using System;
+
 namespace ProfileService.Contracts.Business.Need
 {
     /// <summary>
@@ -5,6 +7,7 @@ namespace ProfileService.Contracts.Business.Need
     /// </summary>
     public class NewBusinessNeed
     {
-        
+        public Guid BusinessId { get; set; }
+        public string Details { get; set; }
     }
 }

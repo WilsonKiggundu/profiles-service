@@ -7,10 +7,6 @@ namespace ProfileService.Contracts.Business.Address
     /// </summary>
     public class SearchBusinessAddress
     {   
-        /// <summary>
-        /// 
-        /// </summary>
-        public Guid Id { get; set; }
         
     }
 }

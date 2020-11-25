@@ -68,7 +68,7 @@ namespace ProfileService.Controllers.Business
         /// </summary>
         /// <param name="business"></param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<UpdateBusiness> Update([FromBody] UpdateBusiness business)
         {
@@ -88,7 +88,7 @@ namespace ProfileService.Controllers.Business
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id)
         {

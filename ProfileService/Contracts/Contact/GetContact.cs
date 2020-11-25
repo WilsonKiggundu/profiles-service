@@ -1,17 +1,13 @@
 using System;
+using ProfileService.Models.Common;
 
 namespace ProfileService.Contracts.Contact
 {
     /// <summary>
     /// Get a Contact
     /// </summary>
-    public class GetContact
+    public class GetContact : BaseModel
     {
-        /// <summary>
-        /// Contact Id
-        /// </summary>
-        public Guid Id { get; set; }
-
         /// <summary>
         /// Type of contact
         /// </summary>

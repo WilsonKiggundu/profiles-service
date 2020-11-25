@@ -1,3 +1,5 @@
+using System;
+
 namespace ProfileService.Contracts.Investor.Interest
 {
     /// <summary>
@@ -5,6 +7,7 @@ namespace ProfileService.Contracts.Investor.Interest
     /// </summary>
     public class NewInvestorInterest
     {
-        
+        public Guid InvestorId { get; set; }
+        public Guid InterestId { get; set; }    
     }
 }

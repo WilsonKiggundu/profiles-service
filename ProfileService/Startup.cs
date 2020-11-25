@@ -85,7 +85,7 @@ namespace ProfileService
             services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                 {
-                    options.Authority = "https://localhost:44303";
+                    options.Authority = Configuration.GetConnectionString("Authentication:Server");
 
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
