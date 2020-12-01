@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Data;
@@ -9,9 +10,10 @@ using ProfileService.Data;
 namespace ProfileService.Migrations
 {
     [DbContext(typeof(ProfileServiceContext))]
-    partial class ProfileServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20201127080247_UpdatedPersonModel_ChangedDateOfBirthToString")]
+    partial class UpdatedPersonModel_ChangedDateOfBirthToString
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,11 +27,11 @@ namespace ProfileService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -76,11 +78,11 @@ namespace ProfileService.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("text");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("District")
                         .HasColumnType("text");
@@ -119,11 +121,11 @@ namespace ProfileService.Migrations
                     b.Property<Guid>("ContactId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -146,11 +148,11 @@ namespace ProfileService.Migrations
                     b.Property<Guid>("BusinessId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("InterestId")
                         .HasColumnType("uuid");
@@ -176,11 +178,11 @@ namespace ProfileService.Migrations
                     b.Property<Guid>("BusinessId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -206,11 +208,11 @@ namespace ProfileService.Migrations
                     b.Property<Guid>("BusinessId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("character varying(280)")
@@ -239,11 +241,11 @@ namespace ProfileService.Migrations
                     b.Property<Guid>("BusinessId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -269,11 +271,11 @@ namespace ProfileService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("IconId")
                         .HasColumnType("uuid");
@@ -303,11 +305,11 @@ namespace ProfileService.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("integer");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Details")
                         .HasColumnType("text");
@@ -337,11 +339,11 @@ namespace ProfileService.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("IconId")
                         .HasColumnType("uuid");
@@ -370,11 +372,11 @@ namespace ProfileService.Migrations
                     b.Property<string>("Category")
                         .HasColumnType("text");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("IconId")
                         .HasColumnType("uuid");
@@ -399,11 +401,11 @@ namespace ProfileService.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("FileName")
                         .IsRequired()
@@ -433,11 +435,11 @@ namespace ProfileService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("InvestmentRange")
                         .HasColumnType("text");
@@ -482,11 +484,11 @@ namespace ProfileService.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("text");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("District")
                         .HasColumnType("text");
@@ -525,11 +527,11 @@ namespace ProfileService.Migrations
                     b.Property<Guid>("ContactId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("InvestorId")
                         .HasColumnType("uuid");
@@ -552,11 +554,11 @@ namespace ProfileService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("InterestId")
                         .HasColumnType("uuid");
@@ -582,11 +584,11 @@ namespace ProfileService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Details")
                         .HasColumnType("text");
@@ -613,11 +615,11 @@ namespace ProfileService.Migrations
                     b.Property<string>("Bio")
                         .HasColumnType("text");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("DateOfBirth")
                         .HasColumnType("text");
@@ -655,28 +657,19 @@ namespace ProfileService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Activities")
-                        .HasColumnType("text");
-
                     b.Property<string>("AwardedBy")
                         .HasColumnType("text");
 
-                    b.Property<string>("DateCreated")
+                    b.Property<string>("Date")
                         .HasColumnType("text");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("EndYear")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FieldOfStudy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Grade")
                         .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
@@ -684,12 +677,6 @@ namespace ProfileService.Migrations
 
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("StartYear")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -707,11 +694,11 @@ namespace ProfileService.Migrations
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -734,11 +721,11 @@ namespace ProfileService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("InterestId")
                         .HasColumnType("uuid");
@@ -764,11 +751,11 @@ namespace ProfileService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DateLastUpdated")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Details")
                         .HasColumnType("text");

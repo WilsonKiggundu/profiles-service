@@ -24,21 +24,45 @@ namespace ProfileService.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<ICollection<GetPerson>> SearchAsync(SearchPerson request)
+        public async Task<ICollection<GetPerson>> SearchAsync(Guid? exclude = null)
         {
-            var results = await _repository.SearchAsync(request);
+            var results = await _repository.SearchAsync(exclude);
             return _mapper.Map<ICollection<GetPerson>>(results);
         }
-        
+
         public async Task<GetPerson> GetByIdAsync(Guid id)
         {
             var result = await _repository.GetByIdAsync(id);
-            return _mapper.Map<GetPerson>(result);
+            var person = _mapper.Map<GetPerson>(result);
+            person.Gender = result.Gender switch
+            {
+                Gender.Female => "female",
+                Gender.Male => "male",
+                _ => "other"
+            };
+            
+            return person;
         }
 
         public async Task InsertAsync(NewPerson newPerson)
         {
-            var person = new Person();
+            var person = new Person
+            {
+                Id = newPerson.UserId,
+                Firstname = newPerson.FirstName,
+                Lastname = newPerson.LastName,
+                Bio = newPerson.Bio,
+                Gender = newPerson.Gender switch    
+                {
+                    "male" => Gender.Male,
+                    "female" => Gender.Female,
+                    //"other" => Gender.Other,
+                    _ => Gender.Female
+                },
+                DateOfBirth = newPerson.DateOfBirth,
+                UserId = newPerson.UserId
+            };
+            
             try
             {
                 await _repository.InsertAsync(person);
@@ -51,13 +75,28 @@ namespace ProfileService.Services.Implementations
 
         public async Task UpdateAsync(UpdatePerson updatePerson)
         {
-            var person = new Person();
+            var person = new Person
+            {
+                Id = updatePerson.Id,
+                Firstname = updatePerson.FirstName,
+                Lastname = updatePerson.LastName,
+                Bio = updatePerson.Bio,
+                Gender = updatePerson.Gender switch    
+                {
+                    "male" => Gender.Male,
+                    "female" => Gender.Female,
+                    _ => Gender.Female
+                },
+                DateOfBirth = updatePerson.DateOfBirth,
+                UserId = updatePerson.UserId
+            };
             try
             {
                 await _repository.UpdateAsync(person);
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.Message);
                 throw new Exception(e.Message, e);
             }
         }
@@ -118,10 +157,10 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task<IEnumerable<GetPersonInterest>> GetInterestsAsync(Guid personId)
+        public async Task<ICollection<GetPersonInterest>> GetInterestsAsync(Guid personId)
         {
             var interests = await _repository.GetInterestsAsync(personId);
-            return _mapper.Map<IEnumerable<GetPersonInterest>>(interests);
+            return _mapper.Map<ICollection<GetPersonInterest>>(interests);
         }
 
         public async Task AddInterestAsync(NewPersonInterest interest)

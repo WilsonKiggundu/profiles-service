@@ -37,6 +37,14 @@ namespace ProfileService.Repositories.Implementations
             await _entities.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
+        
+        public async Task InsertManyAsync(ICollection<T> entities)
+        {
+            if (entities == null) throw new ArgumentNullException(nameof(entities));
+
+            await _entities.AddRangeAsync(entities);
+            await _context.SaveChangesAsync();
+        }
 
         public async Task UpdateAsync(T entity)
         {

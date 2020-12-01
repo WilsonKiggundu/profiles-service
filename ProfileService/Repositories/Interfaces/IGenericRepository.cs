@@ -30,6 +30,9 @@ namespace ProfileService.Repositories.Interfaces
         /// <param name="entity"></param>
         /// <returns></returns>
         Task InsertAsync(T entity);
+
+        
+        Task InsertManyAsync(ICollection<T> entities);
         
         /// <summary>
         /// Update

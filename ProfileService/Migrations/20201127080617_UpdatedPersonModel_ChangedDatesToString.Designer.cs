@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Data;
@@ -9,9 +10,10 @@ using ProfileService.Data;
 namespace ProfileService.Migrations
 {
     [DbContext(typeof(ProfileServiceContext))]
-    partial class ProfileServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20201127080617_UpdatedPersonModel_ChangedDatesToString")]
+    partial class UpdatedPersonModel_ChangedDatesToString
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -655,10 +657,10 @@ namespace ProfileService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Activities")
+                    b.Property<string>("AwardedBy")
                         .HasColumnType("text");
 
-                    b.Property<string>("AwardedBy")
+                    b.Property<string>("Date")
                         .HasColumnType("text");
 
                     b.Property<string>("DateCreated")
@@ -670,26 +672,11 @@ namespace ProfileService.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<string>("EndYear")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FieldOfStudy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Grade")
-                        .HasColumnType("text");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("StartYear")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

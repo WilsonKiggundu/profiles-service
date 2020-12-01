@@ -25,12 +25,12 @@ namespace ProfileService.Models.Common
         /// <summary>
         /// Date and time when record was created
         /// </summary>
-        public DateTime DateCreated { get; set; } = DateTime.UtcNow;
+        public string DateCreated { get; set; } = DateTime.UtcNow.ToString("u");
         
         /// <summary>
         /// Date and time when record was last updated
         /// </summary>
-        public DateTime? DateLastUpdated { get; set; }
+        public string DateLastUpdated { get; set; }    
         
     }
 }

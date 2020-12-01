@@ -43,7 +43,7 @@ namespace ProfileService.Controllers.Person
         /// <param name="award"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<NewPersonAward> Create([FromBody] NewPersonAward award)
+        public async Task<NewPersonAward> Create(NewPersonAward award)
         {
             try
             {

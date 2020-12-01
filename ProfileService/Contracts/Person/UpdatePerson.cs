@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace ProfileService.Contracts.Person
 {
@@ -6,20 +7,17 @@ namespace ProfileService.Contracts.Person
     /// Update person
     /// </summary>
     public class UpdatePerson
-    {
-        /// <summary>
-        /// Person Id
-        /// </summary>
+    {    
         public Guid Id { get; set; }
-
-        /// <summary>
-        /// First name
-        /// </summary>
-        public string Firstname { get; set; }
-        
-        /// <summary>
-        /// Last name
-        /// </summary>
-        public string Lastname { get; set; }
+        public Guid UserId { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public string DateOfBirth { get; set; }
+        public string Gender { get; set; }
+        public string Bio { get; set; }
+        public string Email { get; set; }
+        public string[] Interests { get; set; }
+        public string[] Categories { get; set; }
     }
 }

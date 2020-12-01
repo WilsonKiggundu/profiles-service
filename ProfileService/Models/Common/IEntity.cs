@@ -20,11 +20,11 @@ namespace ProfileService.Models.Common
         /// <summary>
         /// 
         /// </summary>
-        public DateTime DateCreated { get; set; }
+        public string DateCreated { get; set; }
         
         /// <summary>
         /// 
         /// </summary>
-        public DateTime? DateLastUpdated { get; set; }
+        public string DateLastUpdated { get; set; }
     }
 }

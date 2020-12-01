@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProfileService.Contracts.Person;
@@ -28,29 +30,38 @@ namespace ProfileService.Repositories.Implementations
         /// <summary>
         /// Search persons
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="exclude"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ICollection<Person>> SearchAsync(SearchPerson request)
+        public async Task<ICollection<Person>> SearchAsync(Guid? exclude)
         {
-            return await _context.Persons.ToListAsync();
+            return await _context.Persons
+                .Where(p => p.Id != exclude)
+                .Include(p => p.Categories)
+                .Include(p => p.Interests)
+                .ToListAsync();
         }
 
         #region Person Awards
 
         public async Task<IEnumerable<PersonAward>> GetAwardsAsync(Guid personId)
         {
-            throw new NotImplementedException();
+            return await _context
+                .PersonAwards
+                .Where(p => p.PersonId == personId)
+                .ToListAsync();
         }
 
         public async Task AddAwardAsync(PersonAward award)
         {
-            throw new NotImplementedException();
+            await _context.PersonAwards.AddAsync(award);
+            await _context.SaveChangesAsync(true);
         }
 
         public async Task UpdateAwardAsync(PersonAward award)
-        {
-            throw new NotImplementedException();
+        { 
+            _context.PersonAwards.Update(award);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAwardAsync(Guid awardId)
@@ -80,15 +91,21 @@ namespace ProfileService.Repositories.Implementations
         {
             throw new NotImplementedException();
         }
-
+    
         public async Task<IEnumerable<PersonInterest>> GetInterestsAsync(Guid personId)
         {
-            throw new NotImplementedException();
+            return await 
+                _context
+                    .PersonInterests
+                    .Include(p => p.Interest)
+                    .Where(q => q.PersonId == personId)
+                    .ToListAsync();
         }
 
         public async Task AddInterestAsync(PersonInterest interest)
         {
-            throw new NotImplementedException();
+            await _context.PersonInterests.AddAsync(interest);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateInterestAsync(PersonInterest interest)
@@ -103,12 +120,15 @@ namespace ProfileService.Repositories.Implementations
 
         public async Task<IEnumerable<PersonSkill>> GetSkillsAsync(Guid personId)
         {
-            throw new NotImplementedException();
+            return await _context.PersonSkills
+                .Where(p => p.PersonId == personId)
+                .ToListAsync();
         }
 
         public async Task AddSkillAsync(PersonSkill skill)
         {
-            throw new NotImplementedException();
+            await _context.PersonSkills.AddAsync(skill);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateSkillAsync(PersonSkill skill)

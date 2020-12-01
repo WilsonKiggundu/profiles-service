@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace ProfileService.Contracts.Person
 {
@@ -7,35 +8,17 @@ namespace ProfileService.Contracts.Person
     /// </summary>
     public class NewPerson
     {
-        /// <summary>
-        /// Person Id
-        /// </summary>
-        public Guid Id { get; set; }
-
-        /// <summary>
-        /// User Id
-        /// </summary>
         public Guid UserId { get; set; }
-
-        /// <summary>
-        /// First name
-        /// </summary>
-        public string Firstname { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public string DateOfBirth { get; set; }
+        public string Gender { get; set; }
+        public string Bio { get; set; }
+        public string Email { get; set; }
+        public IList<Guid> Interests { get; set; }
+        public IList<Guid> Categories { get; set; }
         
-        /// <summary>
-        /// Last name
-        /// </summary>
-        public string Lastname { get; set; }
-
-        /// <summary>
-        /// Date of Birth
-        /// </summary>
-        public DateTime DateOfBirth { get; set; }
-        
-        /// <summary>
-        /// Gender
-        /// </summary>
-        public Gender Gender { get; set; }    
     }
 
     public enum Gender

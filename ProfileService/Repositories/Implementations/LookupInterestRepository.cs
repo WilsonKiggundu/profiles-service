@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,11 +17,11 @@ namespace ProfileService.Repositories.Implementations
         {
             _context = context;
         }
-        public async Task<ICollection<Interest>> SearchAsync(SearchLookupInterest request)
+        public async Task<ICollection<Interest>> SearchAsync(SearchLookupInterest? request = null)
         {
             IQueryable<Interest> query = _context.LookupInterests;
 
-            if (!string.IsNullOrEmpty(request.Category))
+            if (!string.IsNullOrEmpty(request?.Category))
             {
                 query = query.Where(q => q.Category.ToLower().Contains(request.Category.ToLower()));
             }

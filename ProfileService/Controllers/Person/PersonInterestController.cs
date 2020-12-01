@@ -43,7 +43,7 @@ namespace ProfileService.Controllers.Person
         /// <param name="interest"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<NewPersonInterest> Create([FromBody] NewPersonInterest interest)
+        public async Task<NewPersonInterest> Create(NewPersonInterest interest)
         {
             try
             {

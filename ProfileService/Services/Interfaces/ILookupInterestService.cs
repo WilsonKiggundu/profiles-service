@@ -10,6 +10,7 @@ namespace ProfileService.Services.Interfaces
         Task<ICollection<GetLookupInterest>> SearchAsync(SearchLookupInterest request);
         Task<GetLookupInterest> GetByIdAsync(Guid id);
         Task InsertAsync(NewLookupInterest interest);
+        Task InsertManyAsync(ICollection<NewLookupInterest> interests);
         Task UpdateAsync(UpdateLookupInterest interest);
         Task DeleteAsync(Guid id);
     }

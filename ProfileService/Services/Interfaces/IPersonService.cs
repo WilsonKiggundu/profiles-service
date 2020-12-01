@@ -13,7 +13,7 @@ namespace ProfileService.Services.Interfaces
     {
         #region Person
 
-        Task<ICollection<GetPerson>> SearchAsync(SearchPerson request);
+        Task<ICollection<GetPerson>> SearchAsync(Guid? exclude);
         Task<GetPerson> GetByIdAsync(Guid id);
         Task InsertAsync(NewPerson person);
         Task UpdateAsync(UpdatePerson person);
@@ -32,7 +32,7 @@ namespace ProfileService.Services.Interfaces
         
         #region PersonInterests
 
-        Task<IEnumerable<GetPersonInterest>> GetInterestsAsync(Guid investorId);
+        Task<ICollection<GetPersonInterest>> GetInterestsAsync(Guid investorId);
         Task AddInterestAsync(NewPersonInterest award);
         Task UpdateInterestAsync(UpdatePersonInterest award);    
         Task DeleteInterestAsync(Guid awardId);    

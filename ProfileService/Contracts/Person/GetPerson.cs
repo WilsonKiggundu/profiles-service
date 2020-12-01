@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using ProfileService.Contracts.Lookup.Category;
+using ProfileService.Contracts.Lookup.Interest;
 
 namespace ProfileService.Contracts.Person
 {
@@ -7,29 +10,15 @@ namespace ProfileService.Contracts.Person
     /// </summary>
     public class GetPerson
     {
-        /// <summary>
-        /// Person Id
-        /// </summary>
         public Guid Id { get; set; }
-
-        /// <summary>
-        /// User Id
-        /// </summary>
         public Guid UserId { get; set; }
-
-        /// <summary>
-        /// First name
-        /// </summary>
         public string Firstname { get; set; }
-        
-        /// <summary>
-        /// Last name
-        /// </summary>
         public string Lastname { get; set; }
-        
-        /// <summary>
-        /// Profile photo
-        /// </summary>
-        public string Avatar { get; set; }
+        public string Bio { get; set; }
+        public string DateOfBirth { get; set; }
+        public string Gender { get; set; }
+
+        public ICollection<GetLookupCategory> Categories { get; set; }
+        public ICollection<GetLookupInterest> Interests { get; set; }    
     }
 }

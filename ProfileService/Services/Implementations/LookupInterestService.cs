@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace ProfileService.Services.Implementations
             _repository = repository;
         }
 
-        public async Task<ICollection<GetLookupInterest>> SearchAsync(SearchLookupInterest request)
+        public async Task<ICollection<GetLookupInterest>> SearchAsync(SearchLookupInterest? request)
         {
             var interests = await _repository.SearchAsync(request);
             return _mapper.Map<ICollection<GetLookupInterest>>(interests);
@@ -38,6 +39,19 @@ namespace ProfileService.Services.Implementations
             {
                 var model = _mapper.Map<Interest>(interest);
                 await _repository.InsertAsync(model);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+        
+        public async Task InsertManyAsync(ICollection<NewLookupInterest> interests)
+        {
+            try
+            {
+                var model = _mapper.Map<ICollection<Interest>>(interests);
+                await _repository.InsertManyAsync(model);
             }
             catch (Exception e)
             {

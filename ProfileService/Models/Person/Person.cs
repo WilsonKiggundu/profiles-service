@@ -28,8 +28,6 @@ namespace ProfileService.Models.Person
         /// </summary>
         [Required]
         public string Lastname { get; set; }
-
-        [Required]
         public string DateOfBirth { get; set; }
 
         [Required]

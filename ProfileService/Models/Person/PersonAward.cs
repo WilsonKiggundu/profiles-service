@@ -8,30 +8,17 @@ namespace ProfileService.Models.Person
     /// </summary>
     public class PersonAward : BaseModel
     {
-        /// <summary>
-        /// 
-        /// </summary>
         public Guid PersonId { get; set; }
-        
-        /// <summary>
-        /// 
-        /// </summary>
         public Person Person { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Description { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Date { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
+        
         public string AwardedBy { get; set; }
+        public string Title { get; set; }
+        public string FieldOfStudy { get; set; }
+        public string StartYear { get; set; }
+        public string EndYear { get; set; }
+        public string Grade { get; set; }
+        public string Activities { get; set; }
+        public string Description { get; set; }
         
     }
 }

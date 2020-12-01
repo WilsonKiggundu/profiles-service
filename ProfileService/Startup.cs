@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProfileService.Data;
@@ -25,6 +26,8 @@ namespace ProfileService
     /// </summary>
     public class Startup
     {
+        public readonly string AllowedOrigins = "_allowedOrigins";
+        
         /// <summary>
         /// constructor
         /// </summary>
@@ -45,6 +48,18 @@ namespace ProfileService
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            IdentityModelEventSource.ShowPII = true;
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.WithOrigins("*")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+
+            services.AddResponseCaching();
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
@@ -55,9 +70,7 @@ namespace ProfileService
 
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ProfileServiceContext>(options => options.UseNpgsql(connectionString));
-
             
-
             services.AddDependencyInjection();
 
             services.AddSwaggerGen(context =>
@@ -85,11 +98,12 @@ namespace ProfileService
             services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                 {
-                    options.Authority = Configuration.GetConnectionString("Authentication:Server");
+                    options.Authority = Configuration.Authority();
 
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateAudience = false
+                        ValidateAudience = false,
+                        ValidIssuer = Configuration.Authority()
                     };
                 });
         }
@@ -112,6 +126,8 @@ namespace ProfileService
                 context.RoutePrefix = "docs";
             });
 
+            app.UseCors();
+
             app.UseReDoc(options =>
             {
                 options.SpecUrl("/swagger/v1/swagger.json");
@@ -122,6 +138,8 @@ namespace ProfileService
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseResponseCaching();
 
             app.UseEndpoints(endpoints =>
             {

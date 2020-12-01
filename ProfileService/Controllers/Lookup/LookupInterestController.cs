@@ -14,7 +14,6 @@ namespace ProfileService.Controllers.Lookup
     /// LookupInterest controller
     /// </summary>
     [Route("api/lookup/interests")]
-    [AllowAnonymous]
     public class LookupInterestController : BaseController
     {
         private readonly ILookupInterestService _service;
@@ -27,12 +26,11 @@ namespace ProfileService.Controllers.Lookup
         /// <summary>
         /// SEARCH lookup interest
         /// </summary>
-        /// <param name="request"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<GetLookupInterest>> Get(SearchLookupInterest request)
+        public async Task<IEnumerable<GetLookupInterest>> Get()
         {
-            return await _service.SearchAsync(request);
+            return await _service.SearchAsync(null);
         }
 
         /// <summary>
@@ -41,7 +39,7 @@ namespace ProfileService.Controllers.Lookup
         /// <param name="interest"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task Create([FromBody] NewLookupInterest interest)
+        public async Task Create(NewLookupInterest interest)
         {
             try
             {

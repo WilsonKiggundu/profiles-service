@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -29,12 +30,12 @@ namespace ProfileService.Controllers.Person
         /// <summary>
         /// SEARCH persons
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="exclude"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ICollection<GetPerson>> Get(SearchPerson request)
+        public async Task<ICollection<GetPerson>> Get(Guid? exclude = null)
         {
-            return await _personService.SearchAsync(request);
+            return await _personService.SearchAsync(exclude);
         }
         
         /// <summary>
@@ -43,9 +44,10 @@ namespace ProfileService.Controllers.Person
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<GetPerson> GetOne(Guid id)
+        public async Task<IActionResult> GetOne(Guid id)
         {
-            return await _personService.GetByIdAsync(id);
+            var profile = await _personService.GetByIdAsync(id);
+            return Ok(profile);
         }
 
         /// <summary>
@@ -54,11 +56,16 @@ namespace ProfileService.Controllers.Person
         /// <param name="person"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<NewPerson> Create([FromBody] NewPerson person)
+        public async Task<NewPerson> Create(NewPerson person)
         {
             try
             {
                 await _personService.InsertAsync(person);
+                if (person.Interests.Count > 0)
+                {
+                    
+                }
+                // await _personService.AddInterestAsync();
                 return person;
             }
             catch (Exception e)

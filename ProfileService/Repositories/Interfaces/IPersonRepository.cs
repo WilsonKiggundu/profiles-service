@@ -12,7 +12,7 @@ namespace ProfileService.Repositories.Interfaces
     /// </summary>
     public interface IPersonRepository : IGenericRepository<Person>
     {
-        Task<ICollection<Person>> SearchAsync(SearchPerson request);
+        Task<ICollection<Person>> SearchAsync(Guid? exclude);
         
         #region Person Awards
     
