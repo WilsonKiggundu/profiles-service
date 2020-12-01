@@ -33,15 +33,20 @@ namespace ProfileService.Services.Implementations
         public async Task<GetPerson> GetByIdAsync(Guid id)
         {
             var result = await _repository.GetByIdAsync(id);
+
+            // if (result == null) return new GetPerson();
+            
             var person = _mapper.Map<GetPerson>(result);
-            person.Gender = result.Gender switch
-            {
-                Gender.Female => "female",
-                Gender.Male => "male",
-                _ => "other"
-            };
+            // person.Gender = result.Gender switch
+            // {
+            //     Gender.Female => "female",
+            //     Gender.Male => "male",
+            //     _ => "other"
+            // };
             
             return person;
+
+
         }
 
         public async Task InsertAsync(NewPerson newPerson)

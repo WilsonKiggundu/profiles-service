@@ -47,6 +47,9 @@ namespace ProfileService.Controllers.Person
         public async Task<IActionResult> GetOne(Guid id)
         {
             var profile = await _personService.GetByIdAsync(id);
+            
+            
+            
             return Ok(profile);
         }
 
