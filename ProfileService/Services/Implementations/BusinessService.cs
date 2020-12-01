@@ -29,7 +29,7 @@ namespace ProfileService.Services.Implementations
         public async Task<ICollection<GetBusiness>> SearchAsync(SearchBusiness request)
         {
             var results = await _repository.SearchAsync(request);
-            return _mapper.Map<ICollection<GetBusiness>>(results);
+            return _mapper.Map<List<GetBusiness>>(results);
         }
         
         public async Task<GetBusiness> GetByIdAsync(Guid id)
@@ -42,7 +42,22 @@ namespace ProfileService.Services.Implementations
         {
             try
             {
-                var business = _mapper.Map<Business>(model);
+                var business = new Business
+                {    
+                    Name = model.Name,
+                    Description = model.Description,
+                    Website = model.Website,
+                    EmployeeCount = int.Parse(model.NumberOfEmployees),
+                    IncorporationDate = Convert.ToDateTime(model.DateOfIncorporation),
+                    Category = model.Category switch
+                    {
+                        "1" => BusinessCategory.Fintech,
+                        "2" => BusinessCategory.EdTech,
+                        "3" => BusinessCategory.AgriTech,
+                        "4" => BusinessCategory.LegalTech,
+                        _ => BusinessCategory.Other
+                    }
+                };
                 await _repository.InsertAsync(business);
             }
             catch (Exception e)

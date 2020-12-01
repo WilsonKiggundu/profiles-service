@@ -18,6 +18,8 @@ namespace ProfileService.Models.Business
         /// </summary>
         public string Description { get; set; }
 
+        public BusinessCategory Category { get; set; }
+
         /// <summary>
         /// Number of employees
         /// </summary>
@@ -42,5 +44,14 @@ namespace ProfileService.Models.Business
                               && IncorporationDate.HasValue
                               && EmployeeCount.HasValue;
         }
+    }
+
+    public enum BusinessCategory
+    {
+        Fintech = 1,
+        EdTech = 2,
+        AgriTech = 3,   
+        LegalTech = 4,
+        Other = 99
     }
 }

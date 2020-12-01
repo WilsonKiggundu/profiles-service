@@ -20,7 +20,7 @@ namespace ProfileService.Contracts.Business
         /// <summary>
         /// Number of employees
         /// </summary>
-        public int? NumberOfEmployees { get; set; }
+        public string NumberOfEmployees { get; set; }
         
         /// <summary>
         /// Date of incorporation   
@@ -31,5 +31,7 @@ namespace ProfileService.Contracts.Business
         /// Website url
         /// </summary>
         public string Website { get; set; }
+        
+        public string Category { get; set; }
     }
 }

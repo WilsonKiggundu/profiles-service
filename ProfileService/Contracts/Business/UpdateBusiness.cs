@@ -32,5 +32,7 @@ namespace ProfileService.Contracts.Business
         /// Website url
         /// </summary>
         public string Website { get; set; }
+
+        public string Category { get; set; }
     }
 }

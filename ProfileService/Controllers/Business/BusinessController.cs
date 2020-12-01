@@ -25,11 +25,11 @@ namespace ProfileService.Controllers.Business
         /// <summary>
         /// SEARCH businesses
         /// </summary>
-        /// <param name="request"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ICollection<GetBusiness>> Get(SearchBusiness request)
+        public async Task<ICollection<GetBusiness>> Get()
         {
+            var request = new SearchBusiness();
             return await _businessService.SearchAsync(request);
         }
         
@@ -50,7 +50,7 @@ namespace ProfileService.Controllers.Business
         /// <param name="business"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<NewBusiness> Create([FromBody] NewBusiness business)
+        public async Task<NewBusiness> Create(NewBusiness business)
         {
             try
             {
