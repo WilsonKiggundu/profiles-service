@@ -115,6 +115,12 @@ namespace ProfileService
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetService<ProfileServiceContext>();
+                context.Database.Migrate();
+            }
+            
             app.UseExceptionHandler(error => error.UseCustomErrors(env));
 
             app.UseHttpsRedirection();

@@ -25,6 +25,7 @@ namespace ProfileService
             try
             {
                 Log.Information("Starting up");
+
                 CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)

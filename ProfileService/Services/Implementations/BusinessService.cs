@@ -35,7 +35,19 @@ namespace ProfileService.Services.Implementations
         public async Task<GetBusiness> GetByIdAsync(Guid id)
         {
             var result = await _repository.GetByIdAsync(id);
-            return _mapper.Map<GetBusiness>(result);
+            var business = new GetBusiness
+            {
+                Name = result.Name,
+                Description = result.Description,
+                Category = result.Category.ToString(),
+                Id = result.Id,
+                Website = result.Website,
+                DateCreated = result.DateCreated,
+                DateOfIncorporation = result.IncorporationDate?.ToString("MMM, yyyy"),
+                NumberOfEmployees = result.EmployeeCount
+                
+            };
+            return business;
         }
 
         public async Task InsertAsync(NewBusiness model)
