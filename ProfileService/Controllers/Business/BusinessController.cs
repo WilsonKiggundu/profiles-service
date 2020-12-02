@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ProfileService.Contracts.Business;
+using ProfileService.Contracts.Business.Role;
 using ProfileService.Controllers.Common;
+using ProfileService.Models.Business;
 using ProfileService.Services.Interfaces;
 
 namespace ProfileService.Controllers.Business
@@ -16,10 +20,12 @@ namespace ProfileService.Controllers.Business
     public class BusinessController : BaseController
     {
         private readonly IBusinessService _businessService;
+        private readonly ILogger<BusinessController> _logger;
 
-        public BusinessController(IBusinessService businessService)
+        public BusinessController(IBusinessService businessService, ILogger<BusinessController> logger)
         {
             _businessService = businessService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -70,10 +76,11 @@ namespace ProfileService.Controllers.Business
         /// <returns></returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<UpdateBusiness> Update([FromBody] UpdateBusiness business)
+        public async Task<UpdateBusiness> Update(UpdateBusiness business)
         {
             try
             {
+                _logger.LogCritical(JsonConvert.SerializeObject(business));
                 await _businessService.UpdateAsync(business);
                 return business;
             }

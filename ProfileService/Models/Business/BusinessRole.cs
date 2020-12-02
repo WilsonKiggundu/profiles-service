@@ -26,6 +26,7 @@ namespace ProfileService.Models.Business
         Coo = 7,
         Pr = 8,
         Marketing = 9,
-        Hr = 10
+        Hr = 10,
+        PageAdmin = 0
     }
 }

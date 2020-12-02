@@ -7,7 +7,7 @@ namespace ProfileService.Contracts.Business.Interest
     /// </summary>
     public class NewBusinessInterest
     {
+        public Guid InterestId { get; set; }
         public Guid BusinessId { get; set; } 
-        public string Details { get; set; }
     }
 }

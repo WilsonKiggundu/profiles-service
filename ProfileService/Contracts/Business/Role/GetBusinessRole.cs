@@ -9,7 +9,7 @@ namespace ProfileService.Contracts.Business.Role
     public class GetBusinessRole : BaseModel
     {
         public Guid BusinessId { get; set; }
-        public Guid ContactId { get; set; }
+        public Guid PersonId { get; set; }    
         public string Role { get; set; }
     }
 }

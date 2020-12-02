@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ProfileService.Contracts.Business;
 using ProfileService.Contracts.Business.Address;
 using ProfileService.Contracts.Business.Contact;
@@ -19,11 +21,13 @@ namespace ProfileService.Services.Implementations
     {
         private readonly IBusinessRepository _repository;
         private readonly IMapper _mapper;
+        private readonly ILogger<BusinessService> _logger;
 
-        public BusinessService(IBusinessRepository repository, IMapper mapper)
+        public BusinessService(IBusinessRepository repository, IMapper mapper, ILogger<BusinessService> logger)
         {
             _repository = repository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<ICollection<GetBusiness>> SearchAsync(SearchBusiness request)
@@ -67,10 +71,22 @@ namespace ProfileService.Services.Implementations
                         "2" => BusinessCategory.EdTech,
                         "3" => BusinessCategory.AgriTech,
                         "4" => BusinessCategory.LegalTech,
+                        "99" => BusinessCategory.Other,
                         _ => BusinessCategory.Other
-                    }
+                    },
+                    
                 };
                 await _repository.InsertAsync(business);
+                _logger.LogInformation(JsonConvert.SerializeObject(business));
+
+                var role = new BusinessRole
+                {
+                    BusinessId = business.Id,
+                    Role = RoleType.PageAdmin,
+                    PersonId = Guid.Parse(model.CreatedBy)
+                };
+                await _repository.AddRoleAsync(role);
+                _logger.LogInformation(JsonConvert.SerializeObject(role));
             }
             catch (Exception e)
             {
@@ -82,8 +98,29 @@ namespace ProfileService.Services.Implementations
         {
             try
             {
-                var business = _mapper.Map<Business>(model);
-                await _repository.InsertAsync(business);
+                var business = new Business
+                {    
+                    Id = model.Id,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Website = model.Website,
+                    EmployeeCount = int.Parse(model.NumberOfEmployees),
+                    IncorporationDate = Convert.ToDateTime(model.DateOfIncorporation),
+                    Category = model.Category switch
+                    {
+                        "1" => BusinessCategory.Fintech,
+                        "2" => BusinessCategory.EdTech,
+                        "3" => BusinessCategory.AgriTech,
+                        "4" => BusinessCategory.LegalTech,
+                        "99" => BusinessCategory.Other,
+                        _ => BusinessCategory.Other
+                    },
+                    
+                };
+                
+                _logger.LogInformation(JsonConvert.SerializeObject(business));
+                
+                await _repository.UpdateAsync(business);
             }
             catch (Exception e)
             {
@@ -194,7 +231,9 @@ namespace ProfileService.Services.Implementations
         public async Task<IEnumerable<GetBusinessInterest>> GetInterestsAsync(Guid businessId)
         {
             var interests = await _repository.GetInterestsAsync(businessId);
-            return _mapper.Map<IEnumerable<GetBusinessInterest>>(interests);
+            _logger.LogInformation(JsonConvert.SerializeObject(interests));
+            
+            return _mapper.Map<ICollection<GetBusinessInterest>>(interests);
         }
 
         public async Task AddInterestAsync(NewBusinessInterest interest)

@@ -21,7 +21,7 @@ namespace ProfileService.Contracts.Business
         /// <summary>
         /// Number of employees
         /// </summary>
-        public int? NumberOfEmployees { get; set; }
+        public string NumberOfEmployees { get; set; }
         
         /// <summary>
         /// Date of incorporation   

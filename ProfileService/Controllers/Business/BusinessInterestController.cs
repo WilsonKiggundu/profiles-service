@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ProfileService.Contracts.Business.Interest;
 using ProfileService.Controllers.Common;
 using ProfileService.Services.Interfaces;
@@ -16,10 +18,12 @@ namespace ProfileService.Controllers.Business
     public class BusinessInterestController : BaseController
     {
         private readonly IBusinessService _businessService;
+        private readonly ILogger<BusinessInterestController> _logger;
 
-        public BusinessInterestController(IBusinessService businessService)
+        public BusinessInterestController(IBusinessService businessService, ILogger<BusinessInterestController> logger)
         {
             _businessService = businessService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -39,10 +43,11 @@ namespace ProfileService.Controllers.Business
         /// <param name="interest"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task Create([FromBody] NewBusinessInterest interest)
+        public async Task Create(NewBusinessInterest interest)
         {
             try
             {
+                _logger.LogInformation(JsonConvert.SerializeObject(interest));
                 await _businessService.AddInterestAsync(interest);
             }
             catch (Exception e)
