@@ -3,6 +3,7 @@ using ProfileService.Models.Business;
 using ProfileService.Models.Common;
 using ProfileService.Models.Investor;
 using ProfileService.Models.Person;
+using ProfileService.Models.Posts;
 
 namespace ProfileService.Data
 {
@@ -47,7 +48,6 @@ namespace ProfileService.Data
         public DbSet<Need> LookupNeeds { get; set; }
         
         #endregion
-    
         
         #region Person
         
@@ -79,6 +79,14 @@ namespace ProfileService.Data
         public DbSet<InvestorInterest> InvestorInterests { get; set; }
         public DbSet<InvestorContact> InvestorContacts { get; set; }
 
+        #endregion
+
+        #region Posts
+
+        public DbSet<Article> Articles { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        
         #endregion
     }
 }

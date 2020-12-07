@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Data;
@@ -9,9 +10,10 @@ using ProfileService.Data;
 namespace ProfileService.Migrations
 {
     [DbContext(typeof(ProfileServiceContext))]
-    partial class ProfileServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20201202102920_AddedBlogModels")]
+    partial class AddedBlogModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -837,9 +839,6 @@ namespace ProfileService.Migrations
                     b.Property<Guid?>("ArticleId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AuthorId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("DateCreated")
                         .HasColumnType("text");
 
@@ -858,8 +857,6 @@ namespace ProfileService.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ArticleId");
-
-                    b.HasIndex("AuthorId");
 
                     b.HasIndex("PostId");
 
@@ -1130,12 +1127,6 @@ namespace ProfileService.Migrations
                     b.HasOne("ProfileService.Models.Posts.Article", "Article")
                         .WithMany()
                         .HasForeignKey("ArticleId");
-
-                    b.HasOne("ProfileService.Models.Person.Person", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.HasOne("ProfileService.Models.Posts.Post", "Post")
                         .WithMany()
