@@ -7,6 +7,8 @@ namespace ProfileService.Models.Common
     {
         [Required]
         public Guid OwnerId { get; set; }
+
+        public Guid? EntityId { get; set; }
         
         [Required]
         public string FileName { get; set; }

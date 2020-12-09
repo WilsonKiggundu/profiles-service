@@ -22,6 +22,8 @@ namespace ProfileService.Repositories.Implementations
         {
             return _context.Posts
                 .Include(p => p.Author)
+                .Include(p => p.Uploads)
+                .Include(p => p.Comments)
                 .OrderByDescending(q => q.DateCreated)
                 .ToList();
         }

@@ -9,6 +9,6 @@ namespace ProfileService.Contracts.Blog.Post
         public string Details { get; set; }
         public Guid AuthorId { get; set; }
         
-        // public ICollection<GetLookupUpload> Uploads { get; set; }
+        public string Uploads { get; set; }
     }
 }
