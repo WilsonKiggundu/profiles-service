@@ -1,4 +1,9 @@
 using System.Collections.Generic;
+using ProfileService.Contracts.Business.Address;
+using ProfileService.Contracts.Business.Contact;
+using ProfileService.Contracts.Business.Product;
+using ProfileService.Contracts.Business.Role;
+using ProfileService.Contracts.Lookup.Interest;
 using ProfileService.Models.Business;
 using ProfileService.Models.Common;
 
@@ -9,31 +14,17 @@ namespace ProfileService.Contracts.Business
     /// </summary>
     public class GetBusiness : BaseModel
     {
-        /// <summary>
-        /// Name of the business
-        /// </summary>
         public string Name { get; set; }
-        
-        /// <summary>
-        /// Description of the business
-        /// </summary>
         public string Description { get; set; }
-        
-        /// <summary>
-        /// Number of employees
-        /// </summary>
         public int? NumberOfEmployees { get; set; }
-        
-        /// <summary>
-        /// Date of incorporation   
-        /// </summary>
         public string DateOfIncorporation { get; set; }
-        
-        /// <summary>
-        /// Website url
-        /// </summary>
-        public string Website { get; set; }    
-
+        public string Website { get; set; }
+        public string CoverPhoto { get; set; }
         public string Category { get; set; }
+        public ICollection<GetLookupInterest> Interests { get; set; }
+        public ICollection<GetBusinessAddress> Addresses { get; set; }
+        public ICollection<GetBusinessProduct> Products { get; set; }
+        public ICollection<GetBusinessRole> Roles { get; set; }
+        public ICollection<GetBusinessContact> Contacts { get; set; }
     }
 }

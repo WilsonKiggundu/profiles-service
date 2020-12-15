@@ -28,9 +28,11 @@ namespace ProfileService.Controllers.Blog
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<GetPost> Get()
-        {
-            return _postService.GetAll();
+        public IEnumerable<GetPost> Get(Guid? personId = null)
+        {    
+            return personId.HasValue ? 
+                _postService.GetPostsByAuthorId(personId.Value) : 
+                _postService.GetAll();
         }
         
         /// <summary>

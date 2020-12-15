@@ -32,7 +32,8 @@ namespace ProfileService.Contracts.Business
         /// </summary>
         public string Website { get; set; }
         
-        public string Category { get; set; }
+        public string Category { get; set; }    
+        public string CoverPhoto { get; set; }
 
         public string CreatedBy { get; set; }
     }

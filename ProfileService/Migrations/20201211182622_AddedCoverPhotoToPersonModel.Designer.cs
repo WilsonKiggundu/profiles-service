@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Data;
@@ -9,9 +10,10 @@ using ProfileService.Data;
 namespace ProfileService.Migrations
 {
     [DbContext(typeof(ProfileServiceContext))]
-    partial class ProfileServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20201211182622_AddedCoverPhotoToPersonModel")]
+    partial class AddedCoverPhotoToPersonModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,9 +29,6 @@ namespace ProfileService.Migrations
 
                     b.Property<int>("Category")
                         .HasColumnType("integer");
-
-                    b.Property<string>("CoverPhoto")
-                        .HasColumnType("text");
 
                     b.Property<string>("DateCreated")
                         .HasColumnType("text");
@@ -70,9 +69,6 @@ namespace ProfileService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AddressLine")
-                        .HasColumnType("text");
-
                     b.Property<string>("Building")
                         .HasColumnType("text");
 
@@ -91,16 +87,16 @@ namespace ProfileService.Migrations
                     b.Property<string>("DateLastUpdated")
                         .HasColumnType("text");
 
+                    b.Property<string>("District")
+                        .HasColumnType("text");
+
                     b.Property<string>("Floor")
                         .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("PostalCode")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Region")
+                    b.Property<string>("Postal")
                         .HasColumnType("text");
 
                     b.Property<string>("Street")
@@ -490,9 +486,6 @@ namespace ProfileService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AddressLine")
-                        .HasColumnType("text");
-
                     b.Property<string>("Building")
                         .HasColumnType("text");
 
@@ -508,6 +501,9 @@ namespace ProfileService.Migrations
                     b.Property<string>("DateLastUpdated")
                         .HasColumnType("text");
 
+                    b.Property<string>("District")
+                        .HasColumnType("text");
+
                     b.Property<string>("Floor")
                         .HasColumnType("text");
 
@@ -517,10 +513,7 @@ namespace ProfileService.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("PostalCode")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Region")
+                    b.Property<string>("Postal")
                         .HasColumnType("text");
 
                     b.Property<string>("Street")

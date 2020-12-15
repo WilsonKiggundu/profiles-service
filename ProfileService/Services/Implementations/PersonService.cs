@@ -7,6 +7,7 @@ using ProfileService.Contracts.Person.Awards;
 using ProfileService.Contracts.Person.Categories;
 using ProfileService.Contracts.Person.Interests;
 using ProfileService.Contracts.Person.Skills;
+using ProfileService.Models.Common;
 using ProfileService.Models.Person;
 using ProfileService.Repositories.Interfaces;
 using ProfileService.Services.Interfaces;
@@ -16,12 +17,14 @@ namespace ProfileService.Services.Implementations
     public class PersonService : IPersonService
     {
         private readonly IPersonRepository _repository;
+        private readonly ILookupInterestRepository _interestRepository;
         private readonly IMapper _mapper;
 
-        public PersonService(IPersonRepository repository, IMapper mapper)
+        public PersonService(IPersonRepository repository, IMapper mapper, ILookupInterestRepository interestRepository)
         {
             _repository = repository;
             _mapper = mapper;
+            _interestRepository = interestRepository;
         }
 
         public async Task<ICollection<GetPerson>> SearchAsync(Guid? exclude = null)
@@ -35,18 +38,16 @@ namespace ProfileService.Services.Implementations
             var result = await _repository.GetByIdAsync(id);
 
             // if (result == null) return new GetPerson();
-            
+
             var person = _mapper.Map<GetPerson>(result);
-            // person.Gender = result.Gender switch
-            // {
-            //     Gender.Female => "female",
-            //     Gender.Male => "male",
-            //     _ => "other"
-            // };
-            
+            person.Gender = result.Gender switch
+            {
+                Gender.Female => "female",
+                Gender.Male => "male",
+                _ => "other"
+            };
+
             return person;
-
-
         }
 
         public async Task InsertAsync(NewPerson newPerson)
@@ -57,7 +58,7 @@ namespace ProfileService.Services.Implementations
                 Firstname = newPerson.FirstName,
                 Lastname = newPerson.LastName,
                 Bio = newPerson.Bio,
-                Gender = newPerson.Gender switch    
+                Gender = newPerson.Gender switch
                 {
                     "male" => Gender.Male,
                     "female" => Gender.Female,
@@ -67,7 +68,7 @@ namespace ProfileService.Services.Implementations
                 DateOfBirth = newPerson.DateOfBirth,
                 UserId = newPerson.UserId
             };
-            
+
             try
             {
                 await _repository.InsertAsync(person);
@@ -86,7 +87,9 @@ namespace ProfileService.Services.Implementations
                 Firstname = updatePerson.FirstName,
                 Lastname = updatePerson.LastName,
                 Bio = updatePerson.Bio,
-                Gender = updatePerson.Gender switch    
+                Avatar = updatePerson.Avatar,
+                CoverPhoto = updatePerson.CoverPhoto,
+                Gender = updatePerson.Gender switch
                 {
                     "male" => Gender.Male,
                     "female" => Gender.Female,
@@ -172,7 +175,23 @@ namespace ProfileService.Services.Implementations
         {
             try
             {
-                var model = _mapper.Map<PersonInterest>(interest);
+                var interestId = interest.InterestId ?? Guid.NewGuid();
+
+                if (!interest.InterestId.HasValue && !string.IsNullOrEmpty(interest.Name))
+                {
+                    await _interestRepository.InsertAsync(new Interest
+                    {
+                        Id = interestId,
+                        Category = interest.Name
+                    });
+                }
+
+                var model = new PersonInterest
+                {
+                    InterestId = interestId,
+                    PersonId = interest.PersonId
+                };
+
                 await _repository.AddInterestAsync(model);
             }
             catch (Exception e)
@@ -212,12 +231,14 @@ namespace ProfileService.Services.Implementations
             return _mapper.Map<IEnumerable<GetPersonSkill>>(skills);
         }
 
-        public async Task AddSkillAsync(NewPersonSkill skill)
+        public async Task<NewPersonSkill> AddSkillAsync(NewPersonSkill skill)
         {
             try
             {
                 var model = _mapper.Map<PersonSkill>(skill);
                 await _repository.AddSkillAsync(model);
+
+                return _mapper.Map<NewPersonSkill>(model);
             }
             catch (Exception e)
             {

@@ -27,6 +27,16 @@ namespace ProfileService.Repositories.Implementations
                 .OrderByDescending(q => q.DateCreated)
                 .ToList();
         }
+        public IEnumerable<Post> GetPostsByAuthorId(Guid authorId)
+        {
+            return _context.Posts
+                .Where(p => p.AuthorId == authorId)
+                .Include(p => p.Author)
+                .Include(p => p.Uploads)
+                .Include(p => p.Comments)
+                .OrderByDescending(q => q.DateCreated)
+                .ToList();
+        }
 
         public async Task<Post> GetByIdAsync(Guid id)
         {

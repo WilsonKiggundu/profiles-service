@@ -25,9 +25,9 @@ namespace ProfileService.Services.Implementations
             _logger = logger;
         }
 
-        public async Task<ICollection<GetLookupCategory>> SearchAsync(SearchLookupCategory request)
+        public ICollection<GetLookupCategory> SearchAsync()
         {
-            var categories = await _repository.SearchAsync(request);
+            var categories =  _repository.GetAll();
             return _mapper.Map<ICollection<GetLookupCategory>>(categories);
         }
 

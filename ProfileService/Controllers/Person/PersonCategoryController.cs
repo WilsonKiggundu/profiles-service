@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ProfileService.Contracts.Person.Categories;
 using ProfileService.Controllers.Common;
 using ProfileService.Services.Interfaces;
@@ -16,14 +18,16 @@ namespace ProfileService.Controllers.Person
     public class PersonCategoryController : BaseController
     {
         private readonly IPersonService _personService;
+        private readonly ILogger<PersonCategoryController> _logger;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="personService"></param>
-        public PersonCategoryController(IPersonService personService)
+        public PersonCategoryController(IPersonService personService, ILogger<PersonCategoryController> logger)
         {
             _personService = personService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -34,7 +38,9 @@ namespace ProfileService.Controllers.Person
         [HttpGet]
         public async Task<IEnumerable<GetPersonCategory>> Get(Guid personId)
         {
-            return await _personService.GetCategoriesAsync(personId);
+            var categories = await _personService.GetCategoriesAsync(personId);
+            _logger.LogInformation(JsonConvert.SerializeObject(categories));
+            return categories;
         }
 
         /// <summary>
@@ -43,7 +49,7 @@ namespace ProfileService.Controllers.Person
         /// <param name="category"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<NewPersonCategory> Create([FromBody] NewPersonCategory category)
+        public async Task<NewPersonCategory> Create(NewPersonCategory category)
         {
             try
             {

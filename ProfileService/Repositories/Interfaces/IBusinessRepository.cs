@@ -58,7 +58,7 @@ namespace ProfileService.Repositories.Interfaces
         
         Task<IEnumerable<BusinessProduct>> GetProductsAsync(Guid businessId);
         Task AddProductAsync(BusinessProduct product);
-        Task UpdateProductAsync(BusinessProduct product);    
+        Task<BusinessProduct> UpdateProductAsync(BusinessProduct product);    
         Task DeleteProductAsync(Guid productId);    
 
         #endregion

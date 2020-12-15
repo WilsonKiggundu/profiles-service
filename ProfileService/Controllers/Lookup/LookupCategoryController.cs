@@ -29,9 +29,9 @@ namespace ProfileService.Controllers.Lookup
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<GetLookupCategory>> Get(SearchLookupCategory request)
+        public IEnumerable<GetLookupCategory> Get()
         {
-            return await _service.SearchAsync(request);
+            return _service.SearchAsync();
         }
 
         /// <summary>

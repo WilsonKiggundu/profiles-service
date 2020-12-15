@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,7 @@ using ProfileService.Contracts.Business.Need;
 using ProfileService.Contracts.Business.Product;
 using ProfileService.Contracts.Business.Role;
 using ProfileService.Models.Business;
+using ProfileService.Models.Common;
 using ProfileService.Repositories.Interfaces;
 using ProfileService.Services.Interfaces;
 
@@ -20,14 +22,16 @@ namespace ProfileService.Services.Implementations
     public class BusinessService : IBusinessService
     {
         private readonly IBusinessRepository _repository;
+        private readonly ILookupInterestRepository _interestRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<BusinessService> _logger;
 
-        public BusinessService(IBusinessRepository repository, IMapper mapper, ILogger<BusinessService> logger)
+        public BusinessService(IBusinessRepository repository, IMapper mapper, ILogger<BusinessService> logger, ILookupInterestRepository interestRepository)
         {
             _repository = repository;
             _mapper = mapper;
             _logger = logger;
+            _interestRepository = interestRepository;
         }
 
         public async Task<ICollection<GetBusiness>> SearchAsync(SearchBusiness request)
@@ -47,6 +51,7 @@ namespace ProfileService.Services.Implementations
                 Id = result.Id,
                 Website = result.Website,
                 DateCreated = result.DateCreated,
+                CoverPhoto = result.CoverPhoto,
                 DateOfIncorporation = result.IncorporationDate?.ToString("MMM, yyyy"),
                 NumberOfEmployees = result.EmployeeCount
                 
@@ -63,6 +68,7 @@ namespace ProfileService.Services.Implementations
                     Name = model.Name,
                     Description = model.Description,
                     Website = model.Website,
+                    CoverPhoto = model.CoverPhoto,
                     EmployeeCount = int.Parse(model.NumberOfEmployees),
                     IncorporationDate = Convert.ToDateTime(model.DateOfIncorporation),
                     Category = model.Category switch
@@ -104,8 +110,9 @@ namespace ProfileService.Services.Implementations
                     Name = model.Name,
                     Description = model.Description,
                     Website = model.Website,
-                    EmployeeCount = int.Parse(model.NumberOfEmployees),
-                    IncorporationDate = Convert.ToDateTime(model.DateOfIncorporation),
+                    EmployeeCount = model.NumberOfEmployees,
+                    CoverPhoto = model.CoverPhoto,
+                    //IncorporationDate = Convert.ToDateTime(model.DateOfIncorporation),
                     Category = model.Category switch
                     {
                         "1" => BusinessCategory.Fintech,
@@ -146,12 +153,33 @@ namespace ProfileService.Services.Implementations
             return _mapper.Map<IEnumerable<GetBusinessAddress>>(addresses);
         }
 
-        public async Task AddAddressAsync(NewBusinessAddress address)
+        public async Task<NewBusinessAddress> AddAddressAsync(NewBusinessAddress address)
         {
             try
             {
-                var model = _mapper.Map<BusinessAddress>(address);
+                var model = new BusinessAddress
+                {
+                    Building = address.Building,
+                    City = address.City,
+                    Country = address.Country,
+                    Floor = address.Floor,
+                    Region = address.Region,
+                    Street = address.Street,
+                    AddressLine = address.AddressLine,
+                    PostalCode = address.PostalCode,
+                    BusinessId = address.BusinessId,
+                    Type = address.Type switch
+                    {
+                        "1" => AddressType.Mailing,
+                        "2" => AddressType.Physical,
+                        "3" => AddressType.Billing,
+                        "99" => AddressType.Other,
+                        _ => AddressType.Other
+                    }
+                };
+                
                 await _repository.AddAddressAsync(model);
+                return _mapper.Map<NewBusinessAddress>(model);
             }
             catch (Exception e)
             {
@@ -236,12 +264,31 @@ namespace ProfileService.Services.Implementations
             return _mapper.Map<ICollection<GetBusinessInterest>>(interests);
         }
 
-        public async Task AddInterestAsync(NewBusinessInterest interest)
+        public async Task<GetBusinessInterest> AddInterestAsync(NewBusinessInterest interest)
         {
             try
             {
-                var model = _mapper.Map<BusinessInterest>(interest);
+                var interestId = interest.InterestId ?? Guid.NewGuid();
+                
+                if (!interest.InterestId.HasValue && !string.IsNullOrEmpty(interest.Name))
+                {
+                    await _interestRepository.InsertAsync(new Interest
+                    {
+                        Id = interestId,
+                        Category = interest.Name
+                    });
+                }
+                
+                var model = new BusinessInterest
+                {
+                    BusinessId = interest.BusinessId,
+                    InterestId = interestId
+                };
                 await _repository.AddInterestAsync(model);
+
+                var r = await _interestRepository.GetByIdAsync(interestId);
+
+                return _mapper.Map<GetBusinessInterest>(model);
             }
             catch (Exception e)
             {
@@ -324,12 +371,13 @@ namespace ProfileService.Services.Implementations
             return _mapper.Map<IEnumerable<GetBusinessProduct>>(products);
         }
 
-        public async Task AddProductAsync(NewBusinessProduct address)
+        public async Task<GetBusinessProduct> AddProductAsync(NewBusinessProduct address)
         {
             try
             {
                 var model = _mapper.Map<BusinessProduct>(address);
                 await _repository.AddProductAsync(model);
+                return _mapper.Map<GetBusinessProduct>(model);
             }
             catch (Exception e)
             {
@@ -337,12 +385,14 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task UpdateProductAsync(UpdateBusinessProduct address)
+        public async Task<GetBusinessProduct> UpdateProductAsync(UpdateBusinessProduct address)
         {
             try
             {
                 var model = _mapper.Map<BusinessProduct>(address);
                 await _repository.UpdateProductAsync(model);
+
+                return _mapper.Map<GetBusinessProduct>(model);
             }
             catch (Exception e)
             {

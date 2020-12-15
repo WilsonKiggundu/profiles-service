@@ -74,13 +74,12 @@ namespace ProfileService.Controllers.Business
         /// </summary>
         /// <param name="business"></param>
         /// <returns></returns>
-        [HttpPut("{id}")]
+        [HttpPut]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<UpdateBusiness> Update(UpdateBusiness business)
         {
             try
             {
-                _logger.LogCritical(JsonConvert.SerializeObject(business));
                 await _businessService.UpdateAsync(business);
                 return business;
             }

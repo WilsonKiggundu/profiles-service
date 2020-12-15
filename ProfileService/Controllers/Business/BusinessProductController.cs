@@ -39,11 +39,11 @@ namespace ProfileService.Controllers.Business
         /// <param name="product"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task Create([FromBody] NewBusinessProduct product)
+        public async Task<GetBusinessProduct> Create([FromBody] NewBusinessProduct product)
         {
             try
             {
-                await _businessService.AddProductAsync(product);
+                return await _businessService.AddProductAsync(product);
             }
             catch (Exception e)
             {
@@ -58,11 +58,11 @@ namespace ProfileService.Controllers.Business
         /// <returns></returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task Update([FromBody] UpdateBusinessProduct product)
+        public async Task<GetBusinessProduct> Update([FromBody] UpdateBusinessProduct product)
         {
             try
             {
-                await _businessService.UpdateProductAsync(product);
+                return await _businessService.UpdateProductAsync(product);
             }
             catch (Exception e)
             {

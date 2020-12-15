@@ -7,7 +7,7 @@ namespace ProfileService.Services.Interfaces
 {
     public interface ILookupCategoryService : IService
     {
-        Task<ICollection<GetLookupCategory>> SearchAsync(SearchLookupCategory request);
+        ICollection<GetLookupCategory> SearchAsync();
         Task<GetLookupCategory> GetByIdAsync(Guid id);
         Task InsertAsync(NewLookupCategory category);
         Task UpdateAsync(UpdateLookupCategory category);

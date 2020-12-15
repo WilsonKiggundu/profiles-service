@@ -22,7 +22,7 @@ namespace ProfileService.Services.Interfaces
         #region Business Addresses
     
         Task<IEnumerable<GetBusinessAddress>> GetAddressesAsync(Guid businessId);
-        Task AddAddressAsync(NewBusinessAddress address);
+        Task<NewBusinessAddress> AddAddressAsync(NewBusinessAddress address);
         Task UpdateAddressAsync(UpdateBusinessAddress address);    
         Task DeleteAddressAsync(Guid addressId);    
 
@@ -40,7 +40,7 @@ namespace ProfileService.Services.Interfaces
         #region Business Interests
     
         Task<IEnumerable<GetBusinessInterest>> GetInterestsAsync(Guid businessId);
-        Task AddInterestAsync(NewBusinessInterest interest);
+        Task<GetBusinessInterest> AddInterestAsync(NewBusinessInterest interest);
         Task UpdateInterestAsync(UpdateBusinessInterest interest);    
         Task DeleteInterestAsync(Guid interestId);        
 
@@ -58,8 +58,8 @@ namespace ProfileService.Services.Interfaces
         #region Business Products
         
         Task<IEnumerable<GetBusinessProduct>> GetProductsAsync(Guid businessId);
-        Task AddProductAsync(NewBusinessProduct product);
-        Task UpdateProductAsync(UpdateBusinessProduct product);    
+        Task<GetBusinessProduct> AddProductAsync(NewBusinessProduct product);
+        Task<GetBusinessProduct> UpdateProductAsync(UpdateBusinessProduct product);    
         Task DeleteProductAsync(Guid productId);    
 
         #endregion

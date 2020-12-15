@@ -36,9 +36,7 @@ namespace ProfileService.Repositories.Implementations
         public async Task<ICollection<Person>> SearchAsync(Guid? exclude)
         {
             return await _context.Persons
-                .Where(p => p.Id != exclude)
-                .Include(p => p.Categories)
-                .Include(p => p.Interests)
+                //.Where(p => p.Id != exclude)
                 .ToListAsync();
         }
 
@@ -74,12 +72,16 @@ namespace ProfileService.Repositories.Implementations
 
         public async Task<IEnumerable<PersonCategory>> GetCategoriesAsync(Guid personId)
         {
-            throw new NotImplementedException();
+            return await _context.PersonCategories
+                .Include(p => p.Category)
+                .Where(p => p.PersonId == personId)
+                .ToListAsync();
         }
 
         public async Task AddCategoryAsync(PersonCategory category)
         {
-            throw new NotImplementedException();
+            await _context.PersonCategories.AddAsync(category);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateCategoryAsync(PersonCategory category)

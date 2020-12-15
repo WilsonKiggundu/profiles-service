@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using AutoMapper;
@@ -14,6 +16,7 @@ using Microsoft.OpenApi.Models;
 using ProfileService.Data;
 using ProfileService.Exceptions;
 using ProfileService.Extensions;
+using ProfileService.Models.Common;
 using ProfileService.Repositories.Implementations;
 using ProfileService.Repositories.Interfaces;
 using ProfileService.Services.Implementations;
@@ -118,7 +121,29 @@ namespace ProfileService
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetService<ProfileServiceContext>();
+                
                 context.Database.Migrate();
+                
+                var categories = new List<string>
+                {
+                    "Investor", 
+                    "Student", 
+                    "Entrepreneur", 
+                    "Professional", 
+                    "Intern" 
+                };
+                
+                categories.ForEach(category =>
+                {
+                    var exists = context.LookupCategories.Any(c => c.Name == category);
+                    if (!exists)
+                        context.LookupCategories.Add(new Category
+                        {
+                            Name = category
+                        });
+                });
+
+                context.SaveChanges();
             }
             
             app.UseExceptionHandler(error => error.UseCustomErrors(env));

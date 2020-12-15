@@ -42,7 +42,7 @@ namespace ProfileService.Services.Interfaces
         #region PersonSkills
 
         Task<IEnumerable<GetPersonSkill>> GetSkillsAsync(Guid investorId);
-        Task AddSkillAsync(NewPersonSkill award);
+        Task<NewPersonSkill> AddSkillAsync(NewPersonSkill award);
         Task UpdateSkillAsync(UpdatePersonSkill award);    
         Task DeleteSkillAsync(Guid awardId);    
 

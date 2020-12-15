@@ -47,8 +47,7 @@ namespace ProfileService.Controllers.Person
         {
             try
             {
-                await _personService.AddSkillAsync(skill);
-                return skill;
+                return await _personService.AddSkillAsync(skill);
             }
             catch (Exception e)
             {

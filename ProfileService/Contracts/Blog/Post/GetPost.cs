@@ -11,6 +11,7 @@ namespace ProfileService.Contracts.Blog.Post
     {
         public string Details { get; set; }
         public PostType Type { get; set; }
+        public Guid? ReferenceId { get; set; }
         public Guid AuthorId { get; set; }
         public GetPerson Author { get; set; }
         public ICollection<GetLookupUpload> Uploads { get; set; }

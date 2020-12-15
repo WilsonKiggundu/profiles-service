@@ -8,6 +8,7 @@ namespace ProfileService.Services.Interfaces
     public interface IPostService : IService
     {
         IEnumerable<GetPost> GetAll();
+        IEnumerable<GetPost> GetPostsByAuthorId(Guid authorId);
         Task<GetPost> GetByIdAsync(Guid id);
         Task InsertAsync(NewPost post);
         Task UpdateAsync(UpdatePost post);

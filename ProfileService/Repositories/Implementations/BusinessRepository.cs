@@ -141,9 +141,11 @@ namespace ProfileService.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateProductAsync(BusinessProduct product)
+        public async Task<BusinessProduct> UpdateProductAsync(BusinessProduct product)
         {
-            throw new NotImplementedException();
+            _context.BusinessProducts.Update(product);
+            await _context.SaveChangesAsync();
+            return product;
         }
 
         public async Task DeleteProductAsync(Guid productId)

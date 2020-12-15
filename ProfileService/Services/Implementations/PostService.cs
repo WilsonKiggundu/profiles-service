@@ -32,6 +32,12 @@ namespace ProfileService.Services.Implementations
             return _mapper.Map<ICollection<GetPost>>(_repository.GetAll());
         }
 
+        public IEnumerable<GetPost> GetPostsByAuthorId(Guid authorId)
+        {
+            var posts = _repository.GetPostsByAuthorId(authorId);
+            return _mapper.Map<ICollection<GetPost>>(posts);
+        }
+
         public async Task<GetPost> GetByIdAsync(Guid id)
         {
             var comment = await _repository.GetByIdAsync(id);

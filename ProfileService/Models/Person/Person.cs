@@ -41,8 +41,8 @@ namespace ProfileService.Models.Person
         /// <summary>
         /// Profile photo
         /// </summary>
-        public Guid? UploadId { get; set; }
-        public Upload Upload { get; set; }
+        public string Avatar { get; set; }    
+        public string CoverPhoto { get; set; }
 
         /// <summary>
         /// Personal interests

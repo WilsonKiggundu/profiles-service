@@ -35,6 +35,8 @@ namespace ProfileService.Models.Business
         /// </summary>
         public string Website { get; set; }
 
+        public string CoverPhoto { get; set; }
+
         [NotMapped] public bool ProfileComplete { get; set; }
 
         public Business()

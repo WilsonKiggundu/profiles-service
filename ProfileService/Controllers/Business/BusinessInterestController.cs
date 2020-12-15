@@ -43,12 +43,11 @@ namespace ProfileService.Controllers.Business
         /// <param name="interest"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task Create(NewBusinessInterest interest)
+        public async Task<GetBusinessInterest> Create(NewBusinessInterest interest)
         {
             try
             {
-                _logger.LogInformation(JsonConvert.SerializeObject(interest));
-                await _businessService.AddInterestAsync(interest);
+                return await _businessService.AddInterestAsync(interest);
             }
             catch (Exception e)
             {
