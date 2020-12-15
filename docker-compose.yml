@@ -6,7 +6,7 @@ services:
       dockerfile: ProfileService/Dockerfile
     container_name: profile-service-admin
     environment:
-      - VIRTUAL_HOST=profiles-test.innovationvillage.co.ug
+      - VIRTUAL_HOST=profiles.innovationvillage.co.ug
       - 'ConnectionStrings__DefaultConnection=Server=db; User Id=sa; Database=auth_dev_db; Port=5432; Password=sw33th0m3; SSL Mode=Prefer; Trust Server Certificate=true'
       - AdminConfiguration__RequireHttpsMetadata=false
       - DockerConfiguration__UpdateCaCertificate=true
