@@ -80,6 +80,7 @@ namespace ProfileService.Controllers.Business
         {
             try
             {
+                _logger.LogInformation(JsonConvert.SerializeObject(business));
                 await _businessService.UpdateAsync(business);
                 return business;
             }

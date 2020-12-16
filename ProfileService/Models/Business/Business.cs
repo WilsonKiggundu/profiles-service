@@ -18,7 +18,7 @@ namespace ProfileService.Models.Business
         /// </summary>
         public string Description { get; set; }
 
-        public BusinessCategory Category { get; set; }
+        public string Category { get; set; }
 
         /// <summary>
         /// Number of employees
@@ -28,7 +28,7 @@ namespace ProfileService.Models.Business
         /// <summary>
         /// Incorporation date
         /// </summary>
-        public DateTime? IncorporationDate { get; set; }
+        public string IncorporationDate { get; set; }
 
         /// <summary>
         /// Website URL
@@ -36,6 +36,7 @@ namespace ProfileService.Models.Business
         public string Website { get; set; }
 
         public string CoverPhoto { get; set; }
+        public string Avatar { get; set; }    
 
         [NotMapped] public bool ProfileComplete { get; set; }
 
@@ -43,7 +44,6 @@ namespace ProfileService.Models.Business
         {
             ProfileComplete = !string.IsNullOrEmpty(Description)
                               && !string.IsNullOrEmpty(Website)
-                              && IncorporationDate.HasValue
                               && EmployeeCount.HasValue;
         }
     }

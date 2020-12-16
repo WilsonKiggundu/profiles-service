@@ -52,7 +52,8 @@ namespace ProfileService.Services.Implementations
                 Website = result.Website,
                 DateCreated = result.DateCreated,
                 CoverPhoto = result.CoverPhoto,
-                DateOfIncorporation = result.IncorporationDate?.ToString("MMM, yyyy"),
+                Avatar = result.Avatar,
+                DateOfIncorporation = result.IncorporationDate,
                 NumberOfEmployees = result.EmployeeCount
                 
             };
@@ -69,17 +70,10 @@ namespace ProfileService.Services.Implementations
                     Description = model.Description,
                     Website = model.Website,
                     CoverPhoto = model.CoverPhoto,
+                    Avatar = model.Avatar,
                     EmployeeCount = int.Parse(model.NumberOfEmployees),
-                    IncorporationDate = Convert.ToDateTime(model.DateOfIncorporation),
-                    Category = model.Category switch
-                    {
-                        "1" => BusinessCategory.Fintech,
-                        "2" => BusinessCategory.EdTech,
-                        "3" => BusinessCategory.AgriTech,
-                        "4" => BusinessCategory.LegalTech,
-                        "99" => BusinessCategory.Other,
-                        _ => BusinessCategory.Other
-                    },
+                    IncorporationDate = model.DateOfIncorporation,
+                    Category = model.Category,
                     
                 };
                 await _repository.InsertAsync(business);
@@ -112,17 +106,9 @@ namespace ProfileService.Services.Implementations
                     Website = model.Website,
                     EmployeeCount = model.NumberOfEmployees,
                     CoverPhoto = model.CoverPhoto,
-                    //IncorporationDate = Convert.ToDateTime(model.DateOfIncorporation),
-                    Category = model.Category switch
-                    {
-                        "1" => BusinessCategory.Fintech,
-                        "2" => BusinessCategory.EdTech,
-                        "3" => BusinessCategory.AgriTech,
-                        "4" => BusinessCategory.LegalTech,
-                        "99" => BusinessCategory.Other,
-                        _ => BusinessCategory.Other
-                    },
-                    
+                    Avatar = model.Avatar,
+                    IncorporationDate = model.DateOfIncorporation,
+                    Category = model.Category,
                 };
                 
                 _logger.LogInformation(JsonConvert.SerializeObject(business));
