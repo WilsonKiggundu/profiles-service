@@ -58,7 +58,7 @@ namespace ProfileService.Services.Implementations
         {
             var person = new Person
             {
-                Id = newPerson.UserId,
+                Id = Guid.Parse(newPerson.UserId),
                 Firstname = newPerson.FirstName,
                 Lastname = newPerson.LastName,
                 Bio = newPerson.Bio,
@@ -70,7 +70,7 @@ namespace ProfileService.Services.Implementations
                     _ => Gender.Female
                 },
                 DateOfBirth = newPerson.DateOfBirth,
-                UserId = newPerson.UserId
+                UserId = Guid.Parse(newPerson.UserId)
             };
 
             try
