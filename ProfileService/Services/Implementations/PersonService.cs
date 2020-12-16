@@ -40,12 +40,16 @@ namespace ProfileService.Services.Implementations
             // if (result == null) return new GetPerson();
 
             var person = _mapper.Map<GetPerson>(result);
-            person.Gender = result.Gender switch
+
+            if (person != null)
             {
-                Gender.Female => "female",
-                Gender.Male => "male",
-                _ => "other"
-            };
+                person.Gender = result.Gender switch
+                {
+                    Gender.Female => "female",
+                    Gender.Male => "male",
+                    _ => "other"
+                };
+            }
 
             return person;
         }
