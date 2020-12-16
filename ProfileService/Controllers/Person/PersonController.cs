@@ -62,11 +62,6 @@ namespace ProfileService.Controllers.Person
             try
             {
                 await _personService.InsertAsync(person);
-                if (person.Interests.Count > 0)
-                {
-                    
-                }
-                // await _personService.AddInterestAsync();
                 return person;
             }
             catch (Exception e)
