@@ -20,6 +20,7 @@ namespace ProfileService.Contracts.Business
         public string DateOfIncorporation { get; set; }
         public string Website { get; set; }
         public string CoverPhoto { get; set; }
+        public string Avatar { get; set; }
         public string Category { get; set; }
         public ICollection<GetLookupInterest> Interests { get; set; }
         public ICollection<GetBusinessAddress> Addresses { get; set; }

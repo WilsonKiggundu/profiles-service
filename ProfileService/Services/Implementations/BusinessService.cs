@@ -52,6 +52,7 @@ namespace ProfileService.Services.Implementations
                 Website = result.Website,
                 DateCreated = result.DateCreated,
                 CoverPhoto = result.CoverPhoto,
+                Avatar = result.Avatar,
                 DateOfIncorporation = result.IncorporationDate,
                 NumberOfEmployees = result.EmployeeCount
                 
@@ -69,7 +70,7 @@ namespace ProfileService.Services.Implementations
                     Description = model.Description,
                     Website = model.Website,
                     CoverPhoto = model.CoverPhoto,
-                    ProfilePhoto = model.ProfilePhoto,
+                    Avatar = model.Avatar,
                     EmployeeCount = int.Parse(model.NumberOfEmployees),
                     IncorporationDate = model.DateOfIncorporation,
                     Category = model.Category,
@@ -105,6 +106,7 @@ namespace ProfileService.Services.Implementations
                     Website = model.Website,
                     EmployeeCount = model.NumberOfEmployees,
                     CoverPhoto = model.CoverPhoto,
+                    Avatar = model.Avatar,
                     IncorporationDate = model.DateOfIncorporation,
                     Category = model.Category,
                 };
