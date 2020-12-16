@@ -28,7 +28,7 @@ namespace ProfileService.Models.Business
         /// <summary>
         /// Incorporation date
         /// </summary>
-        public DateTime? IncorporationDate { get; set; }
+        public string IncorporationDate { get; set; }
 
         /// <summary>
         /// Website URL
@@ -43,7 +43,6 @@ namespace ProfileService.Models.Business
         {
             ProfileComplete = !string.IsNullOrEmpty(Description)
                               && !string.IsNullOrEmpty(Website)
-                              && IncorporationDate.HasValue
                               && EmployeeCount.HasValue;
         }
     }

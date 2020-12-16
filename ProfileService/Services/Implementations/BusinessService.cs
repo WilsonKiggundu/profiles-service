@@ -52,7 +52,7 @@ namespace ProfileService.Services.Implementations
                 Website = result.Website,
                 DateCreated = result.DateCreated,
                 CoverPhoto = result.CoverPhoto,
-                DateOfIncorporation = result.IncorporationDate?.ToString("MMM, yyyy"),
+                DateOfIncorporation = result.IncorporationDate,
                 NumberOfEmployees = result.EmployeeCount
                 
             };
@@ -70,7 +70,7 @@ namespace ProfileService.Services.Implementations
                     Website = model.Website,
                     CoverPhoto = model.CoverPhoto,
                     EmployeeCount = int.Parse(model.NumberOfEmployees),
-                    IncorporationDate = Convert.ToDateTime(model.DateOfIncorporation),
+                    IncorporationDate = model.DateOfIncorporation,
                     Category = model.Category switch
                     {
                         "1" => BusinessCategory.Fintech,
