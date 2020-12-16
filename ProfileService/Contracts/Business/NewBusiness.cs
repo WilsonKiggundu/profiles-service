@@ -34,6 +34,7 @@ namespace ProfileService.Contracts.Business
         
         public string Category { get; set; }    
         public string CoverPhoto { get; set; }
+        public string ProfilePhoto { get; set; }
 
         public string CreatedBy { get; set; }
     }

@@ -69,17 +69,10 @@ namespace ProfileService.Services.Implementations
                     Description = model.Description,
                     Website = model.Website,
                     CoverPhoto = model.CoverPhoto,
+                    ProfilePhoto = model.ProfilePhoto,
                     EmployeeCount = int.Parse(model.NumberOfEmployees),
                     IncorporationDate = model.DateOfIncorporation,
-                    Category = model.Category switch
-                    {
-                        "1" => BusinessCategory.Fintech,
-                        "2" => BusinessCategory.EdTech,
-                        "3" => BusinessCategory.AgriTech,
-                        "4" => BusinessCategory.LegalTech,
-                        "99" => BusinessCategory.Other,
-                        _ => BusinessCategory.Other
-                    },
+                    Category = model.Category,
                     
                 };
                 await _repository.InsertAsync(business);
@@ -112,17 +105,8 @@ namespace ProfileService.Services.Implementations
                     Website = model.Website,
                     EmployeeCount = model.NumberOfEmployees,
                     CoverPhoto = model.CoverPhoto,
-                    //IncorporationDate = Convert.ToDateTime(model.DateOfIncorporation),
-                    Category = model.Category switch
-                    {
-                        "1" => BusinessCategory.Fintech,
-                        "2" => BusinessCategory.EdTech,
-                        "3" => BusinessCategory.AgriTech,
-                        "4" => BusinessCategory.LegalTech,
-                        "99" => BusinessCategory.Other,
-                        _ => BusinessCategory.Other
-                    },
-                    
+                    IncorporationDate = model.DateOfIncorporation,
+                    Category = model.Category,
                 };
                 
                 _logger.LogInformation(JsonConvert.SerializeObject(business));

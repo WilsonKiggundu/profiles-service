@@ -18,7 +18,7 @@ namespace ProfileService.Models.Business
         /// </summary>
         public string Description { get; set; }
 
-        public BusinessCategory Category { get; set; }
+        public string Category { get; set; }
 
         /// <summary>
         /// Number of employees
@@ -36,6 +36,7 @@ namespace ProfileService.Models.Business
         public string Website { get; set; }
 
         public string CoverPhoto { get; set; }
+        public string ProfilePhoto { get; set; }    
 
         [NotMapped] public bool ProfileComplete { get; set; }
 
