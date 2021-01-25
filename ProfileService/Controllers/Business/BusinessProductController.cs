@@ -69,19 +69,21 @@ namespace ProfileService.Controllers.Business
                 throw new Exception(e.Message, e);
             }
         }
-        
+
         /// <summary>
         /// DELETE business product
         /// </summary>
+        /// <param name="productId"></param>
+        /// <param name="businessId"></param>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid productId, Guid businessId)
         {
             try
             {
-                await _businessService.DeleteProductAsync(id);
+                await _businessService.DeleteProductAsync(productId, businessId);
             }
             catch (Exception e)
             {

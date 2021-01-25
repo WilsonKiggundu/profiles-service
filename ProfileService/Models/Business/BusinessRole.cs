@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using ProfileService.Models.Common;
 
 namespace ProfileService.Models.Business
@@ -6,12 +7,11 @@ namespace ProfileService.Models.Business
     public class BusinessRole : BaseModel
     {
         public Guid BusinessId { get; set; }
-        public Business Business { get; set; }
 
         public Guid PersonId { get; set; }
         public Person.Person Person { get; set; }
 
-        public RoleType Role { get; set; }
+        public string Role { get; set; }
         
     }
 

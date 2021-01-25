@@ -8,19 +8,8 @@ namespace ProfileService.Models.Person
     /// </summary>
     public class PersonSkill : BaseModel
     {
-        /// <summary>
-        /// 
-        /// </summary>
         public Guid PersonId { get; set; }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public Person Person { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Details { get; set; }
+        public Guid? SkillId { get; set; }
+        public Skill Skill { get; set; }
     }
 }

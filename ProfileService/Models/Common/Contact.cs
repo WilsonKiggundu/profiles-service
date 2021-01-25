@@ -42,20 +42,15 @@ namespace ProfileService.Models.Common
     /// </summary>
     public enum ContactType
     {
-        /// <summary>
-        /// Telephone
-        /// </summary>
         Telephone = 1,
-        
-        /// <summary>
-        /// Email address
-        /// </summary>
         Email = 2,
+        Other = 99
     }
 
     public enum ContactCategory
     {
         Primary = 1,
-        Alternative = 2    
+        Alternative = 2,
+        Other = 99
     }
 }

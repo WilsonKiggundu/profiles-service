@@ -6,10 +6,10 @@ namespace ProfileService.Contracts.Business.Contact
     {
         public BusinessContactMapper()
         {
-            CreateMap<Models.Business.BusinessContact, GetBusinessContact>();
-            CreateMap<NewBusinessContact, Models.Business.BusinessContact>()
+            CreateMap<Models.Common.Contact, GetBusinessContact>();
+            CreateMap<NewBusinessContact, Models.Common.Contact>()
                 .ReverseMap();
-            CreateMap<UpdateBusinessContact, Models.Business.BusinessContact>()
+            CreateMap<UpdateBusinessContact, Models.Common.Contact>()
                 .ReverseMap();
         }
     }

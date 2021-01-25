@@ -17,36 +17,25 @@ namespace ProfileService.Services.Implementations
     public class PostService : IPostService
     {
         private readonly IPostRepository _repository;
+        private readonly IPersonRepository _personRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<PostService> _logger;
 
-        public PostService(IPostRepository repository, IMapper mapper, ILogger<PostService> logger)
+        public PostService(IPostRepository repository, IMapper mapper, ILogger<PostService> logger, IPersonRepository personRepository)
         {
             _repository = repository;
             _mapper = mapper;
             _logger = logger;
+            _personRepository = personRepository;
         }
 
-        public IEnumerable<GetPost> GetAll()
+        public async Task<SearchPostResponse> SearchAsync(SearchPostRequest request)
         {
-            return _mapper.Map<ICollection<GetPost>>(_repository.GetAll());
+            return await _repository.SearchAsync(request);
         }
-
-        public IEnumerable<GetPost> GetPostsByAuthorId(Guid authorId)
+        
+        public async Task<NewPost> InsertAsync(NewPost newPost)
         {
-            var posts = _repository.GetPostsByAuthorId(authorId);
-            return _mapper.Map<ICollection<GetPost>>(posts);
-        }
-
-        public async Task<GetPost> GetByIdAsync(Guid id)
-        {
-            var comment = await _repository.GetByIdAsync(id);
-            return _mapper.Map<GetPost>(comment);
-        }
-
-        public async Task InsertAsync(NewPost newPost)
-        {
-            _logger.LogInformation(JsonConvert.SerializeObject(newPost));
 
             ICollection<Upload> uploads = null;
 
@@ -61,24 +50,21 @@ namespace ProfileService.Services.Implementations
 
             var post = new Post
             {
+                Id = Guid.NewGuid(),
                 AuthorId = newPost.AuthorId,
                 Details = newPost.Details,
                 Uploads = uploads
             };
-            
-            _logger.LogInformation(JsonConvert.SerializeObject(post));
-            
-            await _repository.InsertAsync(_mapper.Map<Post>(post));
-        }
 
-        public async Task UpdateAsync(UpdatePost comment)
-        {
-            throw new NotImplementedException();
-        }
+            await _repository.InsertAsync(post);
 
-        public async Task DeleteAsync(Guid id)
-        {
-            throw new NotImplementedException();
+            post = await _repository.GetByIdAsync(post.Id);
+            post.Author = await _personRepository.GetByIdAsync(post.AuthorId);
+            
+            var result = _mapper.Map<NewPost>(post);
+            result.Uploads = newPost.Uploads;
+
+            return result;
         }
     }
 }

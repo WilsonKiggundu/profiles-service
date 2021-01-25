@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ProfileService.Contracts.Lookup.Category;
 using ProfileService.Contracts.Lookup.Interest;
 using ProfileService.Contracts.Person.Awards;
+using ProfileService.Contracts.Person.Connections;
 using ProfileService.Contracts.Person.Skills;
 
 namespace ProfileService.Contracts.Person
@@ -26,5 +27,6 @@ namespace ProfileService.Contracts.Person
         public ICollection<GetLookupInterest> Interests { get; set; }    
         public ICollection<GetPersonAward> Awards { get; set; }    
         public ICollection<GetPersonSkill> Skills { get; set; }    
+        public ICollection<GetPersonConnection> Connections { get; set; }    
     }
 }

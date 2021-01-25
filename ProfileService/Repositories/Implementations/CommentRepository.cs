@@ -5,70 +5,54 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using ProfileService.Data;
+using ProfileService.Contracts.Blog.Comment;
 using ProfileService.Models.Posts;
 using ProfileService.Repositories.Interfaces;
 
 namespace ProfileService.Repositories.Implementations
 {
-    public class CommentRepository : ICommentRepository
+    public class CommentRepository : GenericRepository<Comment>, ICommentRepository
     {
         private readonly ProfileServiceContext _context;
         private readonly ILogger<CommentRepository> _logger;
         
-        public CommentRepository(ProfileServiceContext context, ILogger<CommentRepository> logger)
+        public CommentRepository(ProfileServiceContext context, ILogger<CommentRepository> logger) : base(context)
         {
             _context = context;
             _logger = logger;
         }
 
-        public IEnumerable<Comment> GetAll()
+        public async Task<SearchCommentsResponse> SearchAsync(SearchCommentsRequest filter)
         {
-            throw new NotImplementedException();
-        }
-        
-        public IEnumerable<Comment> GetAll(Guid? postId, Guid? articleId)
-        {
-            return _context.Comments
-                .Include(q => q.Author)
-                .Where(q => q.ArticleId == articleId && q.PostId == postId)
-                .ToList();
-        }
+            _logger.LogInformation(JsonConvert.SerializeObject(filter, Formatting.Indented));
+            
+            IQueryable<Comment> query = _context.Comments.Include(c => c.Author);
+            if (filter.ArticleId.HasValue)
+            {
+                query = query.Where(c => c.ArticleId == filter.ArticleId);
+            }
+            
+            if (filter.PostId.HasValue)
+            {
+                query = query.Where(c => c.PostId == filter.PostId);
+            }
 
-        public async Task<Comment> GetByIdAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<Comment>> GetByPostId(Guid postId)
-        {
-            return await _context.Comments.Where(q => q.PostId == postId).ToListAsync();
-        }
-        
-        public async Task<IEnumerable<Comment>> GetByArticleId(Guid articleId)
-        {
-            return await _context.Comments.Where(q => q.ArticleId == articleId).ToListAsync();
-        }
-
-        public async Task InsertAsync(Comment entity)
-        {
-            await _context.Comments.AddAsync(entity);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task InsertManyAsync(ICollection<Comment> entities)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task UpdateAsync(Comment entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task DeleteAsync(Guid id)
-        {
-            throw new NotImplementedException();
+            var offset = (filter.Page - 1) * filter.PageSize;
+            var hasMore = await query.Skip(offset).CountAsync() > 0;
+            
+            var comments = await query
+                .Skip((filter.Page - 1) * filter.Page)
+                .Take(filter.PageSize).ToListAsync();
+            
+            return new SearchCommentsResponse
+            {
+                PostId = filter.PostId,
+                ArticleId = filter.ArticleId,
+                Page = filter.Page,
+                PageSize = filter.PageSize,
+                Comments = comments,
+                HasMore = hasMore
+            };
         }
     }
 }

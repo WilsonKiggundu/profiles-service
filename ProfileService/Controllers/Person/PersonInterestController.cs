@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ProfileService.Contracts.Person.Interests;
 using ProfileService.Controllers.Common;
 using ProfileService.Services.Interfaces;
@@ -16,14 +18,16 @@ namespace ProfileService.Controllers.Person
     public class PersonInterestController : BaseController
     {
         private readonly IPersonService _personService;
+        private readonly ILogger<PersonInterestController> _logger;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="personService"></param>
-        public PersonInterestController(IPersonService personService)
+        public PersonInterestController(IPersonService personService, ILogger<PersonInterestController> logger)
         {
             _personService = personService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -40,15 +44,15 @@ namespace ProfileService.Controllers.Person
         /// <summary>
         /// CREATE a person interest
         /// </summary>
-        /// <param name="interest"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<NewPersonInterest> Create(NewPersonInterest interest)
+        public async Task<NewPersonInterest> Create(NewPersonInterest model)
         {
             try
             {
-                await _personService.AddInterestAsync(interest);
-                return interest;
+                _logger.LogInformation(JsonConvert.SerializeObject(model, Formatting.Indented));
+                return await _personService.AddInterestAsync(model);
             }
             catch (Exception e)
             {
@@ -75,20 +79,21 @@ namespace ProfileService.Controllers.Person
                 throw new Exception(e.Message, e);
             }
         }
-        
+
         /// <summary>
         /// DELETE a person interest
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="interestId"></param>
+        /// <param name="personId"></param>
         /// <returns></returns>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid interestId, Guid personId)
         {
             try
             {
-                await _personService.DeleteInterestAsync(id);
-                return Ok(id);
+                await _personService.DeleteInterestAsync(interestId, personId);
+                return Ok(new {interestId, personId});
             }
             catch (Exception e)
             {

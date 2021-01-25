@@ -7,7 +7,8 @@ namespace ProfileService.Contracts.Person.Awards
     public class NewPersonAward    
     {
         public Guid PersonId { get; set; }
-        public string AwardedBy { get; set; }
+        public SchoolViewModel School { get; set; } 
+        
         public string Title { get; set; }
         public string FieldOfStudy { get; set; }
         public string StartYear { get; set; }
@@ -15,6 +16,11 @@ namespace ProfileService.Contracts.Person.Awards
         public string Grade { get; set; }
         public string Activities { get; set; }
         public string Description { get; set; }
-        // public ICollection<GetLookupUpload> Attachments { get; set; }
+    }
+
+    public class SchoolViewModel
+    {
+        public Guid? Id { get; set; }
+        public string Name { get; set; }
     }
 }

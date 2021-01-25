@@ -33,7 +33,7 @@ namespace ProfileService.Controllers.Business
             return await _businessService.GetProductsAsync(businessId);
         }
 
-        /// <summary>
+        /// <summary>®˙
         /// CREATE a business product
         /// </summary>
         /// <param name="product"></param>
@@ -81,7 +81,7 @@ namespace ProfileService.Controllers.Business
         {
             try
             {
-                await _businessService.DeleteProductAsync(id);
+                // await _businessService.dele(id);
             }
             catch (Exception e)
             {

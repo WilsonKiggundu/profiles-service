@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ProfileService.Contracts.Business;
 using ProfileService.Models.Business;
+using ProfileService.Models.Common;
 
 namespace ProfileService.Repositories.Interfaces
 {
@@ -16,23 +17,23 @@ namespace ProfileService.Repositories.Interfaces
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<ICollection<Business>> SearchAsync(SearchBusiness request);
+        Task<SearchBusinessResponse> SearchAsync(SearchBusinessRequest request);
 
         #region Business Addresses
     
         Task<IEnumerable<BusinessAddress>> GetAddressesAsync(Guid businessId);
         Task AddAddressAsync(BusinessAddress address);
         Task UpdateAddressAsync(BusinessAddress address);    
-        Task DeleteAddressAsync(Guid addressId);    
+        Task DeleteAddressAsync(Guid businessId, Guid addressId);    
 
         #endregion    
         
         #region Business Contacts
     
-        Task<IEnumerable<BusinessContact>> GetContactsAsync(Guid businessId);
+        Task<IEnumerable<Contact>> GetContactsAsync(Guid businessId);
         Task AddContactAsync(BusinessContact contact);
         Task UpdateContactAsync(BusinessContact contact);    
-        Task DeleteContactAsync(Guid contactId);    
+        Task DeleteContactAsync(Guid contactId, Guid belongsTo);    
 
         #endregion
         
@@ -41,7 +42,7 @@ namespace ProfileService.Repositories.Interfaces
         Task<IEnumerable<BusinessInterest>> GetInterestsAsync(Guid businessId);
         Task AddInterestAsync(BusinessInterest interest);
         Task UpdateInterestAsync(BusinessInterest interest);    
-        Task DeleteInterestAsync(Guid interestId);    
+        Task DeleteInterestAsync(Guid businessId, Guid interestId);    
 
         #endregion
         
@@ -59,7 +60,7 @@ namespace ProfileService.Repositories.Interfaces
         Task<IEnumerable<BusinessProduct>> GetProductsAsync(Guid businessId);
         Task AddProductAsync(BusinessProduct product);
         Task<BusinessProduct> UpdateProductAsync(BusinessProduct product);    
-        Task DeleteProductAsync(Guid productId);    
+        Task DeleteProductAsync(Guid productId, Guid businessId);    
 
         #endregion
         

@@ -3,68 +3,63 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using ProfileService.Data;
+using ProfileService.Contracts.Blog.Post;
 using ProfileService.Models.Posts;
 using ProfileService.Repositories.Interfaces;
 
 namespace ProfileService.Repositories.Implementations
 {
-    public class PostRepository : IPostRepository
+    public class PostRepository : GenericRepository<Post>,  IPostRepository
     {
         private readonly ProfileServiceContext _context;
 
-        public PostRepository(ProfileServiceContext context)
+        public PostRepository(ProfileServiceContext context) : base(context)
         {
             _context = context;
         }
 
-        public IEnumerable<Post> GetAll()
+        public async Task<SearchPostResponse> SearchAsync(SearchPostRequest request)
         {
-            return _context.Posts
-                .Include(p => p.Author)
+            IQueryable<Post> query = _context.Posts.OrderByDescending(p => p.DateCreated);
+
+            if (request.PostId.HasValue)
+            {
+                request.PageSize = 1;
+                request.Page = 1;
+                query = query.Where(p => p.Id == request.PostId);
+            }
+            
+            if (request.AuthorId.HasValue)
+            {
+                query = query.Where(p => p.AuthorId == request.AuthorId);
+            }
+            
+            var skip = (request.Page - 1) * request.PageSize;
+            var hasMore = await query.Skip(skip).CountAsync() > 0;
+
+            var posts = await query
                 .Include(p => p.Uploads)
-                .Include(p => p.Comments)
-                .OrderByDescending(q => q.DateCreated)
-                .ToList();
-        }
-        public IEnumerable<Post> GetPostsByAuthorId(Guid authorId)
-        {
-            return _context.Posts
-                .Where(p => p.AuthorId == authorId)
                 .Include(p => p.Author)
-                .Include(p => p.Uploads)
-                .Include(p => p.Comments)
-                .OrderByDescending(q => q.DateCreated)
-                .ToList();
-        }
+                .Skip(skip)
+                .Take(request.PageSize)
+                .ToListAsync();
+            
+            posts.ForEach(post =>
+            {
+                post.Likes = new List<Like>();
+                post.Comments = new List<Comment>();
+                post.AlreadyLikedByUser = _context.Likes.Any(p => p.PersonId == request.UserId && p.EntityId == post.Id);
+                post.CommentsCount = _context.Comments.Count(c => c.PostId == post.Id);
+                post.LikesCount = _context.Likes.Count(c => c.EntityId == post.Id);
+            });
+            
+            return new SearchPostResponse
+            {
+                Posts = posts,
+                Request = request,
+                HasMore = hasMore
+            };
 
-        public async Task<Post> GetByIdAsync(Guid id)
-        {
-            return await _context.Posts
-                .Include(p => p.Author)
-                .Where(p => p.Id == id)
-                .FirstOrDefaultAsync();
-        }
-
-        public async Task InsertAsync(Post entity)
-        {
-            await _context.Posts.AddAsync(entity);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task InsertManyAsync(ICollection<Post> entities)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task UpdateAsync(Post entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task DeleteAsync(Guid id)
-        {
-            throw new NotImplementedException();
         }
     }
 }

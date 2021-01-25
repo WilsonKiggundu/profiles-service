@@ -12,7 +12,7 @@ namespace ProfileService.Repositories.Interfaces
     /// </summary>
     public interface IPersonRepository : IGenericRepository<Person>
     {
-        Task<ICollection<Person>> SearchAsync(Guid? exclude);
+        Task<SearchPersonResponse> SearchAsync(SearchPersonRequest request);
         
         #region Person Awards
     
@@ -28,7 +28,7 @@ namespace ProfileService.Repositories.Interfaces
         Task<IEnumerable<PersonCategory>> GetCategoriesAsync(Guid personId);
         Task AddCategoryAsync(PersonCategory category);
         Task UpdateCategoryAsync(PersonCategory category);    
-        Task DeleteCategoryAsync(Guid categoryId);            
+        Task DeleteCategoryAsync(Guid categoryId, Guid personId);            
 
         #endregion   
         
@@ -37,7 +37,7 @@ namespace ProfileService.Repositories.Interfaces
         Task<IEnumerable<PersonInterest>> GetInterestsAsync(Guid personId);
         Task AddInterestAsync(PersonInterest interest);
         Task UpdateInterestAsync(PersonInterest interest);    
-        Task DeleteInterestAsync(Guid interestId);            
+        Task DeleteInterestAsync(Guid interestId, Guid personId);                
 
         #endregion   
         
@@ -46,8 +46,17 @@ namespace ProfileService.Repositories.Interfaces
         Task<IEnumerable<PersonSkill>> GetSkillsAsync(Guid personId);
         Task AddSkillAsync(PersonSkill skill);
         Task UpdateSkillAsync(PersonSkill skill);    
-        Task DeleteSkillAsync(Guid skillId);            
+        Task DeleteSkillAsync(Guid skillId, Guid personId);            
 
-        #endregion   
+        #endregion  
+        
+        #region Person Connections
+    
+        Task<IEnumerable<PersonConnection>> GetConnectionsAsync(Guid personId);
+        Task AddConnectionAsync(PersonConnection connection);
+        Task UpdateConnectionAsync(PersonConnection connection);    
+        Task DeleteConnectionAsync(Guid connectionId);            
+
+        #endregion  
     }
 }

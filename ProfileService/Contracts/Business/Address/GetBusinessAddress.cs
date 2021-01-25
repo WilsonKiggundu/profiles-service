@@ -16,7 +16,7 @@ namespace ProfileService.Contracts.Business.Address
         public string Country { get; set; }
         public string Building { get; set; }
         public string Floor { get; set; }
-        public string Type { get; set; }
+        public AddressType Type { get; set; }
         public Guid BusinessId { get; set; }    
     }
 }

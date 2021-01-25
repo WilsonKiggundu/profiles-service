@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using ProfileService.Data;
+using ProfileService.Repositories;
 
 namespace ProfileService.Migrations
 {
@@ -43,8 +43,8 @@ namespace ProfileService.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<int?>("EmployeeCount")
-                        .HasColumnType("integer");
+                    b.Property<string>("EmployeeCount")
+                        .HasColumnType("text");
 
                     b.Property<string>("IncorporationDate")
                         .HasColumnType("text");
@@ -60,9 +60,6 @@ namespace ProfileService.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasAlternateKey("Name")
-                        .HasName("AlternateKey_Name");
 
                     b.ToTable("Businesses");
                 });
@@ -225,8 +222,7 @@ namespace ProfileService.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
-                        .HasColumnType("character varying(280)")
-                        .HasMaxLength(280);
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -263,8 +259,8 @@ namespace ProfileService.Migrations
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("integer");
+                    b.Property<string>("Role")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -361,14 +357,9 @@ namespace ProfileService.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid?>("PersonId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("IconId");
-
-                    b.HasIndex("PersonId");
 
                     b.ToTable("LookupInterests");
                 });
@@ -399,6 +390,53 @@ namespace ProfileService.Migrations
                     b.HasIndex("IconId");
 
                     b.ToTable("LookupNeeds");
+                });
+
+            modelBuilder.Entity("ProfileService.Models.Common.School", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DateCreated")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DateLastUpdated")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LookupSchools");
+                });
+
+            modelBuilder.Entity("ProfileService.Models.Common.Skill", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DateCreated")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DateLastUpdated")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LookupSkills");
                 });
 
             modelBuilder.Entity("ProfileService.Models.Common.Upload", b =>
@@ -682,9 +720,6 @@ namespace ProfileService.Migrations
                     b.Property<string>("Activities")
                         .HasColumnType("text");
 
-                    b.Property<string>("AwardedBy")
-                        .HasColumnType("text");
-
                     b.Property<string>("DateCreated")
                         .HasColumnType("text");
 
@@ -703,6 +738,9 @@ namespace ProfileService.Migrations
                     b.Property<string>("Grade")
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("InstituteId")
+                        .HasColumnType("uuid");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -716,6 +754,8 @@ namespace ProfileService.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InstituteId");
 
                     b.HasIndex("PersonId");
 
@@ -750,6 +790,34 @@ namespace ProfileService.Migrations
                     b.HasIndex("PersonId");
 
                     b.ToTable("PersonCategories");
+                });
+
+            modelBuilder.Entity("ProfileService.Models.Person.PersonConnection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DateCreated")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DateLastUpdated")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("FollowerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("PersonConnections");
                 });
 
             modelBuilder.Entity("ProfileService.Models.Person.PersonInterest", b =>
@@ -794,18 +862,20 @@ namespace ProfileService.Migrations
                     b.Property<string>("DateLastUpdated")
                         .HasColumnType("text");
 
-                    b.Property<string>("Details")
-                        .HasColumnType("text");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("SkillId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PersonId");
+
+                    b.HasIndex("SkillId");
 
                     b.ToTable("PersonSkills");
                 });
@@ -882,6 +952,39 @@ namespace ProfileService.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("ProfileService.Models.Posts.Like", b =>
+                {
+                    b.Property<Guid>("EntityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DateCreated")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DateLastUpdated")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("EntityId", "PersonId");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("Likes");
+                });
+
             modelBuilder.Entity("ProfileService.Models.Posts.Post", b =>
                 {
                     b.Property<Guid>("Id")
@@ -919,7 +1022,7 @@ namespace ProfileService.Migrations
             modelBuilder.Entity("ProfileService.Models.Business.BusinessAddress", b =>
                 {
                     b.HasOne("ProfileService.Models.Business.Business", "Business")
-                        .WithMany()
+                        .WithMany("Addresses")
                         .HasForeignKey("BusinessId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -928,7 +1031,7 @@ namespace ProfileService.Migrations
             modelBuilder.Entity("ProfileService.Models.Business.BusinessContact", b =>
                 {
                     b.HasOne("ProfileService.Models.Business.Business", "Business")
-                        .WithMany()
+                        .WithMany("Contacts")
                         .HasForeignKey("BusinessId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -943,7 +1046,7 @@ namespace ProfileService.Migrations
             modelBuilder.Entity("ProfileService.Models.Business.BusinessInterest", b =>
                 {
                     b.HasOne("ProfileService.Models.Business.Business", "Business")
-                        .WithMany()
+                        .WithMany("Interests")
                         .HasForeignKey("BusinessId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -958,7 +1061,7 @@ namespace ProfileService.Migrations
             modelBuilder.Entity("ProfileService.Models.Business.BusinessNeed", b =>
                 {
                     b.HasOne("ProfileService.Models.Business.Business", "Business")
-                        .WithMany()
+                        .WithMany("Needs")
                         .HasForeignKey("BusinessId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -973,7 +1076,7 @@ namespace ProfileService.Migrations
             modelBuilder.Entity("ProfileService.Models.Business.BusinessProduct", b =>
                 {
                     b.HasOne("ProfileService.Models.Business.Business", "Business")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("BusinessId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -981,8 +1084,8 @@ namespace ProfileService.Migrations
 
             modelBuilder.Entity("ProfileService.Models.Business.BusinessRole", b =>
                 {
-                    b.HasOne("ProfileService.Models.Business.Business", "Business")
-                        .WithMany()
+                    b.HasOne("ProfileService.Models.Business.Business", null)
+                        .WithMany("Roles")
                         .HasForeignKey("BusinessId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1006,10 +1109,6 @@ namespace ProfileService.Migrations
                     b.HasOne("ProfileService.Models.Common.Upload", "Icon")
                         .WithMany()
                         .HasForeignKey("IconId");
-
-                    b.HasOne("ProfileService.Models.Person.Person", null)
-                        .WithMany("Interests")
-                        .HasForeignKey("PersonId");
                 });
 
             modelBuilder.Entity("ProfileService.Models.Common.Need", b =>
@@ -1085,7 +1184,11 @@ namespace ProfileService.Migrations
 
             modelBuilder.Entity("ProfileService.Models.Person.PersonAward", b =>
                 {
-                    b.HasOne("ProfileService.Models.Person.Person", "Person")
+                    b.HasOne("ProfileService.Models.Common.School", "Institute")
+                        .WithMany()
+                        .HasForeignKey("InstituteId");
+
+                    b.HasOne("ProfileService.Models.Person.Person", null)
                         .WithMany("Awards")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1100,8 +1203,17 @@ namespace ProfileService.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProfileService.Models.Person.Person", "Person")
+                    b.HasOne("ProfileService.Models.Person.Person", null)
                         .WithMany("Categories")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProfileService.Models.Person.PersonConnection", b =>
+                {
+                    b.HasOne("ProfileService.Models.Person.Person", "Person")
+                        .WithMany("Connections")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1115,8 +1227,8 @@ namespace ProfileService.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProfileService.Models.Person.Person", "Person")
-                        .WithMany()
+                    b.HasOne("ProfileService.Models.Person.Person", null)
+                        .WithMany("Interests")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1124,11 +1236,15 @@ namespace ProfileService.Migrations
 
             modelBuilder.Entity("ProfileService.Models.Person.PersonSkill", b =>
                 {
-                    b.HasOne("ProfileService.Models.Person.Person", "Person")
+                    b.HasOne("ProfileService.Models.Person.Person", null)
                         .WithMany("Skills")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("ProfileService.Models.Common.Skill", "Skill")
+                        .WithMany()
+                        .HasForeignKey("SkillId");
                 });
 
             modelBuilder.Entity("ProfileService.Models.Posts.Article", b =>
@@ -1154,6 +1270,19 @@ namespace ProfileService.Migrations
 
                     b.HasOne("ProfileService.Models.Posts.Post", "Post")
                         .WithMany("Comments")
+                        .HasForeignKey("PostId");
+                });
+
+            modelBuilder.Entity("ProfileService.Models.Posts.Like", b =>
+                {
+                    b.HasOne("ProfileService.Models.Person.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProfileService.Models.Posts.Post", null)
+                        .WithMany("Likes")
                         .HasForeignKey("PostId");
                 });
 

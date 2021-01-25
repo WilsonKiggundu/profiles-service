@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ProfileService.Models.Business;
 
 namespace ProfileService.Contracts.Business.Role
@@ -9,7 +10,13 @@ namespace ProfileService.Contracts.Business.Role
     public class NewBusinessRole
     {
         public Guid BusinessId { get; set; }
-        public Guid ContactId { get; set; }
-        public RoleType Role { get; set; }    
+        public Guid PersonId { get; set; }
+        public IList<RoleOption> Roles { get; set; }
+    }
+
+    public class RoleOption
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
     }
 }

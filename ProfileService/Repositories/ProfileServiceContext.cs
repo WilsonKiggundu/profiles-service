@@ -1,17 +1,22 @@
+using System;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 using ProfileService.Models.Business;
 using ProfileService.Models.Common;
 using ProfileService.Models.Investor;
 using ProfileService.Models.Person;
 using ProfileService.Models.Posts;
 
-namespace ProfileService.Data
+namespace ProfileService.Repositories
 {
     /// <summary>
     /// Database Context
     /// </summary>
     public class ProfileServiceContext  : DbContext
     {
+        
         /// <summary>
         /// Constructor
         /// </summary>
@@ -20,9 +25,9 @@ namespace ProfileService.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Business>()
-                .HasAlternateKey(b => b.Name)
-                .HasName("AlternateKey_Name");
+            // modelBuilder.Entity<Business>()
+            //     .HasAlternateKey(b => b.Name)
+            //     .HasName("AlternateKey_Name");
 
             modelBuilder.Entity<Category>()
                 .HasQueryFilter(q => !q.IsDeleted);
@@ -35,7 +40,12 @@ namespace ProfileService.Data
             
             modelBuilder.Entity<Need>()
                 .HasQueryFilter(q => !q.IsDeleted);
-            
+
+            modelBuilder.Entity<Like>()
+                .HasKey(like => new {PostId = like.EntityId, like.PersonId});
+                //.HasIndex(like => new {like.PostId, like.PersonId})
+                //.IsUnique();
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -45,7 +55,9 @@ namespace ProfileService.Data
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Category> LookupCategories { get; set; }
         public DbSet<Upload> LookupUploads { get; set; }
-        public DbSet<Need> LookupNeeds { get; set; }
+        public DbSet<Need> LookupNeeds { get; set; }    
+        public DbSet<Skill> LookupSkills { get; set; }
+        public DbSet<School> LookupSchools { get; set; }
         
         #endregion
         
@@ -56,6 +68,7 @@ namespace ProfileService.Data
         public DbSet<PersonSkill> PersonSkills { get; set; }
         public DbSet<PersonCategory> PersonCategories { get; set; }
         public DbSet<PersonAward> PersonAwards { get; set; }
+        public DbSet<PersonConnection> PersonConnections { get; set; }
 
         #endregion
 
@@ -86,6 +99,7 @@ namespace ProfileService.Data
         public DbSet<Article> Articles { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Like> Likes { get; set; }
         
         #endregion
     }

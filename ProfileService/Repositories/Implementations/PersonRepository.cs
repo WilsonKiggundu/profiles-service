@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProfileService.Contracts.Person;
-using ProfileService.Data;
 using ProfileService.Models.Person;
 using ProfileService.Repositories.Interfaces;
 
@@ -30,14 +29,57 @@ namespace ProfileService.Repositories.Implementations
         /// <summary>
         /// Search persons
         /// </summary>
-        /// <param name="exclude"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ICollection<Person>> SearchAsync(Guid? exclude)
+        public async Task<SearchPersonResponse> SearchAsync(SearchPersonRequest request)
         {
-            return await _context.Persons
-                //.Where(p => p.Id != exclude)
+            IQueryable<Person> query = _context.Persons.OrderByDescending(p => p.DateCreated);
+
+            if (request.Id.HasValue)
+            {
+                request.PageSize = 1;
+                request.Page = 1;
+                query = query.Where(p => p.Id == request.Id);
+            }
+            
+            if (!string.IsNullOrEmpty(request.Name))
+            {
+                query = query.Where(p => 
+                    p.Firstname.ToLower().Contains(request.Name.ToLower()) || 
+                    p.Lastname.ToLower().Contains(request.Name.ToLower()));
+            }
+            
+            var skip = (request.Page - 1) * request.PageSize;
+            var hasMore = await query.Skip(skip).CountAsync() > 0;
+
+            var people = await query
+                .Include(s => s.Awards)
+                .ThenInclude(a => a.Institute)
+                .Include(s => s.Categories)
+                .ThenInclude(s => s.Category)
+                .Include(s => s.Interests)
+                .ThenInclude(i => i.Interest)
+                .Include(s => s.Skills)
+                .ThenInclude(s => s.Skill)
+                .Include(s => s.Connections)
+                // .ThenInclude(c => c.Person)
+                .Skip(skip)
+                .Take(request.PageSize)
                 .ToListAsync();
+            
+            people.ForEach(person =>
+            {
+                person.FullName = $"{person.Firstname} {person.Lastname}";
+                person.ConnectionsCount = _context.PersonConnections.Count(c => c.PersonId == person.Id);
+            });
+            
+            return new SearchPersonResponse
+            {
+                Persons = people,
+                Request = request,
+                HasMore = hasMore
+            };
         }
 
         #region Person Awards
@@ -69,7 +111,6 @@ namespace ProfileService.Repositories.Implementations
 
         #endregion
         
-
         public async Task<IEnumerable<PersonCategory>> GetCategoriesAsync(Guid personId)
         {
             return await _context.PersonCategories
@@ -89,9 +130,14 @@ namespace ProfileService.Repositories.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task DeleteCategoryAsync(Guid categoryId)
+        public async Task DeleteCategoryAsync(Guid categoryId, Guid personId)
         {
-            throw new NotImplementedException();
+            var category =
+                await _context.PersonCategories.FirstOrDefaultAsync(c =>
+                    c.CategoryId == categoryId && c.PersonId == personId);
+
+            _context.PersonCategories.Remove(category);
+            await _context.SaveChangesAsync();
         }
     
         public async Task<IEnumerable<PersonInterest>> GetInterestsAsync(Guid personId)
@@ -115,9 +161,15 @@ namespace ProfileService.Repositories.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task DeleteInterestAsync(Guid interestId)
+        public async Task DeleteInterestAsync(Guid interestId, Guid personId)
         {
-            throw new NotImplementedException();
+            var interest =
+                await _context.PersonInterests.FirstOrDefaultAsync(q =>
+                    q.PersonId == personId && q.InterestId == interestId);
+
+            _context.PersonInterests.Remove(interest);
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<PersonSkill>> GetSkillsAsync(Guid personId)
@@ -138,7 +190,52 @@ namespace ProfileService.Repositories.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task DeleteSkillAsync(Guid skillId)
+        public async Task DeleteSkillAsync(Guid skillId, Guid personId)
+        {
+            var entity =
+                await _context.PersonSkills
+                    .FirstOrDefaultAsync(s => 
+                        s.SkillId == skillId && 
+                        s.PersonId == personId);
+
+            _context.PersonSkills.Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+        
+        public async Task<IEnumerable<PersonConnection>> GetConnectionsAsync(Guid personId)
+        {
+            return await _context.PersonConnections
+                .Include(p => p.Person)
+                .Where(p => p.FollowerId == personId)
+                .Select(s => new PersonConnection
+                {
+                    Person = new Person
+                    {
+                        Firstname = s.Person.Firstname,
+                        Lastname = s.Person.Lastname,
+                        Avatar = s.Person.Avatar,
+                        Id = s.Person.Id,
+                        Bio = s.Person.Bio
+                    },
+                    Id = s.Id,
+                    PersonId = s.PersonId,
+                    FollowerId = s.FollowerId
+                })
+                .ToListAsync();
+        }
+
+        public async Task AddConnectionAsync(PersonConnection connection)
+        {
+            await _context.PersonConnections.AddAsync(connection);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateConnectionAsync(PersonConnection connection)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task DeleteConnectionAsync(Guid connectionId)
         {
             throw new NotImplementedException();
         }

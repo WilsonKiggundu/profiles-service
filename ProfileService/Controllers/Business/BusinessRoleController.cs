@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ProfileService.Contracts.Business.Role;
 using ProfileService.Controllers.Common;
 using ProfileService.Services.Interfaces;
@@ -16,10 +18,12 @@ namespace ProfileService.Controllers.Business
     public class BusinessRoleController : BaseController
     {
         private readonly IBusinessService _businessService;
+        private readonly ILogger<BusinessRoleController> _logger;
 
-        public BusinessRoleController(IBusinessService businessService)
+        public BusinessRoleController(IBusinessService businessService, ILogger<BusinessRoleController> logger)
         {
             _businessService = businessService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -39,8 +43,9 @@ namespace ProfileService.Controllers.Business
         /// <param name="role"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task Create([FromBody] NewBusinessRole role)
+        public async Task Create(NewBusinessRole role)
         {
+            _logger.LogInformation(JsonConvert.SerializeObject(role, Formatting.Indented));
             try
             {
                 await _businessService.AddRoleAsync(role);

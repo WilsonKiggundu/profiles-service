@@ -4,6 +4,7 @@ using ProfileService.Contracts.Blog.Comment;
 using ProfileService.Contracts.Lookup.Upload;
 using ProfileService.Contracts.Person;
 using ProfileService.Models.Common;
+using ProfileService.Models.Posts;
 
 namespace ProfileService.Contracts.Blog.Post
 {
@@ -16,6 +17,7 @@ namespace ProfileService.Contracts.Blog.Post
         public GetPerson Author { get; set; }
         public ICollection<GetLookupUpload> Uploads { get; set; }
         public ICollection<GetComment> Comments { get; set; }
+        public ICollection<Like> Likes { get; set; }
     }
 
     public enum PostType

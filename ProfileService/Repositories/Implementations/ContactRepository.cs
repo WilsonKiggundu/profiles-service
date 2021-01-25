@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProfileService.Contracts.Contact;
-using ProfileService.Data;
 using ProfileService.Models.Common;
 using ProfileService.Repositories.Interfaces;
 
