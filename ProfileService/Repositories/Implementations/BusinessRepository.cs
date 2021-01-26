@@ -124,7 +124,8 @@ namespace ProfileService.Repositories.Implementations
 
         public async Task UpdateContactAsync(BusinessContact contact)
         {
-            throw new NotImplementedException();
+            _context.BusinessContacts.Update(contact);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteContactAsync(Guid contactId, Guid belongsTo)

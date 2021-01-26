@@ -8,6 +8,7 @@ using ProfileService.Contracts.Business.Interest;
 using ProfileService.Contracts.Business.Need;
 using ProfileService.Contracts.Business.Product;
 using ProfileService.Contracts.Business.Role;
+using ProfileService.Models.Business;
 
 namespace ProfileService.Services.Interfaces
 {
@@ -32,7 +33,7 @@ namespace ProfileService.Services.Interfaces
     
         Task<IEnumerable<GetBusinessContact>> GetContactsAsync(Guid businessId);
         Task<NewBusinessContact> AddContactAsync(NewBusinessContact contact);
-        Task<UpdateBusinessContact> UpdateContactAsync(UpdateBusinessContact contact);        
+        Task<BusinessContact> UpdateContactAsync(UpdateBusinessContact contact);        
         Task DeleteContactAsync(Guid contactId, Guid belongsTo);    
 
         #endregion

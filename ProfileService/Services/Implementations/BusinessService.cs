@@ -213,13 +213,36 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task<UpdateBusinessContact> UpdateContactAsync(UpdateBusinessContact contact)
+        public async Task<BusinessContact> UpdateContactAsync(UpdateBusinessContact contact)
         {
             try
             {
-                var model = _mapper.Map<BusinessContact>(contact);
-                await _repository.UpdateContactAsync(model);
-                return _mapper.Map<UpdateBusinessContact>(model);
+                _logger.LogInformation(JsonConvert.SerializeObject(contact, Formatting.Indented));
+                
+                var contactEntity = await _contactRepository.GetByIdAsync(contact.Id);
+
+                contactEntity.Category = contact.Category;
+                contactEntity.Details = contact.Details;
+                contactEntity.Type = contact.Type;
+                // contactEntity.BelongsTo = contact.BelongsTo;
+                contactEntity.Value = contact.Value;
+                
+                await _contactRepository.UpdateAsync(contactEntity);
+                
+                return new BusinessContact
+                {
+                    BusinessId = contact.BelongsTo,
+                    ContactId = contact.Id,
+                    Contact = new Contact
+                    {
+                        Category = contact.Category,
+                        Details = contact.Details,
+                        Id = contact.Id,
+                        Type = contact.Type,
+                        Value = contact.Value,
+                        BelongsTo = contact.BelongsTo
+                    }
+                };
             }
             catch (Exception e)
             {

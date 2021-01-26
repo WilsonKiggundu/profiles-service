@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProfileService.Contracts.Business.Contact;
 using ProfileService.Controllers.Common;
+using ProfileService.Models.Business;
 using ProfileService.Services.Interfaces;
 
 namespace ProfileService.Controllers.Business
@@ -58,11 +59,11 @@ namespace ProfileService.Controllers.Business
         /// <returns></returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task Update([FromBody] UpdateBusinessContact contact)
+        public async Task<BusinessContact> Update([FromBody] UpdateBusinessContact contact)
         {
             try
             {
-                await _businessService.UpdateContactAsync(contact);
+                return await _businessService.UpdateContactAsync(contact);
             }
             catch (Exception e)
             {
