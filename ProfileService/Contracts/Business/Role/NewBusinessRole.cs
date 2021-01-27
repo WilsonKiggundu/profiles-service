@@ -11,7 +11,7 @@ namespace ProfileService.Contracts.Business.Role
     {
         public Guid BusinessId { get; set; }
         public Guid PersonId { get; set; }
-        public IList<RoleOption> Roles { get; set; }
+        public RoleOption Role { get; set; }
     }
 
     public class RoleOption

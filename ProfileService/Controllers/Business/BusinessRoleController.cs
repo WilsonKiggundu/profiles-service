@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProfileService.Contracts.Business.Role;
 using ProfileService.Controllers.Common;
+using ProfileService.Models.Business;
 using ProfileService.Services.Interfaces;
 
 namespace ProfileService.Controllers.Business
@@ -43,12 +44,11 @@ namespace ProfileService.Controllers.Business
         /// <param name="role"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task Create(NewBusinessRole role)
+        public async Task<BusinessRole> Create(NewBusinessRole role)
         {
-            _logger.LogInformation(JsonConvert.SerializeObject(role, Formatting.Indented));
             try
             {
-                await _businessService.AddRoleAsync(role);
+                return await _businessService.AddRoleAsync(role);
             }
             catch (Exception e)
             {
@@ -74,19 +74,20 @@ namespace ProfileService.Controllers.Business
                 throw new Exception(e.Message, e);
             }
         }
-        
+
         /// <summary>
         /// DELETE business role
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="businessId"></param>
+        /// <param name="personId"></param>
         /// <returns></returns>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid businessId, Guid personId)
         {
             try
             {
-                await _businessService.DeleteRoleAsync(id);
+                await _businessService.DeleteRoleAsync(businessId, personId);
             }
             catch (Exception e)
             {

@@ -235,9 +235,14 @@ namespace ProfileService.Repositories.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task DeleteRoleAsync(Guid roleId)
+        public async Task DeleteRoleAsync(Guid businessId, Guid personId)
         {
-            throw new NotImplementedException();
+            var role = await _context.BusinessRoles.FirstOrDefaultAsync(f =>
+                f.BusinessId == businessId && f.PersonId == personId);
+
+            _context.BusinessRoles.Remove(role);
+
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -32,7 +32,7 @@ namespace ProfileService.Services.Interfaces
         #region Business Contacts
     
         Task<IEnumerable<GetBusinessContact>> GetContactsAsync(Guid businessId);
-        Task<NewBusinessContact> AddContactAsync(NewBusinessContact contact);
+        Task<BusinessContact> AddContactAsync(NewBusinessContact contact);
         Task<BusinessContact> UpdateContactAsync(UpdateBusinessContact contact);        
         Task DeleteContactAsync(Guid contactId, Guid belongsTo);    
 
@@ -68,9 +68,9 @@ namespace ProfileService.Services.Interfaces
         #region Business Roles
     
         Task<IEnumerable<GetBusinessRole>> GetRolesAsync(Guid businessId);
-        Task AddRoleAsync(NewBusinessRole role);
+        Task<BusinessRole> AddRoleAsync(NewBusinessRole role);
         Task UpdateRoleAsync(UpdateBusinessRole role);        
-        Task DeleteRoleAsync(Guid roleId);        
+        Task DeleteRoleAsync(Guid businessId, Guid personId);        
 
         #endregion
 

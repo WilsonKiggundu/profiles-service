@@ -26,14 +26,16 @@ namespace ProfileService.Services.Implementations
         private readonly ILookupInterestRepository _interestRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<BusinessService> _logger;
+        private readonly IPersonRepository _personRepository;
 
-        public BusinessService(IBusinessRepository repository, IMapper mapper, ILogger<BusinessService> logger, ILookupInterestRepository interestRepository, IContactRepository contactRepository)
+        public BusinessService(IBusinessRepository repository, IMapper mapper, ILogger<BusinessService> logger, ILookupInterestRepository interestRepository, IContactRepository contactRepository, IPersonRepository personRepository)
         {
             _repository = repository;
             _mapper = mapper;
             _logger = logger;
             _interestRepository = interestRepository;
             _contactRepository = contactRepository;
+            _personRepository = personRepository;
         }
 
         public async Task<SearchBusinessResponse> SearchAsync(SearchBusinessRequest request)
@@ -185,16 +187,19 @@ namespace ProfileService.Services.Implementations
             return _mapper.Map<IEnumerable<GetBusinessContact>>(contacts);
         }
 
-        public async Task<NewBusinessContact> AddContactAsync(NewBusinessContact contact)
+        public async Task<BusinessContact> AddContactAsync(NewBusinessContact contact)
         {
             try
             {
+                var contactId = Guid.NewGuid();
+                
                 var businessContact = new BusinessContact
                 {
                     BusinessId = contact.BelongsTo,
+                    ContactId = contactId,
                     Contact = new Contact
                     {
-                        Id = Guid.NewGuid(),
+                        Id = contactId,
                         Category = contact.Category,
                         Details = contact.Details,
                         Type = contact.Type,
@@ -205,7 +210,7 @@ namespace ProfileService.Services.Implementations
 
                 await _repository.AddContactAsync(businessContact);
                 
-                return _mapper.Map<NewBusinessContact>(businessContact.Contact);
+                return businessContact;
             }
             catch (Exception e)
             {
@@ -424,20 +429,24 @@ namespace ProfileService.Services.Implementations
             return _mapper.Map<IEnumerable<GetBusinessRole>>(roles);
         }
 
-        public async Task AddRoleAsync(NewBusinessRole role)
+        public async Task<BusinessRole> AddRoleAsync(NewBusinessRole role)
         {
             try
             {
-                foreach (var roleOption in role.Roles)
-                {
-                    await _repository.AddRoleAsync(new BusinessRole
-                    {
-                        BusinessId = role.BusinessId,
-                        PersonId = role.PersonId,
-                        Role = roleOption.Name
-                    });
-                }
+                _logger.LogInformation(JsonConvert.SerializeObject(role, Formatting.Indented));
                 
+                var businessRole = new BusinessRole
+                {
+                    BusinessId = role.BusinessId,
+                    PersonId = role.PersonId,
+                    Role = role.Role.Name
+                };
+                
+                await _repository.AddRoleAsync(businessRole);
+                var person = await _personRepository.GetByIdAsync(role.PersonId);
+                businessRole.Person = person;
+
+                return businessRole;
             }
             catch (Exception e)
             {
@@ -458,11 +467,11 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task DeleteRoleAsync(Guid roleId)
+        public async Task DeleteRoleAsync(Guid businessId, Guid personId)
         {
             try
             {
-                await _repository.DeleteRoleAsync(roleId);
+                await _repository.DeleteRoleAsync(businessId, personId);
             }
             catch (Exception e)
             {

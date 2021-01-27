@@ -69,7 +69,7 @@ namespace ProfileService.Repositories.Interfaces
         Task<IEnumerable<BusinessRole>> GetRolesAsync(Guid businessId);
         Task AddRoleAsync(BusinessRole role);
         Task UpdateRoleAsync(BusinessRole role);    
-        Task DeleteRoleAsync(Guid roleId);        
+        Task DeleteRoleAsync(Guid businessId, Guid personId);        
 
         #endregion
 

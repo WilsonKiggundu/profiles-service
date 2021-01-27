@@ -40,7 +40,7 @@ namespace ProfileService.Controllers.Business
         /// <param name="contact"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<NewBusinessContact> Create([FromBody] NewBusinessContact contact)
+        public async Task<BusinessContact> Create([FromBody] NewBusinessContact contact)
         {
             try
             {
