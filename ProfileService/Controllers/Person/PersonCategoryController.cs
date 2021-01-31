@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ProfileService.Contracts.Lookup.Category;
 using ProfileService.Contracts.Person.Categories;
 using ProfileService.Controllers.Common;
+using ProfileService.Models.Common;
+using ProfileService.Models.Person;
 using ProfileService.Services.Interfaces;
 
 namespace ProfileService.Controllers.Person
@@ -49,13 +52,31 @@ namespace ProfileService.Controllers.Person
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<NewPersonCategory> Create(NewPersonCategory model)
+        public async Task<ICollection<PersonCategory>> Create(AddPersonCategory model)
         {
             try
             {
-                _logger.LogInformation(JsonConvert.SerializeObject(model, Formatting.Indented));
-                await _personService.AddCategoryAsync(model);
-                return model;
+                var response = new List<PersonCategory>();
+
+                foreach (var category in model.Categories)
+                {
+                    var result 
+                        = await _personService.AddCategoryAsync(category, model.PersonId);
+                    
+                    response.Add(new PersonCategory
+                    {
+                        
+                        PersonId = model.PersonId,
+                        CategoryId = result.Id,
+                        Category = new Category
+                        {
+                            Id = result.Id,
+                            Name = result.Name
+                        }
+                    });
+                }
+                
+                return response;
             }
             catch (Exception e)
             {

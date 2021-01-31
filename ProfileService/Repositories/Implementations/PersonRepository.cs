@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ProfileService.Contracts.Person;
 using ProfileService.Models.Person;
 using ProfileService.Repositories.Interfaces;
@@ -16,14 +18,16 @@ namespace ProfileService.Repositories.Implementations
     public class PersonRepository : GenericRepository<Person>, IPersonRepository
     {
         private readonly ProfileServiceContext _context;
+        private readonly ILogger<PersonRepository> _logger;
         
         /// <summary>
         /// 
         /// </summary>
         /// <param name="context"></param>
-        public PersonRepository(ProfileServiceContext context) : base(context)
+        public PersonRepository(ProfileServiceContext context, ILogger<PersonRepository> logger) : base(context)
         {
             _context = context;
+            _logger = logger;
         }
 
         /// <summary>
@@ -62,14 +66,13 @@ namespace ProfileService.Repositories.Implementations
                 .ThenInclude(i => i.Interest)
                 .Include(s => s.Skills)
                 .ThenInclude(s => s.Skill)
-                .Include(s => s.Connections)
-                // .ThenInclude(c => c.Person)
                 .Skip(skip)
                 .Take(request.PageSize)
                 .ToListAsync();
             
             people.ForEach(person =>
             {
+                person.Connections = new List<PersonConnection>();
                 person.FullName = $"{person.Firstname} {person.Lastname}";
                 person.ConnectionsCount = _context.PersonConnections.Count(c => c.PersonId == person.Id);
             });
@@ -99,14 +102,22 @@ namespace ProfileService.Repositories.Implementations
         }
 
         public async Task UpdateAwardAsync(PersonAward award)
-        { 
+        {
             _context.PersonAwards.Update(award);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAwardAsync(Guid awardId)
+        public async Task DeleteAwardAsync(Guid awardId, Guid personId)
         {
-            throw new NotImplementedException();
+            var award = await _context
+                .PersonAwards
+                .FirstOrDefaultAsync(q => 
+                    q.Id == awardId && 
+                    q.PersonId == personId);
+
+            _context.PersonAwards.Remove(award);
+
+            await _context.SaveChangesAsync();
         }
 
         #endregion
@@ -119,10 +130,11 @@ namespace ProfileService.Repositories.Implementations
                 .ToListAsync();
         }
 
-        public async Task AddCategoryAsync(PersonCategory category)
+        public async Task<PersonCategory> AddCategoryAsync(PersonCategory category)
         {
             await _context.PersonCategories.AddAsync(category);
             await _context.SaveChangesAsync();
+            return category;
         }
 
         public async Task UpdateCategoryAsync(PersonCategory category)
@@ -150,10 +162,15 @@ namespace ProfileService.Repositories.Implementations
                     .ToListAsync();
         }
 
-        public async Task AddInterestAsync(PersonInterest interest)
+        public async Task<PersonInterest> AddInterestAsync(PersonInterest interest)
         {
             await _context.PersonInterests.AddAsync(interest);
             await _context.SaveChangesAsync();
+
+            return await _context.PersonInterests
+                .Include(q => q.Interest)
+                .SingleOrDefaultAsync(q =>
+                q.InterestId.Equals(interest.InterestId) && q.PersonId.Equals(interest.PersonId));
         }
 
         public async Task UpdateInterestAsync(PersonInterest interest)
@@ -179,10 +196,17 @@ namespace ProfileService.Repositories.Implementations
                 .ToListAsync();
         }
 
-        public async Task AddSkillAsync(PersonSkill skill)
+        public async Task<PersonSkill> AddSkillAsync(PersonSkill skill)
         {
             await _context.PersonSkills.AddAsync(skill);
             await _context.SaveChangesAsync();
+            
+            return await _context
+                .PersonSkills
+                .Include(q => q.Skill)
+                .SingleOrDefaultAsync(q => 
+                    q.PersonId == skill.PersonId &&
+                    q.SkillId == skill.SkillId);
         }
 
         public async Task UpdateSkillAsync(PersonSkill skill)

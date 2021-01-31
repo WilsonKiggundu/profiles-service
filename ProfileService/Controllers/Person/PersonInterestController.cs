@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProfileService.Contracts.Person.Interests;
 using ProfileService.Controllers.Common;
+using ProfileService.Models.Person;
 using ProfileService.Services.Interfaces;
 
 namespace ProfileService.Controllers.Person
@@ -47,12 +48,19 @@ namespace ProfileService.Controllers.Person
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<NewPersonInterest> Create(NewPersonInterest model)
+        public async Task<ICollection<PersonInterest>> Create(NewPersonInterest model)
         {
             try
             {
-                _logger.LogInformation(JsonConvert.SerializeObject(model, Formatting.Indented));
-                return await _personService.AddInterestAsync(model);
+                var response = new List<PersonInterest>();
+
+                foreach (var interest in model.Interests)
+                {
+                    var result = await _personService.AddInterestAsync(interest, model.PersonId);
+                    response.Add(result);
+                }
+
+                return response;
             }
             catch (Exception e)
             {

@@ -19,14 +19,14 @@ namespace ProfileService.Repositories.Interfaces
         Task<IEnumerable<PersonAward>> GetAwardsAsync(Guid personId);
         Task AddAwardAsync(PersonAward award);
         Task UpdateAwardAsync(PersonAward award);    
-        Task DeleteAwardAsync(Guid awardId);            
+        Task DeleteAwardAsync(Guid awardId, Guid personId);            
 
         #endregion    
         
         #region Person Categories
     
         Task<IEnumerable<PersonCategory>> GetCategoriesAsync(Guid personId);
-        Task AddCategoryAsync(PersonCategory category);
+        Task<PersonCategory> AddCategoryAsync(PersonCategory category);
         Task UpdateCategoryAsync(PersonCategory category);    
         Task DeleteCategoryAsync(Guid categoryId, Guid personId);            
 
@@ -35,7 +35,7 @@ namespace ProfileService.Repositories.Interfaces
         #region Person Interests
     
         Task<IEnumerable<PersonInterest>> GetInterestsAsync(Guid personId);
-        Task AddInterestAsync(PersonInterest interest);
+        Task<PersonInterest> AddInterestAsync(PersonInterest interest);
         Task UpdateInterestAsync(PersonInterest interest);    
         Task DeleteInterestAsync(Guid interestId, Guid personId);                
 
@@ -44,7 +44,7 @@ namespace ProfileService.Repositories.Interfaces
         #region Person Skills
     
         Task<IEnumerable<PersonSkill>> GetSkillsAsync(Guid personId);
-        Task AddSkillAsync(PersonSkill skill);
+        Task<PersonSkill> AddSkillAsync(PersonSkill skill);
         Task UpdateSkillAsync(PersonSkill skill);    
         Task DeleteSkillAsync(Guid skillId, Guid personId);            
 

@@ -67,8 +67,7 @@ namespace ProfileService.Controllers.Person
         {
             try
             {
-                await _personService.InsertAsync(person);
-                return person;
+                return await _personService.InsertAsync(person);
             }
             catch (Exception e)
             {
@@ -77,11 +76,11 @@ namespace ProfileService.Controllers.Person
         }
         
         [HttpPut("coverPhoto")]
-        public async Task UpdateCoverPhoto(UpdatePerson person)
+        public async Task<UpdatePerson> UpdateCoverPhoto(UpdatePerson person)
         {
             try
             {
-                await _personService.UpdateCoverPhotoAsync(person);
+                return await _personService.UpdateCoverPhotoAsync(person);
             }
             catch (Exception e)
             {
@@ -90,11 +89,11 @@ namespace ProfileService.Controllers.Person
         }
         
         [HttpPut("avatar")]
-        public async Task UpdateAvatar(UpdatePerson person)
+        public async Task<UpdatePerson> UpdateAvatar(UpdatePerson person)
         {
             try
             {
-                await _personService.UpdateAvatarAsync(person);
+                return await _personService.UpdateAvatarAsync(person);
             }
             catch (Exception e)
             {
@@ -109,12 +108,11 @@ namespace ProfileService.Controllers.Person
         /// <returns></returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<UpdatePerson> Update([FromBody] UpdatePerson person)
+        public async Task<UpdatePerson> Update(UpdatePerson person)
         {
             try
             {
-                await _personService.UpdateAsync(person);
-                return person;
+                return await _personService.UpdateAsync(person);
             }
             catch (Exception e)
             {

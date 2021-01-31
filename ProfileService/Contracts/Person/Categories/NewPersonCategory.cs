@@ -13,6 +13,12 @@ namespace ProfileService.Contracts.Person.Categories
         public Guid PersonId { get; set; }    
     }
 
+    public class AddPersonCategory
+    {
+        public IList<CategoryViewModel> Categories { get; set; }
+        public Guid PersonId { get; set; }
+    }
+
     public class CategoryViewModel
     {
         public Guid? Id { get; set; }

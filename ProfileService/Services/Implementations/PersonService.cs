@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ProfileService.Contracts.Lookup.Category;
 using ProfileService.Contracts.Person;
 using ProfileService.Contracts.Person.Awards;
 using ProfileService.Contracts.Person.Categories;
@@ -25,8 +27,11 @@ namespace ProfileService.Services.Implementations
         private readonly ILookupSkillRepository _skillRepository;
         private readonly ILookupSchoolRepository _schoolRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<PersonService> _logger;
 
-        public PersonService(IPersonRepository repository, IMapper mapper, ILookupInterestRepository interestRepository, ILookupCategoryRepository categoryRepository, ILookupSkillRepository skillRepository, ILookupSchoolRepository schoolRepository)
+        public PersonService(IPersonRepository repository, IMapper mapper, ILookupInterestRepository interestRepository,
+            ILookupCategoryRepository categoryRepository, ILookupSkillRepository skillRepository,
+            ILookupSchoolRepository schoolRepository, ILogger<PersonService> logger)
         {
             _repository = repository;
             _mapper = mapper;
@@ -34,6 +39,7 @@ namespace ProfileService.Services.Implementations
             _categoryRepository = categoryRepository;
             _skillRepository = skillRepository;
             _schoolRepository = schoolRepository;
+            _logger = logger;
         }
 
         public async Task<SearchPersonResponse> SearchAsync(SearchPersonRequest request)
@@ -62,7 +68,7 @@ namespace ProfileService.Services.Implementations
             return person;
         }
 
-        public async Task InsertAsync(NewPerson newPerson)
+        public async Task<NewPerson> InsertAsync(NewPerson newPerson)
         {
             var person = new Person
             {
@@ -70,6 +76,8 @@ namespace ProfileService.Services.Implementations
                 Firstname = newPerson.FirstName,
                 Lastname = newPerson.LastName,
                 Bio = newPerson.Bio,
+                Avatar = newPerson.Avatar,
+                CoverPhoto = newPerson.CoverPhoto,
                 Gender = newPerson.Gender switch
                 {
                     "male" => Gender.Male,
@@ -84,20 +92,22 @@ namespace ProfileService.Services.Implementations
             try
             {
                 await _repository.InsertAsync(person);
+                return _mapper.Map<NewPerson>(person);
             }
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
             }
         }
-        
-        public async Task UpdateCoverPhotoAsync(UpdatePerson updatePerson)
+
+        public async Task<UpdatePerson> UpdateCoverPhotoAsync(UpdatePerson updatePerson)
         {
             var person = await _repository.GetByIdAsync(updatePerson.UserId);
             person.CoverPhoto = updatePerson.CoverPhoto;
             try
             {
                 await _repository.UpdateAsync(person);
+                return _mapper.Map<UpdatePerson>(person);
             }
             catch (Exception e)
             {
@@ -105,13 +115,14 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task UpdateAvatarAsync(UpdatePerson updatePerson)
+        public async Task<UpdatePerson> UpdateAvatarAsync(UpdatePerson updatePerson)
         {
             var person = await _repository.GetByIdAsync(updatePerson.UserId);
             person.Avatar = updatePerson.Avatar;
             try
             {
                 await _repository.UpdateAsync(person);
+                return _mapper.Map<UpdatePerson>(person);
             }
             catch (Exception e)
             {
@@ -119,7 +130,7 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task UpdateAsync(UpdatePerson updatePerson)
+        public async Task<UpdatePerson> UpdateAsync(UpdatePerson updatePerson)
         {
             var person = await _repository.GetByIdAsync(updatePerson.Id);
             person.Bio = updatePerson.Bio;
@@ -130,9 +141,13 @@ namespace ProfileService.Services.Implementations
                 "female" => Gender.Female,
                 _ => Gender.Other
             };
+            person.Avatar = updatePerson.Avatar;
+            person.CoverPhoto = updatePerson.CoverPhoto;
+
             try
             {
                 await _repository.UpdateAsync(person);
+                return _mapper.Map<UpdatePerson>(person);
             }
             catch (Exception e)
             {
@@ -163,21 +178,31 @@ namespace ProfileService.Services.Implementations
         {
             try
             {
-                var schoolId = award.School.Id;
+                var instituteId = award.Institute.Id;
 
-                if (!schoolId.HasValue)
+                if (!instituteId.HasValue)
                 {
-                    schoolId = Guid.NewGuid();
+                    instituteId = Guid.NewGuid();
                     await _schoolRepository.InsertAsync(new School
                     {
-                        Id = schoolId.Value,
-                        Name = award.School.Name
+                        Id = instituteId.Value,
+                        Name = award.Institute.Name
                     });
                 }
-                
-                var model = _mapper.Map<PersonAward>(award);
-                model.InstituteId = schoolId.Value;
-                
+
+                var model = new PersonAward
+                {
+                    InstituteId = instituteId.Value,
+                    Activities = award.Activities,
+                    Description = award.Description,
+                    Grade = award.Grade,
+                    FieldOfStudy = award.FieldOfStudy,
+                    StartYear = award.StartYear,
+                    Title = award.Title,
+                    EndYear = award.EndYear,
+                    PersonId = award.PersonId
+                };
+
                 await _repository.AddAwardAsync(model);
             }
             catch (Exception e)
@@ -188,9 +213,24 @@ namespace ProfileService.Services.Implementations
 
         public async Task UpdateAwardAsync(UpdatePersonAward award)
         {
+            _logger.LogInformation(JsonConvert.SerializeObject(award, Formatting.Indented));
+
             try
             {
+                var instituteId = award.Institute.Id;
+
+                if (!instituteId.HasValue)
+                {
+                    instituteId = Guid.NewGuid();
+                    await _schoolRepository.InsertAsync(new School
+                    {
+                        Id = instituteId.Value,
+                        Name = award.Institute.Name
+                    });
+                }
+
                 var model = _mapper.Map<PersonAward>(award);
+                model.InstituteId = instituteId;
                 await _repository.UpdateAwardAsync(model);
             }
             catch (Exception e)
@@ -199,11 +239,11 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task DeleteAwardAsync(Guid awardId)
+        public async Task DeleteAwardAsync(Guid awardId, Guid personId)
         {
             try
             {
-                await _repository.DeleteAwardAsync(awardId);
+                await _repository.DeleteAwardAsync(awardId, personId);
             }
             catch (Exception e)
             {
@@ -217,37 +257,31 @@ namespace ProfileService.Services.Implementations
             return _mapper.Map<ICollection<GetPersonInterest>>(interests);
         }
 
-        public async Task<NewPersonInterest> AddInterestAsync(NewPersonInterest model)
+        public async Task<PersonInterest> AddInterestAsync(InterestViewModel interest, Guid personId)
         {
-
             try
             {
-                foreach (var interest in model.Interests)
+                var interestId = interest.Id;
+                if (!interest.Id.HasValue)
                 {
-                    var interestId = interest.Id;
-                    if (!interest.Id.HasValue)
-                    {
-                        interestId = Guid.NewGuid();
-                        
-                        await _interestRepository.InsertAsync(new Interest
-                        {
-                            Category = interest.Name,
-                            Id = interestId.Value
-                        });
-                    }
+                    interestId = Guid.NewGuid();
 
-                    if (interestId.HasValue)
+                    await _interestRepository.InsertAsync(new Interest
                     {
-                        await _repository.AddInterestAsync(new PersonInterest
-                        {
-                            PersonId = model.PersonId,
-                            InterestId = interestId.Value
-                        });
-                    }
+                        Category = interest.Name,
+                        Id = interestId.Value
+                    });
                 }
 
-                return model;
+                if (!interestId.HasValue) throw new ArgumentNullException(nameof(interestId));
 
+                var personInterest = new PersonInterest
+                {
+                    PersonId = personId,
+                    InterestId = interestId.Value
+                };
+
+                return await _repository.AddInterestAsync(personInterest);
             }
             catch (Exception e)
             {
@@ -286,49 +320,51 @@ namespace ProfileService.Services.Implementations
             return _mapper.Map<IEnumerable<GetPersonSkill>>(skills);
         }
 
-        public async Task<NewPersonSkill> AddSkillAsync(NewPersonSkill model)
+        public async Task<PersonSkill> AddSkillAsync(SkillViewModel skill, Guid personId)
         {
             try
             {
-                var result = new NewPersonSkill
-                {
-                    PersonId = model.PersonId,
-                    Skills = model.Skills.Where(q => q.Id.HasValue).ToList()
-                };
+                // var interestId = interest.Id;
+                // if (!interest.Id.HasValue)
+                // {
+                //     interestId = Guid.NewGuid();
+                //
+                //     await _interestRepository.InsertAsync(new Interest
+                //     {
+                //         Category = interest.Name,
+                //         Id = interestId.Value
+                //     });
+                // }
+                //
+                // if (!interestId.HasValue) throw new ArgumentNullException(nameof(interestId));
+                //
+                // var personInterest = new PersonInterest
+                // {
+                //     PersonId = personId,
+                //     InterestId = interestId.Value
+                // };
+                //
+                // return await _repository.AddInterestAsync(personInterest);
                 
-                foreach (var skill in model.Skills)
+                var skillId = skill.Id;
+                if (!skill.Id.HasValue)
                 {
-                    var skillId = skill.Id;
-                    if (!skill.Id.HasValue)
-                    {
-                        skillId = Guid.NewGuid();
-
-                        var toAdd = new Skill
-                        {
-                            Name = skill.Name,
-                            Id = skillId.Value
-                        };
-                        await _skillRepository.InsertAsync(toAdd);
-                        result.Skills.Add(new SkillViewModel
-                        {
-                            Id = toAdd.Id,
-                            Name = toAdd.Name
-                        });
-                    }
-
-                    if (skillId.HasValue)
-                    {
-                        await _repository.AddSkillAsync(new PersonSkill
-                        {
-                            PersonId = model.PersonId,
-                            SkillId = skillId
-                        });
-                    }
+                    skillId = Guid.NewGuid();
                     
+                    await _skillRepository.InsertAsync(new Skill
+                    {
+                        Id = skillId.Value,
+                        Name = skill.Name
+                    });
                 }
-
-                return result;
-
+                
+                if (!skillId.HasValue) throw new ArgumentNullException(nameof(skillId));
+                
+                return await _repository.AddSkillAsync(new PersonSkill
+                {
+                    PersonId = personId,
+                    SkillId = skillId
+                });
             }
             catch (Exception e)
             {
@@ -413,37 +449,36 @@ namespace ProfileService.Services.Implementations
             return _mapper.Map<IEnumerable<GetPersonCategory>>(categories);
         }
 
-        public async Task AddCategoryAsync(NewPersonCategory model)
+        public async Task<GetLookupCategory> AddCategoryAsync(CategoryViewModel category, Guid personId)
         {
             try
             {
-                foreach (var category in model.Categories)
+                var categoryId = category.Id;
+                if (!category.Id.HasValue)
                 {
-                    var categoryId = category.Id;
-                    if (!category.Id.HasValue)
-                    {
-                        categoryId = Guid.NewGuid();
-                        
-                        await _categoryRepository.InsertAsync(new Category
-                        {
-                            Name = category.Name,
-                            Id = categoryId.Value
-                        });
-                    }
+                    categoryId = Guid.NewGuid();
 
-                    if (categoryId.HasValue)
+                    await _categoryRepository.InsertAsync(new Category
                     {
-                        await _repository.AddCategoryAsync(new PersonCategory
-                        {
-                            PersonId = model.PersonId,
-                            CategoryId = categoryId.Value
-                        });
-                    }
-                    
-                    
+                        Name = category.Name,
+                        Id = categoryId.Value
+                    });
                 }
-                
-                
+
+                if (categoryId.HasValue)
+                {
+                    await _repository.AddCategoryAsync(new PersonCategory
+                    {
+                        PersonId = personId,
+                        CategoryId = categoryId.Value
+                    });
+                }
+
+                return new GetLookupCategory
+                {
+                    Id = Guid.Parse(categoryId.ToString()),
+                    Name = category.Name
+                };
             }
             catch (Exception e)
             {
@@ -462,7 +497,7 @@ namespace ProfileService.Services.Implementations
             {
                 throw new Exception(e.Message, e);
             }
-        }    
+        }
 
         public async Task DeleteCategoryAsync(Guid categoryId, Guid personId)
         {

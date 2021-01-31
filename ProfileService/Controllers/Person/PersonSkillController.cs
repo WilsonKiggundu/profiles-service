@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProfileService.Contracts.Person.Skills;
 using ProfileService.Controllers.Common;
+using ProfileService.Models.Person;
 using ProfileService.Services.Interfaces;
 
 namespace ProfileService.Controllers.Person
@@ -45,15 +46,23 @@ namespace ProfileService.Controllers.Person
         /// <summary>
         /// CREATE a person skill
         /// </summary>
-        /// <param name="skill"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<NewPersonSkill> Create(NewPersonSkill skill)
+        public async Task<ICollection<PersonSkill>> Create(NewPersonSkill model)
         {
             try
-            {
-                _logger.LogInformation(JsonConvert.SerializeObject(skill, Formatting.Indented));
-                return await _personService.AddSkillAsync(skill);
+            { 
+                var response = new List<PersonSkill>();
+
+                foreach (var skill in model.Skills)
+                {    
+                    var result = 
+                        await _personService.AddSkillAsync(skill, model.PersonId);
+                    response.Add(result);
+                }
+                
+                return response;
             }
             catch (Exception e)
             {
@@ -94,7 +103,7 @@ namespace ProfileService.Controllers.Person
             try
             {
                 await _personService.DeleteSkillAsync(skillId, personId);
-                return Ok();
+                return Ok(new {skillId, personId});
             }
             catch (Exception e)
             {
