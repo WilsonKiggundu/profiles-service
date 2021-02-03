@@ -40,11 +40,11 @@ namespace ProfileService.Controllers.Lookup
         /// <param name="category"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task Create([FromBody] NewLookupCategory category)
+        public async Task<NewLookupCategory> Create(NewLookupCategory category)
         {
             try
             {
-                await _service.InsertAsync(category);
+                return await _service.InsertAsync(category);
             }
             catch (Exception e)
             {

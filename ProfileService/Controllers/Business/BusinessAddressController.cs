@@ -64,30 +64,33 @@ namespace ProfileService.Controllers.Business
         /// <returns></returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task Update([FromBody] UpdateBusinessAddress address)
+        public async Task<UpdateBusinessAddress> Update([FromBody] UpdateBusinessAddress address)
         {
             try
             {
                 await _businessService.UpdateAddressAsync(address);
+                return address;
             }
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
             }
         }
-        
+
         /// <summary>
         /// DELETE business address
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="businessId"></param>
+        /// <param name="addressId"></param>
         /// <returns></returns>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid businessId, Guid addressId)    
         {
             try
             {
-                await _businessService.DeleteAddressAsync(id);
+                await _businessService.DeleteAddressAsync(businessId, addressId);
             }
             catch (Exception e)
             {

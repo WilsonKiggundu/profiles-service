@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProfileService.Contracts.Business.Contact;
 using ProfileService.Controllers.Common;
+using ProfileService.Models.Business;
 using ProfileService.Services.Interfaces;
 
 namespace ProfileService.Controllers.Business
@@ -39,11 +40,11 @@ namespace ProfileService.Controllers.Business
         /// <param name="contact"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task Create([FromBody] NewBusinessContact contact)
+        public async Task<BusinessContact> Create([FromBody] NewBusinessContact contact)
         {
             try
             {
-                await _businessService.AddContactAsync(contact);
+                return await _businessService.AddContactAsync(contact);
             }
             catch (Exception e)
             {
@@ -58,30 +59,31 @@ namespace ProfileService.Controllers.Business
         /// <returns></returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task Update([FromBody] UpdateBusinessContact contact)
+        public async Task<BusinessContact> Update([FromBody] UpdateBusinessContact contact)
         {
             try
             {
-                await _businessService.UpdateContactAsync(contact);
+                return await _businessService.UpdateContactAsync(contact);
             }
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
             }
         }
-        
+
         /// <summary>
         /// DELETE business contact
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="contactId"></param>
+        /// <param name="belongsTo"></param>
         /// <returns></returns>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid contactId, Guid belongsTo)
         {
             try
             {
-                await _businessService.DeleteContactAsync(id);
+                await _businessService.DeleteContactAsync(contactId, belongsTo);
             }
             catch (Exception e)
             {

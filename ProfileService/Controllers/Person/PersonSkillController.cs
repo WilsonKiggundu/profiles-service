@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ProfileService.Contracts.Person.Skills;
 using ProfileService.Controllers.Common;
+using ProfileService.Models.Person;
 using ProfileService.Services.Interfaces;
 
 namespace ProfileService.Controllers.Person
@@ -16,14 +19,17 @@ namespace ProfileService.Controllers.Person
     public class PersonSkillController : BaseController
     {
         private readonly IPersonService _personService;
+        private readonly ILogger<PersonSkillController> _logger;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="personService"></param>
-        public PersonSkillController(IPersonService personService)
+        /// <param name="logger"></param>
+        public PersonSkillController(IPersonService personService, ILogger<PersonSkillController> logger)
         {
             _personService = personService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -40,14 +46,23 @@ namespace ProfileService.Controllers.Person
         /// <summary>
         /// CREATE a person skill
         /// </summary>
-        /// <param name="skill"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<NewPersonSkill> Create([FromBody] NewPersonSkill skill)
+        public async Task<ICollection<PersonSkill>> Create(NewPersonSkill model)
         {
             try
-            {
-                return await _personService.AddSkillAsync(skill);
+            { 
+                var response = new List<PersonSkill>();
+
+                foreach (var skill in model.Skills)
+                {    
+                    var result = 
+                        await _personService.AddSkillAsync(skill, model.PersonId);
+                    response.Add(result);
+                }
+                
+                return response;
             }
             catch (Exception e)
             {
@@ -74,20 +89,21 @@ namespace ProfileService.Controllers.Person
                 throw new Exception(e.Message, e);
             }
         }
-        
+
         /// <summary>
         /// DELETE a person skill
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="skillId"></param>
+        /// <param name="personId"></param>
         /// <returns></returns>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid skillId, Guid personId)
         {
             try
             {
-                await _personService.DeleteSkillAsync(id);
-                return Ok(id);
+                await _personService.DeleteSkillAsync(skillId, personId);
+                return Ok(new {skillId, personId});
             }
             catch (Exception e)
             {

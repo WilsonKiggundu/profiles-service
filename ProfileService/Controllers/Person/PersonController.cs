@@ -1,9 +1,10 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ProfileService.Contracts.Person;
 using ProfileService.Controllers.Common;
 using ProfileService.Services.Interfaces;
@@ -17,25 +18,28 @@ namespace ProfileService.Controllers.Person
     public class PersonController : BaseController
     {
         private readonly IPersonService _personService;
+        private readonly ILogger<PersonController> _logger;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="personService"></param>
-        public PersonController(IPersonService personService)
+        /// <param name="logger"></param>
+        public PersonController(IPersonService personService, ILogger<PersonController> logger)
         {
             _personService = personService;
+            _logger = logger;
         }
 
         /// <summary>
         /// SEARCH persons
         /// </summary>
-        /// <param name="exclude"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ICollection<GetPerson>> Get(Guid? exclude = null)
+        public async Task<SearchPersonResponse> Get([FromQuery] SearchPersonRequest request)
         {
-            return await _personService.SearchAsync(exclude);
+            return await _personService.SearchAsync(request);
         }
         
         /// <summary>
@@ -47,6 +51,8 @@ namespace ProfileService.Controllers.Person
         public async Task<IActionResult> GetOne(Guid id)
         {
             var profile = await _personService.GetByIdAsync(id);
+            
+            _logger.LogInformation(JsonConvert.SerializeObject(profile, Formatting.Indented));
 
             return Ok(profile);
         }
@@ -61,8 +67,33 @@ namespace ProfileService.Controllers.Person
         {
             try
             {
-                await _personService.InsertAsync(person);
-                return person;
+                return await _personService.InsertAsync(person);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+        
+        [HttpPut("coverPhoto")]
+        public async Task<UpdatePerson> UpdateCoverPhoto(UpdatePerson person)
+        {
+            try
+            {
+                return await _personService.UpdateCoverPhotoAsync(person);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+        
+        [HttpPut("avatar")]
+        public async Task<UpdatePerson> UpdateAvatar(UpdatePerson person)
+        {
+            try
+            {
+                return await _personService.UpdateAvatarAsync(person);
             }
             catch (Exception e)
             {
@@ -77,12 +108,11 @@ namespace ProfileService.Controllers.Person
         /// <returns></returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<UpdatePerson> Update([FromBody] UpdatePerson person)
+        public async Task<UpdatePerson> Update(UpdatePerson person)
         {
             try
             {
-                await _personService.UpdateAsync(person);
-                return person;
+                return await _personService.UpdateAsync(person);
             }
             catch (Exception e)
             {

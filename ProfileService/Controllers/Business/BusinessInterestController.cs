@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -40,14 +41,24 @@ namespace ProfileService.Controllers.Business
         /// <summary>
         /// CREATE a business interest
         /// </summary>
-        /// <param name="interest"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<GetBusinessInterest> Create(NewBusinessInterest interest)
+        public async Task<ICollection<GetBusinessInterest>> Create(AddBusinessInterest model)    
         {
             try
             {
-                return await _businessService.AddInterestAsync(interest);
+                var response = new List<GetBusinessInterest>();
+                var data = JsonConvert.DeserializeObject<IList<NewBusinessInterest>>(model.Interests);
+
+                foreach (var interest in data)
+                {
+                    _logger.LogInformation(JsonConvert.SerializeObject(interest, Formatting.Indented));
+                    var result = await _businessService.AddInterestAsync(interest, model.BusinessId);
+                    response.Add(result);
+                }
+
+                return response;
             }
             catch (Exception e)
             {
@@ -73,19 +84,20 @@ namespace ProfileService.Controllers.Business
                 throw new Exception(e.Message, e);
             }
         }
-        
+
         /// <summary>
         /// DELETE business interest
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="businessId"></param>
         /// <returns></returns>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid id, Guid businessId)
         {
             try
             {
-                await _businessService.DeleteInterestAsync(id);
+                await _businessService.DeleteInterestAsync(businessId, id);
             }
             catch (Exception e)
             {

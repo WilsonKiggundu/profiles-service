@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ProfileService.Contracts.Lookup.Category;
 using ProfileService.Contracts.Person.Categories;
 using ProfileService.Controllers.Common;
+using ProfileService.Models.Common;
+using ProfileService.Models.Person;
 using ProfileService.Services.Interfaces;
 
 namespace ProfileService.Controllers.Person
@@ -46,15 +49,34 @@ namespace ProfileService.Controllers.Person
         /// <summary>
         /// CREATE a person category
         /// </summary>
-        /// <param name="category"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<NewPersonCategory> Create(NewPersonCategory category)
+        public async Task<ICollection<PersonCategory>> Create(AddPersonCategory model)
         {
             try
             {
-                await _personService.AddCategoryAsync(category);
-                return category;
+                var response = new List<PersonCategory>();
+
+                foreach (var category in model.Categories)
+                {
+                    var result 
+                        = await _personService.AddCategoryAsync(category, model.PersonId);
+                    
+                    response.Add(new PersonCategory
+                    {
+                        
+                        PersonId = model.PersonId,
+                        CategoryId = result.Id,
+                        Category = new Category
+                        {
+                            Id = result.Id,
+                            Name = result.Name
+                        }
+                    });
+                }
+                
+                return response;
             }
             catch (Exception e)
             {
@@ -81,20 +103,21 @@ namespace ProfileService.Controllers.Person
                 throw new Exception(e.Message, e);
             }
         }
-        
+
         /// <summary>
         /// DELETE a person category
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="categoryId"></param>
+        /// <param name="personId"></param>
         /// <returns></returns>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid categoryId, Guid personId)
         {
             try
             {
-                await _personService.DeleteCategoryAsync(id);
-                return Ok(id);
+                await _personService.DeleteCategoryAsync(categoryId, personId);
+                return Ok();
             }
             catch (Exception e)
             {

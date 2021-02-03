@@ -13,10 +13,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using ProfileService.Data;
 using ProfileService.Exceptions;
 using ProfileService.Extensions;
 using ProfileService.Models.Common;
+using ProfileService.Repositories;
 using ProfileService.Repositories.Implementations;
 using ProfileService.Repositories.Interfaces;
 using ProfileService.Services.Implementations;
@@ -63,6 +63,7 @@ namespace ProfileService
             });
 
             services.AddResponseCaching();
+            
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {

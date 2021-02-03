@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,20 +27,10 @@ namespace ProfileService.Controllers.Blog
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<GetComment> Get(Guid? postId = null, Guid? articleId = null)
+        public async Task<SearchCommentsResponse> Get([FromQuery] SearchCommentsRequest request)
         {
-            return _commentService.GetAll(postId, articleId);
-        }
-        
-        /// <summary>
-        /// GET comment by Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id}")]
-        public async Task<GetComment> GetOne(Guid id)
-        {
-            return await _commentService.GetByIdAsync(id);
+            _logger.LogInformation(JsonConvert.SerializeObject(request, Formatting.Indented));
+            return await _commentService.SearchAsync(request);
         }
 
         /// <summary>
@@ -54,8 +43,7 @@ namespace ProfileService.Controllers.Blog
         {
             try
             {
-                await _commentService.InsertAsync(comment);
-                return comment;
+                return await _commentService.InsertAsync(comment);
             }
             catch (Exception e)
             {

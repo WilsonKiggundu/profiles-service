@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using ProfileService.Models.Common;
@@ -7,36 +8,28 @@ namespace ProfileService.Models.Business
 {
     public class Business : BaseModel
     {
-        /// <summary>
-        /// Business name
-        /// </summary>
         [Required]
         public string Name { get; set; }
 
-        /// <summary>
-        /// About the business
-        /// </summary>
         public string Description { get; set; }
 
         public string Category { get; set; }
 
-        /// <summary>
-        /// Number of employees
-        /// </summary>
-        public int? EmployeeCount { get; set; }
+        public string EmployeeCount { get; set; }
         
-        /// <summary>
-        /// Incorporation date
-        /// </summary>
         public string IncorporationDate { get; set; }
 
-        /// <summary>
-        /// Website URL
-        /// </summary>
         public string Website { get; set; }
 
         public string CoverPhoto { get; set; }
-        public string Avatar { get; set; }    
+        public string Avatar { get; set; }
+
+        public ICollection<BusinessInterest> Interests { get; set; }
+        public ICollection<BusinessAddress> Addresses { get; set; }
+        public ICollection<BusinessProduct> Products { get; set; }
+        public ICollection<BusinessContact> Contacts { get; set; }
+        public ICollection<BusinessNeed> Needs { get; set; }
+        public ICollection<BusinessRole> Roles { get; set; }
 
         [NotMapped] public bool ProfileComplete { get; set; }
 
@@ -44,7 +37,7 @@ namespace ProfileService.Models.Business
         {
             ProfileComplete = !string.IsNullOrEmpty(Description)
                               && !string.IsNullOrEmpty(Website)
-                              && EmployeeCount.HasValue;
+                              && !string.IsNullOrEmpty(EmployeeCount);
         }
     }
 

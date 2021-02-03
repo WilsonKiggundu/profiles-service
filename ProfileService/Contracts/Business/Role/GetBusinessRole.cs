@@ -1,4 +1,5 @@
 using System;
+using ProfileService.Contracts.Person;
 using ProfileService.Models.Common;
 
 namespace ProfileService.Contracts.Business.Role
@@ -9,7 +10,8 @@ namespace ProfileService.Contracts.Business.Role
     public class GetBusinessRole : BaseModel
     {
         public Guid BusinessId { get; set; }
-        public Guid PersonId { get; set; }    
+        public Guid PersonId { get; set; }
+        public GetPerson Person { get; set; }
         public string Role { get; set; }
     }
 }

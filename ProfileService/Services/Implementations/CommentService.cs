@@ -12,44 +12,41 @@ namespace ProfileService.Services.Implementations
     public class CommentService : ICommentService
     {
         private readonly ICommentRepository _repository;
+        private readonly IPersonRepository _personRepository;
         private readonly IMapper _mapper;
 
-        public CommentService(ICommentRepository repository, IMapper mapper)
+        public CommentService(ICommentRepository repository, IMapper mapper, IPersonRepository personRepository)
         {
             _repository = repository;
             _mapper = mapper;
-        }
-
-        public IEnumerable<GetComment> GetAll()
-        {
-            return _mapper.Map<ICollection<GetComment>>(_repository.GetAll());
+            _personRepository = personRepository;
         }
         
-        public IEnumerable<GetComment> GetAll(Guid? postId, Guid? articleId)
+        public async Task<SearchCommentsResponse> SearchAsync(SearchCommentsRequest filter)
         {
-            return _mapper.Map<ICollection<GetComment>>(_repository.GetAll(postId, articleId));
+            return await _repository.SearchAsync(filter);
         }
 
-        public async Task<GetComment> GetByIdAsync(Guid id)
+        public async Task<NewComment> InsertAsync(NewComment comment)
         {
-            var comment = await _repository.GetByIdAsync(id);
-            return _mapper.Map<GetComment>(comment);
+            var entity = _mapper.Map<Comment>(comment);
+            await _repository.InsertAsync(entity);
+
+            entity.Author = await _personRepository.GetByIdAsync(comment.AuthorId);
+            
+            return _mapper.Map<NewComment>(entity);
         }
 
-        public async Task InsertAsync(NewComment comment)
+        public async Task<UpdateComment> UpdateAsync(UpdateComment comment)
         {
-
-            await _repository.InsertAsync(_mapper.Map<Comment>(comment));
-        }
-
-        public async Task UpdateAsync(UpdateComment comment)
-        {
-            throw new NotImplementedException();
+            var entity = _mapper.Map<Comment>(comment);
+            await _repository.UpdateAsync(entity);
+            return comment;
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            await _repository.DeleteAsync(id);
         }
     }
 }

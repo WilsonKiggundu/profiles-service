@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProfileService.Contracts.Lookup.Interest;
-using ProfileService.Data;
 using ProfileService.Models.Common;
 using ProfileService.Repositories.Interfaces;
 

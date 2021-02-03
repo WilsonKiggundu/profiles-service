@@ -9,9 +9,9 @@ namespace ProfileService.Models.Person
     public class PersonAward : BaseModel
     {
         public Guid PersonId { get; set; }
-        public Person Person { get; set; }
+        public Guid? InstituteId { get; set; }
+        public School Institute { get; set; }
         
-        public string AwardedBy { get; set; }
         public string Title { get; set; }
         public string FieldOfStudy { get; set; }
         public string StartYear { get; set; }

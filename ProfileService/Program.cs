@@ -1,20 +1,13 @@
 using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Serilog;
-using Serilog.Formatting.Compact;
 
 namespace ProfileService
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public static class Program
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="args"></param>
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
@@ -25,6 +18,11 @@ namespace ProfileService
             try
             {
                 Log.Information("Starting up");
+                
+                JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                };
 
                 CreateHostBuilder(args).Build().Run();
             }

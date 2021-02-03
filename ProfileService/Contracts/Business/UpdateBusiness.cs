@@ -10,8 +10,8 @@ namespace ProfileService.Contracts.Business
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public int NumberOfEmployees { get; set; }
-        public string DateOfIncorporation { get; set; }
+        public string EmployeeCount { get; set; }
+        public string IncorporationDate { get; set; }
         public string Website { get; set; }
         public string CoverPhoto { get; set; }    
         public string Avatar { get; set; }

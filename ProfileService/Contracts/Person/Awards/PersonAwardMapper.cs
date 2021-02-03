@@ -1,4 +1,5 @@
 using AutoMapper;
+using ProfileService.Models.Common;
 
 namespace ProfileService.Contracts.Person.Awards
 {
@@ -11,6 +12,7 @@ namespace ProfileService.Contracts.Person.Awards
                 .ReverseMap();
             CreateMap<UpdatePersonAward, Models.Person.PersonAward>()
                 .ReverseMap();
+            CreateMap<SchoolViewModel, School>().ReverseMap();
         }
     }
 }

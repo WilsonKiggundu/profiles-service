@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using ProfileService.Models.Common;
 
 namespace ProfileService.Models.Business
@@ -8,12 +9,13 @@ namespace ProfileService.Models.Business
     {
         [Required]
         public Guid BusinessId { get; set; }
+        
+        [JsonIgnore]
         public Business Business { get; set; }
 
         [Required]
         public string Name { get; set; }
         
-        [MaxLength(280)]
         public string Description { get; set; }
 
     }

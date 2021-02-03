@@ -10,7 +10,6 @@ namespace ProfileService.Contracts.Person
     {
         public string UserId { get; set; }
         public string FirstName { get; set; }
-        public string MiddleName { get; set; }
         public string LastName { get; set; }
         public string DateOfBirth { get; set; }
         public string Gender { get; set; }
@@ -18,8 +17,6 @@ namespace ProfileService.Contracts.Person
         public string Email { get; set; }
         public string Avatar { get; set; }
         public string CoverPhoto { get; set; }
-        public IList<Guid> Interests { get; set; }
-        public IList<Guid> Categories { get; set; }
         
     }
 

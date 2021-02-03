@@ -8,15 +8,16 @@ using ProfileService.Contracts.Business.Interest;
 using ProfileService.Contracts.Business.Need;
 using ProfileService.Contracts.Business.Product;
 using ProfileService.Contracts.Business.Role;
+using ProfileService.Models.Business;
 
 namespace ProfileService.Services.Interfaces
 {
     public interface IBusinessService : IService
     {
-        Task<ICollection<GetBusiness>> SearchAsync(SearchBusiness request);
+        Task<SearchBusinessResponse> SearchAsync(SearchBusinessRequest request);
         Task<GetBusiness> GetByIdAsync(Guid id);
-        Task InsertAsync(NewBusiness business);
-        Task UpdateAsync(UpdateBusiness business);
+        Task<NewBusiness> InsertAsync(NewBusiness business);
+        Task<UpdateBusiness> UpdateAsync(UpdateBusiness business);
         Task DeleteAsync(Guid id);
 
         #region Business Addresses
@@ -24,25 +25,25 @@ namespace ProfileService.Services.Interfaces
         Task<IEnumerable<GetBusinessAddress>> GetAddressesAsync(Guid businessId);
         Task<NewBusinessAddress> AddAddressAsync(NewBusinessAddress address);
         Task UpdateAddressAsync(UpdateBusinessAddress address);    
-        Task DeleteAddressAsync(Guid addressId);    
+        Task DeleteAddressAsync(Guid businessId, Guid addressId);    
 
         #endregion    
         
         #region Business Contacts
     
         Task<IEnumerable<GetBusinessContact>> GetContactsAsync(Guid businessId);
-        Task AddContactAsync(NewBusinessContact contact);
-        Task UpdateContactAsync(UpdateBusinessContact contact);        
-        Task DeleteContactAsync(Guid contactId);    
+        Task<BusinessContact> AddContactAsync(NewBusinessContact contact);
+        Task<BusinessContact> UpdateContactAsync(UpdateBusinessContact contact);        
+        Task DeleteContactAsync(Guid contactId, Guid belongsTo);    
 
         #endregion
         
         #region Business Interests
     
         Task<IEnumerable<GetBusinessInterest>> GetInterestsAsync(Guid businessId);
-        Task<GetBusinessInterest> AddInterestAsync(NewBusinessInterest interest);
+        Task<GetBusinessInterest> AddInterestAsync(NewBusinessInterest interest, Guid businessId);
         Task UpdateInterestAsync(UpdateBusinessInterest interest);    
-        Task DeleteInterestAsync(Guid interestId);        
+        Task DeleteInterestAsync(Guid businessId, Guid interestId);        
 
         #endregion
         
@@ -60,17 +61,20 @@ namespace ProfileService.Services.Interfaces
         Task<IEnumerable<GetBusinessProduct>> GetProductsAsync(Guid businessId);
         Task<GetBusinessProduct> AddProductAsync(NewBusinessProduct product);
         Task<GetBusinessProduct> UpdateProductAsync(UpdateBusinessProduct product);    
-        Task DeleteProductAsync(Guid productId);    
+        Task DeleteProductAsync(Guid productId, Guid businessId);    
 
         #endregion
         
         #region Business Roles
     
         Task<IEnumerable<GetBusinessRole>> GetRolesAsync(Guid businessId);
-        Task AddRoleAsync(NewBusinessRole role);
+        Task<BusinessRole> AddRoleAsync(NewBusinessRole role);
         Task UpdateRoleAsync(UpdateBusinessRole role);        
-        Task DeleteRoleAsync(Guid roleId);        
+        Task DeleteRoleAsync(Guid businessId, Guid personId);        
 
         #endregion
+
+        Task<UpdateBusiness> UpdateCoverPhotoAsync(UpdateBusiness business);
+        Task<UpdateBusiness> UpdateAvatarAsync(UpdateBusiness business);
     }
 }

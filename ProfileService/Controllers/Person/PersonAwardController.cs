@@ -47,6 +47,7 @@ namespace ProfileService.Controllers.Person
         {
             try
             {
+                award.Id = Guid.NewGuid();
                 await _personService.AddAwardAsync(award);
                 return award;
             }
@@ -75,20 +76,21 @@ namespace ProfileService.Controllers.Person
                 throw new Exception(e.Message, e);
             }
         }
-        
+
         /// <summary>
         /// DELETE a person award
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="awardId"></param>
+        /// <param name="personId"></param>
         /// <returns></returns>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid awardId, Guid personId)
         {
             try
             {
-                await _personService.DeleteAwardAsync(id);
-                return Ok(id);
+                await _personService.DeleteAwardAsync(awardId, personId);
+                return Ok(new {awardId, personId});
             }
             catch (Exception e)
             {

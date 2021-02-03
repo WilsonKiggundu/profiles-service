@@ -9,7 +9,7 @@ namespace ProfileService.Services.Interfaces
     {
         ICollection<GetLookupCategory> SearchAsync();
         Task<GetLookupCategory> GetByIdAsync(Guid id);
-        Task InsertAsync(NewLookupCategory category);
+        Task<NewLookupCategory> InsertAsync(NewLookupCategory category);
         Task UpdateAsync(UpdateLookupCategory category);
         Task DeleteAsync(Guid id);
     }

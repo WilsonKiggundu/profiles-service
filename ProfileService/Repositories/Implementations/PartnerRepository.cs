@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ProfileService.Contracts.Partner;
-using ProfileService.Data;
 using ProfileService.Models.Partner;
 using ProfileService.Repositories.Interfaces;
 

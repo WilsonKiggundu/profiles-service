@@ -22,22 +22,25 @@ namespace ProfileService.Services.Implementations
     public class BusinessService : IBusinessService
     {
         private readonly IBusinessRepository _repository;
+        private readonly IContactRepository _contactRepository;
         private readonly ILookupInterestRepository _interestRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<BusinessService> _logger;
+        private readonly IPersonRepository _personRepository;
 
-        public BusinessService(IBusinessRepository repository, IMapper mapper, ILogger<BusinessService> logger, ILookupInterestRepository interestRepository)
+        public BusinessService(IBusinessRepository repository, IMapper mapper, ILogger<BusinessService> logger, ILookupInterestRepository interestRepository, IContactRepository contactRepository, IPersonRepository personRepository)
         {
             _repository = repository;
             _mapper = mapper;
             _logger = logger;
             _interestRepository = interestRepository;
+            _contactRepository = contactRepository;
+            _personRepository = personRepository;
         }
 
-        public async Task<ICollection<GetBusiness>> SearchAsync(SearchBusiness request)
+        public async Task<SearchBusinessResponse> SearchAsync(SearchBusinessRequest request)
         {
-            var results = await _repository.SearchAsync(request);
-            return _mapper.Map<List<GetBusiness>>(results);
+            return await _repository.SearchAsync(request);
         }
         
         public async Task<GetBusiness> GetByIdAsync(Guid id)
@@ -53,40 +56,43 @@ namespace ProfileService.Services.Implementations
                 DateCreated = result.DateCreated,
                 CoverPhoto = result.CoverPhoto,
                 Avatar = result.Avatar,
-                DateOfIncorporation = result.IncorporationDate,
-                NumberOfEmployees = result.EmployeeCount
+                IncorporationDate = result.IncorporationDate,
+                EmployeeCount = result.EmployeeCount
                 
             };
             return business;
         }
 
-        public async Task InsertAsync(NewBusiness model)
+        public async Task<NewBusiness> InsertAsync(NewBusiness model)
         {
             try
             {
                 var business = new Business
                 {    
+                    Id = Guid.NewGuid(),
                     Name = model.Name,
                     Description = model.Description,
                     Website = model.Website,
                     CoverPhoto = model.CoverPhoto,
                     Avatar = model.Avatar,
-                    EmployeeCount = int.Parse(model.NumberOfEmployees),
-                    IncorporationDate = model.DateOfIncorporation,
+                    EmployeeCount = model.EmployeeCount,
+                    IncorporationDate = model.IncorporationDate,
                     Category = model.Category,
                     
                 };
                 await _repository.InsertAsync(business);
-                _logger.LogInformation(JsonConvert.SerializeObject(business));
 
                 var role = new BusinessRole
                 {
                     BusinessId = business.Id,
-                    Role = RoleType.PageAdmin,
+                    Role = RoleType.PageAdmin.ToString(),
                     PersonId = Guid.Parse(model.CreatedBy)
                 };
+                
                 await _repository.AddRoleAsync(role);
-                _logger.LogInformation(JsonConvert.SerializeObject(role));
+
+                return _mapper.Map<NewBusiness>(business);
+
             }
             catch (Exception e)
             {
@@ -94,26 +100,23 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task UpdateAsync(UpdateBusiness model)
+        public async Task<UpdateBusiness> UpdateAsync(UpdateBusiness model)
         {
             try
             {
-                var business = new Business
-                {    
-                    Id = model.Id,
-                    Name = model.Name,
-                    Description = model.Description,
-                    Website = model.Website,
-                    EmployeeCount = model.NumberOfEmployees,
-                    CoverPhoto = model.CoverPhoto,
-                    Avatar = model.Avatar,
-                    IncorporationDate = model.DateOfIncorporation,
-                    Category = model.Category,
-                };
-                
-                _logger.LogInformation(JsonConvert.SerializeObject(business));
+                var business = await _repository.GetByIdAsync(model.Id);
+                business.CoverPhoto = model.CoverPhoto;
+                business.Name = model.Name;
+                business.Description = model.Description;
+                business.Website = model.Website;
+                business.EmployeeCount = model.EmployeeCount;
+                business.Avatar = model.Avatar;
+                business.IncorporationDate = model.IncorporationDate;
+                business.Category = model.Category;
                 
                 await _repository.UpdateAsync(business);
+
+                return _mapper.Map<UpdateBusiness>(business);
             }
             catch (Exception e)
             {
@@ -143,27 +146,7 @@ namespace ProfileService.Services.Implementations
         {
             try
             {
-                var model = new BusinessAddress
-                {
-                    Building = address.Building,
-                    City = address.City,
-                    Country = address.Country,
-                    Floor = address.Floor,
-                    Region = address.Region,
-                    Street = address.Street,
-                    AddressLine = address.AddressLine,
-                    PostalCode = address.PostalCode,
-                    BusinessId = address.BusinessId,
-                    Type = address.Type switch
-                    {
-                        "1" => AddressType.Mailing,
-                        "2" => AddressType.Physical,
-                        "3" => AddressType.Billing,
-                        "99" => AddressType.Other,
-                        _ => AddressType.Other
-                    }
-                };
-                
+                var model = _mapper.Map<BusinessAddress>(address);
                 await _repository.AddAddressAsync(model);
                 return _mapper.Map<NewBusinessAddress>(model);
             }
@@ -186,11 +169,11 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task DeleteAddressAsync(Guid addressId)
+        public async Task DeleteAddressAsync(Guid businessId, Guid addressId)
         {
             try
             {
-                await _repository.DeleteAddressAsync(addressId);
+                await _repository.DeleteAddressAsync(businessId, addressId);
             }
             catch (Exception e)
             {
@@ -204,12 +187,30 @@ namespace ProfileService.Services.Implementations
             return _mapper.Map<IEnumerable<GetBusinessContact>>(contacts);
         }
 
-        public async Task AddContactAsync(NewBusinessContact contact)
+        public async Task<BusinessContact> AddContactAsync(NewBusinessContact contact)
         {
             try
             {
-                var model = _mapper.Map<BusinessContact>(contact);
-                await _repository.AddContactAsync(model);
+                var contactId = Guid.NewGuid();
+                
+                var businessContact = new BusinessContact
+                {
+                    BusinessId = contact.BelongsTo,
+                    ContactId = contactId,
+                    Contact = new Contact
+                    {
+                        Id = contactId,
+                        Category = contact.Category,
+                        Details = contact.Details,
+                        Type = contact.Type,
+                        Value = contact.Value,
+                        BelongsTo = contact.BelongsTo,
+                    }
+                };
+
+                await _repository.AddContactAsync(businessContact);
+                
+                return businessContact;
             }
             catch (Exception e)
             {
@@ -217,12 +218,36 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task UpdateContactAsync(UpdateBusinessContact contact)
+        public async Task<BusinessContact> UpdateContactAsync(UpdateBusinessContact contact)
         {
             try
             {
-                var model = _mapper.Map<BusinessContact>(contact);
-                await _repository.UpdateContactAsync(model);
+                _logger.LogInformation(JsonConvert.SerializeObject(contact, Formatting.Indented));
+                
+                var contactEntity = await _contactRepository.GetByIdAsync(contact.Id);
+
+                contactEntity.Category = contact.Category;
+                contactEntity.Details = contact.Details;
+                contactEntity.Type = contact.Type;
+                // contactEntity.BelongsTo = contact.BelongsTo;
+                contactEntity.Value = contact.Value;
+                
+                await _contactRepository.UpdateAsync(contactEntity);
+                
+                return new BusinessContact
+                {
+                    BusinessId = contact.BelongsTo,
+                    ContactId = contact.Id,
+                    Contact = new Contact
+                    {
+                        Category = contact.Category,
+                        Details = contact.Details,
+                        Id = contact.Id,
+                        Type = contact.Type,
+                        Value = contact.Value,
+                        BelongsTo = contact.BelongsTo
+                    }
+                };
             }
             catch (Exception e)
             {
@@ -230,11 +255,11 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task DeleteContactAsync(Guid contactId)
+        public async Task DeleteContactAsync(Guid contactId, Guid belongsTo)
         {
             try
             {
-                await _repository.DeleteContactAsync(contactId);
+                await _repository.DeleteContactAsync(contactId, belongsTo);
             }
             catch (Exception e)
             {
@@ -250,7 +275,7 @@ namespace ProfileService.Services.Implementations
             return _mapper.Map<ICollection<GetBusinessInterest>>(interests);
         }
 
-        public async Task<GetBusinessInterest> AddInterestAsync(NewBusinessInterest interest)
+        public async Task<GetBusinessInterest> AddInterestAsync(NewBusinessInterest interest, Guid businessId)    
         {
             try
             {
@@ -267,7 +292,7 @@ namespace ProfileService.Services.Implementations
                 
                 var model = new BusinessInterest
                 {
-                    BusinessId = interest.BusinessId,
+                    BusinessId = businessId,
                     InterestId = interestId
                 };
                 await _repository.AddInterestAsync(model);
@@ -295,11 +320,11 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task DeleteInterestAsync(Guid interestId)
+        public async Task DeleteInterestAsync(Guid businessId, Guid interestId)
         {
             try
             {
-                await _repository.DeleteInterestAsync(interestId);
+                await _repository.DeleteInterestAsync(businessId, interestId);
             }
             catch (Exception e)
             {
@@ -386,11 +411,11 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task DeleteProductAsync(Guid addressId)
+        public async Task DeleteProductAsync(Guid productId, Guid businessId)
         {
             try
             {
-                await _repository.DeleteProductAsync(addressId);
+                await _repository.DeleteProductAsync(productId, businessId);
             }
             catch (Exception e)
             {
@@ -404,12 +429,24 @@ namespace ProfileService.Services.Implementations
             return _mapper.Map<IEnumerable<GetBusinessRole>>(roles);
         }
 
-        public async Task AddRoleAsync(NewBusinessRole role)
+        public async Task<BusinessRole> AddRoleAsync(NewBusinessRole role)
         {
             try
             {
-                var model = _mapper.Map<BusinessRole>(role);
-                await _repository.AddRoleAsync(model);
+                _logger.LogInformation(JsonConvert.SerializeObject(role, Formatting.Indented));
+                
+                var businessRole = new BusinessRole
+                {
+                    BusinessId = role.BusinessId,
+                    PersonId = role.PersonId,
+                    Role = role.Role.Name
+                };
+                
+                await _repository.AddRoleAsync(businessRole);
+                var person = await _personRepository.GetByIdAsync(role.PersonId);
+                businessRole.Person = person;
+
+                return businessRole;
             }
             catch (Exception e)
             {
@@ -430,11 +467,43 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task DeleteRoleAsync(Guid roleId)
+        public async Task DeleteRoleAsync(Guid businessId, Guid personId)
         {
             try
             {
-                await _repository.DeleteRoleAsync(roleId);
+                await _repository.DeleteRoleAsync(businessId, personId);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<UpdateBusiness> UpdateCoverPhotoAsync(UpdateBusiness model)    
+        {
+            var business = await _repository.GetByIdAsync(model.Id);
+            business.CoverPhoto = model.CoverPhoto;
+            
+            try
+            {
+                await _repository.UpdateAsync(business);
+                return _mapper.Map<UpdateBusiness>(business);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<UpdateBusiness> UpdateAvatarAsync(UpdateBusiness model)    
+        {
+            var business = await _repository.GetByIdAsync(model.Id);
+            business.Avatar = model.Avatar;
+            
+            try
+            {
+                await _repository.UpdateAsync(business);
+                return _mapper.Map<UpdateBusiness>(business);
             }
             catch (Exception e)
             {

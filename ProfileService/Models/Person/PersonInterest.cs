@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using ProfileService.Models.Common;
 
 namespace ProfileService.Models.Person
@@ -9,16 +10,9 @@ namespace ProfileService.Models.Person
     /// </summary>
     public class PersonInterest : BaseModel
     {
-        /// <summary>
-        /// 
-        /// </summary>
         [Required]
         public Guid PersonId { get; set; }
-        public Person Person { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [Required]
         public Guid InterestId { get; set; }
         public Interest Interest { get; set; }

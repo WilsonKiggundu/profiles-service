@@ -33,9 +33,8 @@ namespace ProfileService.Controllers.Business
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ICollection<GetBusiness>> Get()
+        public async Task<SearchBusinessResponse> Get([FromQuery] SearchBusinessRequest request)
         {
-            var request = new SearchBusiness();
             return await _businessService.SearchAsync(request);
         }
         
@@ -60,8 +59,7 @@ namespace ProfileService.Controllers.Business
         {
             try
             {
-                await _businessService.InsertAsync(business);
-                return business;
+                return await _businessService.InsertAsync(business);
             }
             catch (Exception e)
             {
@@ -80,9 +78,35 @@ namespace ProfileService.Controllers.Business
         {
             try
             {
-                _logger.LogInformation(JsonConvert.SerializeObject(business));
-                await _businessService.UpdateAsync(business);
-                return business;
+                _logger.LogInformation(JsonConvert.SerializeObject(business, Formatting.Indented));
+                
+                return await _businessService.UpdateAsync(business);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+        
+        [HttpPut("coverPhoto")]
+        public async Task<UpdateBusiness> UpdateCoverPhoto(UpdateBusiness person)
+        {
+            try
+            {
+                return await _businessService.UpdateCoverPhotoAsync(person);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+        
+        [HttpPut("avatar")]
+        public async Task<UpdateBusiness> UpdateAvatar(UpdateBusiness person)
+        {
+            try
+            {
+                return await _businessService.UpdateAvatarAsync(person);
             }
             catch (Exception e)
             {

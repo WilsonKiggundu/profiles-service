@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProfileService.Contracts.Investor;
-using ProfileService.Data;
 using ProfileService.Models.Investor;
 using ProfileService.Repositories.Interfaces;
 

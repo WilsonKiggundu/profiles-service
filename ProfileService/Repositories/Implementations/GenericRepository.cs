@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using ProfileService.Data;
 using ProfileService.Models.Common;
 using ProfileService.Repositories.Interfaces;
 
@@ -14,7 +13,7 @@ namespace ProfileService.Repositories.Implementations
         private readonly ProfileServiceContext _context;
         private readonly DbSet<T> _entities;
 
-        public GenericRepository(ProfileServiceContext context)
+        protected GenericRepository(ProfileServiceContext context)
         {
             _context = context;
             _entities = context.Set<T>();
