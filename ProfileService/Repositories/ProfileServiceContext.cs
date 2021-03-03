@@ -8,6 +8,7 @@ using ProfileService.Models.Common;
 using ProfileService.Models.Investor;
 using ProfileService.Models.Person;
 using ProfileService.Models.Posts;
+using ProfileService.Models.Preferences;
 
 namespace ProfileService.Repositories
 {
@@ -101,6 +102,12 @@ namespace ProfileService.Repositories
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Like> Likes { get; set; }
         
+        #endregion
+
+        #region Preferences
+
+        public DbSet<EmailSettings> EmailPreferences { get; set; }
+
         #endregion
     }
 }

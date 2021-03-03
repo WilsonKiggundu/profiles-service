@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using ProfileService.Repositories;
 
 namespace ProfileService.Migrations
 {
@@ -14,6 +15,7 @@ namespace ProfileService.Migrations
                 oldType: "character varying(280)",
                 oldMaxLength: 280,
                 oldNullable: true);
+
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

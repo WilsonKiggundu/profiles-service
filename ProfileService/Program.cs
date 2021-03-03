@@ -1,7 +1,12 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using ProfileService.Helpers;
+using ProfileService.Helpers.Email;
+using ProfileService.Repositories;
 using Serilog;
 
 namespace ProfileService
@@ -17,14 +22,24 @@ namespace ProfileService
             
             try
             {
+                
                 Log.Information("Starting up");
+                
+                var host = CreateHostBuilder(args).Build();
+                using (var scope = host.Services.CreateScope())
+                {
+                    var context = scope.ServiceProvider.GetService<ProfileServiceContext>();
+                    DataSeeder.SeedEmailPreferences(context);
+
+                }
+                
                 
                 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                 };
 
-                CreateHostBuilder(args).Build().Run();
+                host.Run();
             }
             catch (Exception ex)
             {

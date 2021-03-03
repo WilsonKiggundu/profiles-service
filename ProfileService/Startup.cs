@@ -76,6 +76,7 @@ namespace ProfileService
             services.AddDbContext<ProfileServiceContext>(options => options.UseNpgsql(connectionString));
             
             services.AddDependencyInjection();
+            services.AddEmailSenders(Configuration);
 
             services.AddSwaggerGen(context =>
             {

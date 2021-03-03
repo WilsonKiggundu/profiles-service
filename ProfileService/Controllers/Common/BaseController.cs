@@ -1,3 +1,5 @@
+using System;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +17,9 @@ namespace ProfileService.Controllers.Common
     [Produces("application/json")]
     public class BaseController : ControllerBase
     {
-        
+        public BaseController()
+        {
+            
+        }
     }
 }

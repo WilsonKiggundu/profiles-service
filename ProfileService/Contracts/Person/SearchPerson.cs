@@ -9,6 +9,7 @@ namespace ProfileService.Contracts.Person
     public class SearchPersonRequest
     {   
         public Guid? Id { get; set; }
+        public Guid? UserId { get; set; }
         public string Name { get; set; }
 
         public int Page { get; set; } = 1;

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProfileService.Contracts.Person;
 using ProfileService.Models.Person;
+using ProfileService.Models.Preferences;
 using ProfileService.Repositories.Interfaces;
 
 namespace ProfileService.Repositories.Implementations
@@ -38,7 +39,9 @@ namespace ProfileService.Repositories.Implementations
         /// <exception cref="NotImplementedException"></exception>
         public async Task<SearchPersonResponse> SearchAsync(SearchPersonRequest request)
         {
-            IQueryable<Person> query = _context.Persons.OrderByDescending(p => p.DateCreated);
+            IQueryable<Person> query = _context.Persons
+                .Where(p => p.Id != request.UserId)
+                .OrderByDescending(p => p.DateCreated);
 
             if (request.Id.HasValue)
             {
@@ -75,6 +78,7 @@ namespace ProfileService.Repositories.Implementations
                 person.Connections = new List<PersonConnection>();
                 person.FullName = $"{person.Firstname} {person.Lastname}";
                 person.ConnectionsCount = _context.PersonConnections.Count(c => c.PersonId == person.Id);
+                person.IsConnected = _context.PersonConnections.Any(c => c.FollowerId == request.UserId);
             });
             
             return new SearchPersonResponse
@@ -262,6 +266,11 @@ namespace ProfileService.Repositories.Implementations
         public async Task DeleteConnectionAsync(Guid connectionId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<EmailSettings> EmailPreferences(Guid personId)
+        {
+            return await _context.EmailPreferences.SingleOrDefaultAsync(q => q.PersonId == personId);
         }
     }
 }

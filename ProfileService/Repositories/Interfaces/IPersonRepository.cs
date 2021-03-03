@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ProfileService.Contracts.Person;
 using ProfileService.Models.Investor;
 using ProfileService.Models.Person;
+using ProfileService.Models.Preferences;
 
 namespace ProfileService.Repositories.Interfaces
 {
@@ -57,6 +58,12 @@ namespace ProfileService.Repositories.Interfaces
         Task UpdateConnectionAsync(PersonConnection connection);    
         Task DeleteConnectionAsync(Guid connectionId);            
 
-        #endregion  
+        #endregion
+
+        #region Person Preferences
+
+        Task<EmailSettings> EmailPreferences(Guid personId);
+
+        #endregion
     }
 }

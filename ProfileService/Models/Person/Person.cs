@@ -32,8 +32,8 @@ namespace ProfileService.Models.Person
         public virtual IEnumerable<PersonAward> Awards { get; set; } 
         public virtual IEnumerable<PersonConnection> Connections { get; set; }
 
-        [NotMapped]
-        public int ConnectionsCount { get; set; }
+        [NotMapped] public int ConnectionsCount { get; set; }
+        [NotMapped] public bool IsConnected { get; set; }
         
         [NotMapped] public string FullName { get; set; }
 
