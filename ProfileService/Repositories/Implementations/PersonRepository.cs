@@ -78,7 +78,7 @@ namespace ProfileService.Repositories.Implementations
                 person.Connections = new List<PersonConnection>();
                 person.FullName = $"{person.Firstname} {person.Lastname}";
                 person.ConnectionsCount = _context.PersonConnections.Count(c => c.PersonId == person.Id);
-                person.IsConnected = _context.PersonConnections.Any(c => c.FollowerId == request.UserId);
+                person.IsConnected = _context.PersonConnections.Any(c => c.FollowerId == request.UserId && c.PersonId == person.Id);
             });
             
             return new SearchPersonResponse
