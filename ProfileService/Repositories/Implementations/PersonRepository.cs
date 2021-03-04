@@ -40,7 +40,7 @@ namespace ProfileService.Repositories.Implementations
         public async Task<SearchPersonResponse> SearchAsync(SearchPersonRequest request)
         {
             IQueryable<Person> query = _context.Persons
-                .Where(p => p.Id != request.UserId)
+                // .Where(p => p.Id != request.UserId)
                 .OrderByDescending(p => p.DateCreated);
 
             if (request.Id.HasValue)
@@ -48,6 +48,10 @@ namespace ProfileService.Repositories.Implementations
                 request.PageSize = 1;
                 request.Page = 1;
                 query = query.Where(p => p.Id == request.Id);
+            }
+            else
+            {
+                query = query.Where(q => q.Id != request.UserId);
             }
             
             if (!string.IsNullOrEmpty(request.Name))
