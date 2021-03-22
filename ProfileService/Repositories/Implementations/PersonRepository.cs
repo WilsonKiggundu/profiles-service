@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProfileService.Contracts.Person;
+using ProfileService.Models.Business;
+using ProfileService.Models.Common;
 using ProfileService.Models.Person;
 using ProfileService.Models.Preferences;
 using ProfileService.Repositories.Interfaces;
@@ -275,6 +277,39 @@ namespace ProfileService.Repositories.Implementations
         public async Task<EmailSettings> EmailPreferences(Guid personId)
         {
             return await _context.EmailPreferences.SingleOrDefaultAsync(q => q.PersonId == personId);
+        }
+        
+        public async Task<IEnumerable<Contact>> GetContactsAsync(Guid personId)
+        {
+            var contacts = await _context.Contacts
+                .Where(q => q.BelongsTo == personId)
+                .Where(q => !q.IsDeleted)
+                .ToListAsync();
+
+            return contacts;
+        }
+
+        public async Task AddContactAsync(PersonContact contact)
+        {
+            await _context.PersonContacts.AddAsync(contact);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateContactAsync(PersonContact contact)
+        {
+            _context.PersonContacts.Update(contact);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteContactAsync(Guid contactId, Guid belongsTo)
+        {
+            var contact =
+                await _context.PersonContacts.FirstOrDefaultAsync(q =>
+                    q.PersonId == belongsTo && q.ContactId == contactId);
+
+            _context.PersonContacts.Remove(contact);
+
+            await _context.SaveChangesAsync();
         }
     }
 }

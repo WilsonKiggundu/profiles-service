@@ -70,6 +70,7 @@ namespace ProfileService.Repositories
         public DbSet<PersonCategory> PersonCategories { get; set; }
         public DbSet<PersonAward> PersonAwards { get; set; }
         public DbSet<PersonConnection> PersonConnections { get; set; }
+        public DbSet<PersonContact> PersonContacts { get; set; }
 
         #endregion
 

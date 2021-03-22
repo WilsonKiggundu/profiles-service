@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ProfileService.Contracts.Person;
+using ProfileService.Models.Business;
+using ProfileService.Models.Common;
 using ProfileService.Models.Investor;
 using ProfileService.Models.Person;
 using ProfileService.Models.Preferences;
@@ -57,6 +59,15 @@ namespace ProfileService.Repositories.Interfaces
         Task AddConnectionAsync(PersonConnection connection);
         Task UpdateConnectionAsync(PersonConnection connection);    
         Task DeleteConnectionAsync(Guid connectionId);            
+
+        #endregion
+        
+        #region Business Contacts
+    
+        Task<IEnumerable<Contact>> GetContactsAsync(Guid businessId);
+        Task AddContactAsync(PersonContact contact);
+        Task UpdateContactAsync(PersonContact contact);        
+        Task DeleteContactAsync(Guid contactId, Guid belongsTo);    
 
         #endregion
 

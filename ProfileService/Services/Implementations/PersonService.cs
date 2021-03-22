@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -10,6 +9,7 @@ using ProfileService.Contracts.Person;
 using ProfileService.Contracts.Person.Awards;
 using ProfileService.Contracts.Person.Categories;
 using ProfileService.Contracts.Person.Connections;
+using ProfileService.Contracts.Person.Contact;
 using ProfileService.Contracts.Person.Interests;
 using ProfileService.Contracts.Person.Skills;
 using ProfileService.Models.Common;
@@ -28,10 +28,11 @@ namespace ProfileService.Services.Implementations
         private readonly ILookupSchoolRepository _schoolRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<PersonService> _logger;
+        private readonly IContactRepository _contactRepository;
 
         public PersonService(IPersonRepository repository, IMapper mapper, ILookupInterestRepository interestRepository,
             ILookupCategoryRepository categoryRepository, ILookupSkillRepository skillRepository,
-            ILookupSchoolRepository schoolRepository, ILogger<PersonService> logger)
+            ILookupSchoolRepository schoolRepository, ILogger<PersonService> logger, IContactRepository contactRepository)
         {
             _repository = repository;
             _mapper = mapper;
@@ -40,6 +41,7 @@ namespace ProfileService.Services.Implementations
             _skillRepository = skillRepository;
             _schoolRepository = schoolRepository;
             _logger = logger;
+            _contactRepository = contactRepository;
         }
 
         public async Task<SearchPersonResponse> SearchAsync(SearchPersonRequest request)
@@ -123,6 +125,92 @@ namespace ProfileService.Services.Implementations
             {
                 await _repository.UpdateAsync(person);
                 return _mapper.Map<UpdatePerson>(person);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<IEnumerable<GetPersonContact>> GetContactsAsync(Guid personId)
+        {
+            var contacts = await _repository.GetContactsAsync(personId);
+            return _mapper.Map<IEnumerable<GetPersonContact>>(contacts);
+        }
+
+        public async Task<PersonContact> AddContactAsync(NewPersonContact contact)
+        {
+            try
+            {
+                var contactId = Guid.NewGuid();
+                
+                var personContact = new PersonContact
+                {
+                    PersonId = contact.BelongsTo,
+                    ContactId = contactId,
+                    Contact = new Contact
+                    {
+                        Id = contactId,
+                        Category = contact.Category,
+                        Details = contact.Details,
+                        Type = contact.Type,
+                        Value = contact.Value,
+                        BelongsTo = contact.BelongsTo,
+                    }
+                };
+
+                await _repository.AddContactAsync(personContact);
+                
+                return personContact;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<PersonContact> UpdateContactAsync(UpdatePersonContact contact)
+        {
+            try
+            {
+                _logger.LogInformation(JsonConvert.SerializeObject(contact, Formatting.Indented));
+                
+                var contactEntity = await _contactRepository.GetByIdAsync(contact.Id);
+
+                contactEntity.Category = contact.Category;
+                contactEntity.Details = contact.Details;
+                contactEntity.Type = contact.Type;
+                // contactEntity.BelongsTo = contact.BelongsTo;
+                contactEntity.Value = contact.Value;
+                
+                await _contactRepository.UpdateAsync(contactEntity);
+                
+                return new PersonContact
+                {
+                    PersonId = contact.BelongsTo,
+                    ContactId = contact.Id,
+                    Contact = new Contact
+                    {
+                        Category = contact.Category,
+                        Details = contact.Details,
+                        Id = contact.Id,
+                        Type = contact.Type,
+                        Value = contact.Value,
+                        BelongsTo = contact.BelongsTo
+                    }
+                };
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task DeleteContactAsync(Guid contactId, Guid belongsTo)
+        {
+            try
+            {
+                await _repository.DeleteContactAsync(contactId, belongsTo);
             }
             catch (Exception e)
             {
