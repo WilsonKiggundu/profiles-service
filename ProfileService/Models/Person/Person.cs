@@ -29,6 +29,7 @@ namespace ProfileService.Models.Person
         public virtual IEnumerable<PersonInterest> Interests { get; set; }
         public virtual IEnumerable<PersonCategory> Categories { get; set; }
         public virtual IEnumerable<PersonSkill> Skills { get; set; }
+        public virtual IEnumerable<PersonContact> Contacts { get; set; }
         public virtual IEnumerable<PersonAward> Awards { get; set; } 
         public virtual IEnumerable<PersonConnection> Connections { get; set; }
 

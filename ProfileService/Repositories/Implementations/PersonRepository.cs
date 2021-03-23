@@ -75,6 +75,8 @@ namespace ProfileService.Repositories.Implementations
                 .ThenInclude(i => i.Interest)
                 .Include(s => s.Skills)
                 .ThenInclude(s => s.Skill)
+                .Include(s => s.Contacts)
+                .ThenInclude(c => c.Contact)
                 .Skip(skip)
                 .Take(request.PageSize)
                 .ToListAsync();
