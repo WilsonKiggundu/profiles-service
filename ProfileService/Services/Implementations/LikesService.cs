@@ -20,15 +20,17 @@ namespace ProfileService.Services.Implementations
         private readonly IPostRepository _postRepository;
         private readonly IWebNotification _notification;
         private readonly IDeviceRepository _deviceRepository;
+        private readonly IPersonRepository _personRepository;
 
         public LikesService(ILikesRepository repository, ILogger<LikesService> logger, IPostRepository postRepository,
-            IDeviceRepository deviceRepository, IWebNotification notification)
+            IDeviceRepository deviceRepository, IWebNotification notification, IPersonRepository personRepository)
         {
             _repository = repository;
             _logger = logger;
             _postRepository = postRepository;
             _deviceRepository = deviceRepository;
             _notification = notification;
+            _personRepository = personRepository;
         }
 
         public async Task<SearchLikeResponse> SearchAsync(SearchLikeRequest request)
@@ -45,6 +47,7 @@ namespace ProfileService.Services.Implementations
             await _repository.InsertAsync(like);
 
             like = await _repository.GetByIdAsync(like.Id);
+            var person = await _personRepository.GetByIdAsync(like.PersonId);
 
             var post = (await _postRepository.SearchAsync(new SearchPostRequest
             {
@@ -55,7 +58,7 @@ namespace ProfileService.Services.Implementations
             
             await _notification.SendAsync(devices, new NotificationPayload
             {
-                Title = like.Person.Firstname + " liked on your post",
+                Title = person.Firstname + " liked on your post",
                 Message = post.Details,
                 Data = new
                 {
