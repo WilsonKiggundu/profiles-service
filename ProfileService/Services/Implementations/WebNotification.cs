@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProfileService.Helpers;
 using ProfileService.Models.Common;
@@ -12,10 +14,12 @@ namespace ProfileService.Services.Implementations
     public class WebNotification : IWebNotification
     {
         private readonly IDeviceService _deviceService;
+        private readonly ILogger<WebNotification> _logger;
 
-        public WebNotification(IDeviceService deviceService)
+        public WebNotification(IDeviceService deviceService, ILogger<WebNotification> logger)
         {
             _deviceService = deviceService;
+            _logger = logger;
         }
 
         public async Task SendAsync(ICollection<Device> devices, NotificationPayload payload)
@@ -30,7 +34,15 @@ namespace ProfileService.Services.Implementations
                 
                 var webPushClient = new WebPushClient();
 
-                await webPushClient.SendNotificationAsync(pushSubscription, JsonConvert.SerializeObject(payload), vapidDetails);
+                try
+                {
+                    await webPushClient.SendNotificationAsync(pushSubscription, JsonConvert.SerializeObject(payload), vapidDetails);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, e.Message);
+                }
+
             });
 
         }
