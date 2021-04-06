@@ -45,8 +45,8 @@ namespace ProfileService.Services.Implementations
             if (comment.PostId.HasValue)
             {
                 var post = await _postRepository.GetByIdAsync(comment.PostId.Value);
-                var device = await _deviceService.SearchAsync(post.Author.Id.ToString());
-                await _notification.SendAsync(new List<Device>(device), new NotificationPayload
+                var device = await _deviceService.SearchAsync(post.AuthorId.ToString());
+                await _notification.SendAsync(device, new NotificationPayload
                 {
                     Title = entity.Author.Firstname + " commented on your post",
                     Message = comment.Details,
