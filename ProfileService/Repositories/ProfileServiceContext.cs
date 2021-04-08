@@ -110,5 +110,12 @@ namespace ProfileService.Repositories
         public DbSet<EmailSettings> EmailPreferences { get; set; }
 
         #endregion
+
+        #region Connected Devices
+
+        public DbSet<Device> Devices { get; set; }
+        public DbSet<VapidKeys> VapidKeys { get; set; }    
+
+        #endregion
     }
 }

@@ -9,7 +9,7 @@ namespace ProfileService.Controllers.Common
     /// <summary>
     /// 
     /// </summary>
-    [Authorize]
+    [AllowAnonymous]
     [ApiController]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
