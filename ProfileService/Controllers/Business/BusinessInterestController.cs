@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ namespace ProfileService.Controllers.Business
     /// BusinessInterest controller
     /// </summary>
     [Route("api/business/interests")]
+    [AllowAnonymous]
     public class BusinessInterestController : BaseController
     {
         private readonly IBusinessService _businessService;

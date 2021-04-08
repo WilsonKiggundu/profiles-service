@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProfileService.Contracts.Business.Contact;
@@ -14,6 +15,7 @@ namespace ProfileService.Controllers.Business
     /// BusinessContact controller
     /// </summary>
     [Route("api/business/contacts")]
+    [AllowAnonymous]
     public class BusinessContactController : BaseController
     {
         private readonly IBusinessService _businessService;
