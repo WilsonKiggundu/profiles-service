@@ -62,6 +62,7 @@ namespace ProfileService
                 });
             });
 
+            services.AddHttpClient();
             services.AddResponseCaching();
             
             services.AddControllers()
