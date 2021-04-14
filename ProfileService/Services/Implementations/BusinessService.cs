@@ -46,11 +46,14 @@ namespace ProfileService.Services.Implementations
         public async Task<GetBusiness> GetByIdAsync(Guid id)
         {
             var result = await _repository.GetByIdAsync(id);
+
+            if (result == null) return null;
+            
             var business = new GetBusiness
             {
                 Name = result.Name,
                 Description = result.Description,
-                Category = result.Category.ToString(),
+                Category = result.Category,
                 Id = result.Id,
                 Website = result.Website,
                 DateCreated = result.DateCreated,
