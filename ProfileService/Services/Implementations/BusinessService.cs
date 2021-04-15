@@ -24,11 +24,12 @@ namespace ProfileService.Services.Implementations
         private readonly IBusinessRepository _repository;
         private readonly IContactRepository _contactRepository;
         private readonly ILookupInterestRepository _interestRepository;
+        private readonly ILookupNeedRepository _needRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<BusinessService> _logger;
         private readonly IPersonRepository _personRepository;
 
-        public BusinessService(IBusinessRepository repository, IMapper mapper, ILogger<BusinessService> logger, ILookupInterestRepository interestRepository, IContactRepository contactRepository, IPersonRepository personRepository)
+        public BusinessService(IBusinessRepository repository, IMapper mapper, ILogger<BusinessService> logger, ILookupInterestRepository interestRepository, IContactRepository contactRepository, IPersonRepository personRepository, ILookupNeedRepository needRepository)
         {
             _repository = repository;
             _mapper = mapper;
@@ -36,6 +37,7 @@ namespace ProfileService.Services.Implementations
             _interestRepository = interestRepository;
             _contactRepository = contactRepository;
             _personRepository = personRepository;
+            _needRepository = needRepository;
         }
 
         public async Task<SearchBusinessResponse> SearchAsync(SearchBusinessRequest request)
@@ -70,9 +72,11 @@ namespace ProfileService.Services.Implementations
         {
             try
             {
+                var isIdPresent = !string.IsNullOrWhiteSpace(model.Id.ToString());
+                
                 var business = new Business
                 {    
-                    Id = Guid.NewGuid(),
+                    Id = isIdPresent ? model.Id : Guid.NewGuid(),
                     Name = model.Name,
                     Description = model.Description,
                     Website = model.Website,
@@ -345,8 +349,19 @@ namespace ProfileService.Services.Implementations
         {
             try
             {
-                var model = _mapper.Map<BusinessNeed>(need);
-                await _repository.AddNeedAsync(model);
+                var businessNeed = new Need
+                {
+                    Category = need.Details,
+                    Id = Guid.NewGuid()
+                };
+
+                await _needRepository.InsertAsync(businessNeed);
+                
+                await _repository.AddNeedAsync(new BusinessNeed
+                {
+                    BusinessId = need.BusinessId,
+                    NeedId = businessNeed.Id
+                });
             }
             catch (Exception e)
             {
