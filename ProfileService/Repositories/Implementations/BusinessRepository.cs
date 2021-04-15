@@ -173,12 +173,16 @@ namespace ProfileService.Repositories.Implementations
 
         public async Task<IEnumerable<BusinessNeed>> GetNeedsAsync(Guid businessId)
         {
-            throw new NotImplementedException();
+            return await _context.BusinessNeeds
+                .Where(b => !b.IsDeleted)
+                .Where(b => b.BusinessId == businessId)
+                .ToListAsync();
         }
 
         public async Task AddNeedAsync(BusinessNeed need)
         {
-            throw new NotImplementedException();
+            await _context.BusinessNeeds.AddAsync(need);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateNeedAsync(BusinessNeed need)
