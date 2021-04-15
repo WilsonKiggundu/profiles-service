@@ -7,7 +7,7 @@ services:
     container_name: profile-service-admin
     environment:
       - VIRTUAL_HOST=profiles-test.innovationvillage.co.ug
-      - 'ConnectionStrings__DefaultConnection=Server=db; User Id=sa; Database=auth_dev_db; Port=5432; Password=sw33th0m3; SSL Mode=Prefer; Trust Server Certificate=true'
+      - 'ConnectionStrings__DefaultConnection=Server=db; User Id=profile_user; Database=profile_db; Port=5432; Password=50m3B1gPassword; SSL Mode=Prefer; Trust Server Certificate=true'
       - AdminConfiguration__RequireHttpsMetadata=false
       - DockerConfiguration__UpdateCaCertificate=true
       - ASPNETCORE_ENVIRONMENT=Test
@@ -24,10 +24,10 @@ services:
     image: postgres:12.1
     container_name: profile-service-db
     environment:
-      SA_PASSWORD: '${DB_PASSWORD:-Password_123}'
+      SA_PASSWORD: 50m3B1gPassword
       ACCEPT_EULA: 'Y'
     volumes:
-      - dbdata:/var/lib/postgresql/data
+      - dbdata:/var/lib/postgresql/data_profile
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 volumes:
   dbdata:
