@@ -6,11 +6,11 @@ services:
       dockerfile: ProfileService/Dockerfile
     container_name: profile-service-admin
     environment:
-      - VIRTUAL_HOST=profiles-test.innovationvillage.co.ug
+      - VIRTUAL_HOST=profiles.innovationvillage.co.ug
       - 'ConnectionStrings__DefaultConnection=Server=db; User Id=profile_user; Database=profile_db; Port=5432; Password=50m3B1gPassword; SSL Mode=Prefer; Trust Server Certificate=true'
       - AdminConfiguration__RequireHttpsMetadata=false
       - DockerConfiguration__UpdateCaCertificate=true
-      - ASPNETCORE_ENVIRONMENT=Test
+      - ASPNETCORE_ENVIRONMENT=Production
     ports:
       - '44404:80'
     depends_on:
