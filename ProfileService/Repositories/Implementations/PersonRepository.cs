@@ -22,7 +22,7 @@ namespace ProfileService.Repositories.Implementations
     {
         private readonly ProfileServiceContext _context;
         private readonly ILogger<PersonRepository> _logger;
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -43,6 +43,8 @@ namespace ProfileService.Repositories.Implementations
         {
             IQueryable<Person> query = _context.Persons
                 // .Where(p => p.Id != request.UserId)
+                .Include(c => c.Categories)
+                .ThenInclude(d => d.Category)
                 .OrderByDescending(p => p.DateCreated);
 
             if (request.Id.HasValue)
@@ -55,14 +57,25 @@ namespace ProfileService.Repositories.Implementations
             {
                 query = query.Where(q => q.Id != request.UserId);
             }
-            
+
             if (!string.IsNullOrEmpty(request.Name))
             {
-                query = query.Where(p => 
-                    p.Firstname.ToLower().Contains(request.Name.ToLower()) || 
+                var nameParts = request.Name.Split(' ');
+
+                query = query.Where(p =>
+                    p.Firstname.ToLower().Contains(request.Name.ToLower()) ||
                     p.Lastname.ToLower().Contains(request.Name.ToLower()));
             }
-            
+
+            if (!string.IsNullOrEmpty(request.Category))
+            {
+                var category = request.Category;
+                query = query.Where(c =>
+                    c.Categories.Any(m
+                        => m.CategoryId.ToString() == category)
+                );
+            }
+
             var skip = (request.Page - 1) * request.PageSize;
             var hasMore = await query.Skip(skip).CountAsync() > 0;
 
@@ -80,15 +93,16 @@ namespace ProfileService.Repositories.Implementations
                 .Skip(skip)
                 .Take(request.PageSize)
                 .ToListAsync();
-            
+
             people.ForEach(person =>
             {
                 person.Connections = new List<PersonConnection>();
                 person.FullName = $"{person.Firstname} {person.Lastname}";
                 person.ConnectionsCount = _context.PersonConnections.Count(c => c.PersonId == person.Id);
-                person.IsConnected = _context.PersonConnections.Any(c => c.FollowerId == request.UserId && c.PersonId == person.Id);
+                person.IsConnected =
+                    _context.PersonConnections.Any(c => c.FollowerId == request.UserId && c.PersonId == person.Id);
             });
-            
+
             return new SearchPersonResponse
             {
                 Persons = people,
@@ -123,8 +137,8 @@ namespace ProfileService.Repositories.Implementations
         {
             var award = await _context
                 .PersonAwards
-                .FirstOrDefaultAsync(q => 
-                    q.Id == awardId && 
+                .FirstOrDefaultAsync(q =>
+                    q.Id == awardId &&
                     q.PersonId == personId);
 
             _context.PersonAwards.Remove(award);
@@ -133,7 +147,7 @@ namespace ProfileService.Repositories.Implementations
         }
 
         #endregion
-        
+
         public async Task<IEnumerable<PersonCategory>> GetCategoriesAsync(Guid personId)
         {
             return await _context.PersonCategories
@@ -163,10 +177,10 @@ namespace ProfileService.Repositories.Implementations
             _context.PersonCategories.Remove(category);
             await _context.SaveChangesAsync();
         }
-    
+
         public async Task<IEnumerable<PersonInterest>> GetInterestsAsync(Guid personId)
         {
-            return await 
+            return await
                 _context
                     .PersonInterests
                     .Include(p => p.Interest)
@@ -182,7 +196,7 @@ namespace ProfileService.Repositories.Implementations
             return await _context.PersonInterests
                 .Include(q => q.Interest)
                 .SingleOrDefaultAsync(q =>
-                q.InterestId.Equals(interest.InterestId) && q.PersonId.Equals(interest.PersonId));
+                    q.InterestId.Equals(interest.InterestId) && q.PersonId.Equals(interest.PersonId));
         }
 
         public async Task UpdateInterestAsync(PersonInterest interest)
@@ -212,11 +226,11 @@ namespace ProfileService.Repositories.Implementations
         {
             await _context.PersonSkills.AddAsync(skill);
             await _context.SaveChangesAsync();
-            
+
             return await _context
                 .PersonSkills
                 .Include(q => q.Skill)
-                .SingleOrDefaultAsync(q => 
+                .SingleOrDefaultAsync(q =>
                     q.PersonId == skill.PersonId &&
                     q.SkillId == skill.SkillId);
         }
@@ -230,14 +244,14 @@ namespace ProfileService.Repositories.Implementations
         {
             var entity =
                 await _context.PersonSkills
-                    .FirstOrDefaultAsync(s => 
-                        s.SkillId == skillId && 
+                    .FirstOrDefaultAsync(s =>
+                        s.SkillId == skillId &&
                         s.PersonId == personId);
 
             _context.PersonSkills.Remove(entity);
             await _context.SaveChangesAsync();
         }
-        
+
         public async Task<IEnumerable<PersonConnection>> GetConnectionsAsync(Guid personId)
         {
             return await _context.PersonConnections
@@ -280,7 +294,7 @@ namespace ProfileService.Repositories.Implementations
         {
             return await _context.EmailPreferences.SingleOrDefaultAsync(q => q.PersonId == personId);
         }
-        
+
         public async Task<IEnumerable<Contact>> GetContactsAsync(Guid personId)
         {
             var contacts = await _context.Contacts

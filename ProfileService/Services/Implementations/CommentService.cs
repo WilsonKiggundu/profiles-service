@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ProfileService.Contracts.Blog.Comment;
 using ProfileService.Helpers;
 using ProfileService.Models.Common;
@@ -19,8 +22,10 @@ namespace ProfileService.Services.Implementations
         private readonly IMapper _mapper;
         private readonly IDeviceService _deviceService;
         private readonly IWebNotification _notification;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<CommentService> _logger;
 
-        public CommentService(ICommentRepository repository, IMapper mapper, IPersonRepository personRepository, IWebNotification notification, IDeviceService deviceService, IPostRepository postRepository)
+        public CommentService(ICommentRepository repository, IMapper mapper, IPersonRepository personRepository, IWebNotification notification, IDeviceService deviceService, IPostRepository postRepository, ILogger<CommentService> logger, IConfiguration configuration)
         {
             _repository = repository;
             _mapper = mapper;
@@ -28,6 +33,8 @@ namespace ProfileService.Services.Implementations
             _notification = notification;
             _deviceService = deviceService;
             _postRepository = postRepository;
+            _logger = logger;
+            _configuration = configuration;
         }
         
         public async Task<SearchCommentsResponse> SearchAsync(SearchCommentsRequest filter)
@@ -37,6 +44,8 @@ namespace ProfileService.Services.Implementations
 
         public async Task<NewComment> InsertAsync(NewComment comment)
         {
+            comment.Id = Guid.NewGuid();
+            
             var entity = _mapper.Map<Comment>(comment);
             await _repository.InsertAsync(entity);
 
@@ -45,16 +54,22 @@ namespace ProfileService.Services.Implementations
             if (comment.PostId.HasValue)
             {
                 var post = await _postRepository.GetByIdAsync(comment.PostId.Value);
-                var device = await _deviceService.SearchAsync(post.AuthorId.ToString());
-                await _notification.SendAsync(device, new NotificationPayload
+                var devices 
+                    = await _deviceService.SearchAsync(null, post.AuthorId.ToString());
+                
+                await _notification.SendAsync(devices, new NotificationPayload
                 {
                     Title = entity.Author.Firstname + " commented on your post",
                     Message = comment.Details,
+                    
                     Data = new
                     {
                         postId = comment.PostId,
-                        commentId = comment.Id
+                        commentId = comment.Id,
+                        profileId = comment.AuthorId,
+                        baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>()
                     },
+                    
                     Options = new NotificationOptions
                     {
                         Actions = new List<NotificationAction>
@@ -63,20 +78,15 @@ namespace ProfileService.Services.Implementations
                             {
                                 Action = "view-profile",
                                 Title = "View profile"
-                            },
-                            new NotificationAction
-                            {
-                                Action = "follow",
-                                Title = "Follow"
                             }
                         },
+                        
                         Body = comment.Details,
                         Tag = comment.Id.ToString(),
                         Icon = entity.Author.Avatar,
                     }
                 });
             }
-            
             
             return _mapper.Map<NewComment>(entity);
         }

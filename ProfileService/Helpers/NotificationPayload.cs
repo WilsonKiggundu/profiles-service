@@ -4,6 +4,9 @@ namespace ProfileService.Helpers
 {
     public class NotificationPayload
     {
+        [JsonProperty("baseUrl")]
+        public string BaseUrl { get; set; }
+        
         [JsonProperty("title")]
         public string Title { get; set; }
         

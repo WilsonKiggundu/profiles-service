@@ -10,7 +10,7 @@ namespace ProfileService.Services.Interfaces
 {
     public interface IDeviceService : IService    
     {        
-        Task<ICollection<Device>> SearchAsync(string name = null);
+        Task<ICollection<Device>> SearchAsync(string except = null, string name = null);
         Task InsertAsync(Device device);
         Task DeleteAsync(Guid id);
         Task<Device> GetByName(string name);

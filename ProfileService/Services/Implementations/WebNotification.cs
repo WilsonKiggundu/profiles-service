@@ -40,6 +40,7 @@ namespace ProfileService.Services.Implementations
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine();
                     _logger.LogError(e, e.Message);
                 }
 

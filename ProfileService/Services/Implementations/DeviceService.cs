@@ -20,9 +20,9 @@ namespace ProfileService.Services.Implementations
             _logger = logger;    
         }
 
-        public async Task<ICollection<Device>> SearchAsync(string name = null)
+        public async Task<ICollection<Device>> SearchAsync(string except = null, string name = null)
         {
-            return await _repository.SearchAsync(name);
+            return await _repository.SearchAsync(name);    
         }
 
         public async Task InsertAsync(Device device)

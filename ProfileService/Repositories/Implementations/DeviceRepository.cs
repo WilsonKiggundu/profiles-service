@@ -25,9 +25,15 @@ namespace ProfileService.Repositories.Implementations
                 .FirstOrDefaultAsync(q => q.Name.Equals(name));
         }
 
-        public async Task<ICollection<Device>> SearchAsync(string name)
+        public async Task<ICollection<Device>> SearchAsync(string except, string name)
         {
             IQueryable<Device> query = _context.Devices;
+
+            if (!string.IsNullOrEmpty(except))
+            {
+                query = query.Where(q => !q.Name.Equals(except));
+            }
+            
             if (!string.IsNullOrEmpty(name))
             {
                 query = query.Where(q => q.Name.Equals(name));
