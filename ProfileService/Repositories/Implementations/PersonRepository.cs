@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ProfileService.Contracts.Lookup.Category;
 using ProfileService.Contracts.Person;
 using ProfileService.Models.Business;
 using ProfileService.Models.Common;
@@ -22,15 +23,17 @@ namespace ProfileService.Repositories.Implementations
     {
         private readonly ProfileServiceContext _context;
         private readonly ILogger<PersonRepository> _logger;
+        private readonly ILookupCategoryRepository _lookupCategoryRepository;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="context"></param>
-        public PersonRepository(ProfileServiceContext context, ILogger<PersonRepository> logger) : base(context)
+        public PersonRepository(ProfileServiceContext context, ILogger<PersonRepository> logger, ILookupCategoryRepository lookupCategoryRepository) : base(context)
         {
             _context = context;
             _logger = logger;
+            _lookupCategoryRepository = lookupCategoryRepository;
         }
 
         /// <summary>
@@ -69,10 +72,9 @@ namespace ProfileService.Repositories.Implementations
 
             if (!string.IsNullOrEmpty(request.Category))
             {
-                var category = request.Category;
                 query = query.Where(c =>
                     c.Categories.Any(m
-                        => m.Category.Name.ToString() == category)
+                        => m.Category.Name.ToLower() == request.Category.ToLower())
                 );
             }
 
@@ -82,8 +84,6 @@ namespace ProfileService.Repositories.Implementations
             var people = await query
                 .Include(s => s.Awards)
                 .ThenInclude(a => a.Institute)
-                .Include(s => s.Categories)
-                .ThenInclude(s => s.Category)
                 .Include(s => s.Interests)
                 .ThenInclude(i => i.Interest)
                 .Include(s => s.Skills)
