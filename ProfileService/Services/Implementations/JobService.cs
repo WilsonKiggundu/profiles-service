@@ -45,7 +45,7 @@ namespace ProfileService.Services.Implementations
             }else if (search?.CompanyId != null)
             {
                 url = $"{url}?companyId={search.CompanyId}";
-            }else if (search?.CompanyId != null)
+            }else if (search?.CompanyName != null)
             {
                 url = $"{url}?companyId={search.CompanyName}";
             }
@@ -62,28 +62,61 @@ namespace ProfileService.Services.Implementations
             try
             {
                 var responseStream = await response.Content.ReadAsStringAsync();
-                var jobs = JsonConvert.DeserializeObject<List<Job>>(responseStream);
+                var jobs = new List<Job>();
 
-                foreach (var job in jobs)
+                if (search?.Id != null)
                 {
+                    var job = JsonConvert.DeserializeObject<Job>(responseStream);
+
                     job.Profile = await _personService.GetByIdAsync(job.ProfileId);
-                    if (string.IsNullOrEmpty(job.CompanyId)) continue;
+                    if (string.IsNullOrEmpty(job.CompanyId))
+                    {
+                        var isGuid = Guid.TryParse(job.CompanyId, out var companyId);
                     
-                    var isGuid = Guid.TryParse(job.CompanyId, out var companyId);
-                    if (isGuid)
-                    {
-                        job.Company = await _businessService.GetByIdAsync(companyId);
-                    }
-                    else
-                    {
-                        job.Company = new GetBusiness
+                        if (isGuid)
                         {
-                            Name = job.CompanyId
-                        };
+                            job.Company = await _businessService.GetByIdAsync(companyId);
+                        }
+                        else
+                        {
+                            job.Company = new GetBusiness
+                            {
+                                Name = job.CompanyId
+                            };
+                        }
                     }
+                    
+                    jobs.Add(job);
+
                 }
-                
-                return new List<Job>(jobs);
+                else
+                {
+                    var jobsJson = JsonConvert.DeserializeObject<List<Job>>(responseStream);
+
+                    foreach (var job in jobsJson)
+                    {
+                        job.Profile = await _personService.GetByIdAsync(job.ProfileId);
+                        if (string.IsNullOrEmpty(job.CompanyId)) continue;
+                    
+                        var isGuid = Guid.TryParse(job.CompanyId, out var companyId);
+                        
+                        if (isGuid)
+                        {
+                            job.Company = await _businessService.GetByIdAsync(companyId);
+                        }
+                        else
+                        {
+                            job.Company = new GetBusiness
+                            {
+                                Name = job.CompanyId
+                            };
+                        }
+                    }
+                    
+                    jobs.AddRange(jobsJson);
+                }
+
+                return jobs;
             }
             catch (Exception e)
             {
