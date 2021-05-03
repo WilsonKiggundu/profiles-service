@@ -26,7 +26,7 @@ namespace ProfileService.Contracts
         public string MaxSalary { get; set; }
         public string Skills { get; set; }
         public JobCategory Category { get; set; }
-        public List<string> Applicants { get; set; }
+        public List<JobApplicant> Applicants { get; set; }
         public List<JobUpload> Uploads { get; set; }
     }
 
@@ -52,4 +52,14 @@ namespace ProfileService.Contracts
         public Guid? CompanyId { get; set; }    
         public string CompanyName { get; set; }
     }
+
+    public class JobApplicant
+    {
+        public int Id { get; set; }
+        public string Details { get; set; }
+        public string ProfileId { get; set; }
+        public string DateTime { get; set; }
+        public string NotifyEmail { get; set; }    
+        public string Status { get; set; }
+    }    
 }

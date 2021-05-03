@@ -49,7 +49,7 @@ namespace ProfileService.Services.Implementations
             {
                 url = $"{url}?companyId={search.CompanyName}";
             }
-            
+
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add("Accept", "application/json");
             // request.Headers.Add("APIKEY", apiKey);
