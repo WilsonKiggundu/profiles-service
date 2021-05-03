@@ -72,7 +72,7 @@ namespace ProfileService.Repositories.Implementations
                 var category = request.Category;
                 query = query.Where(c =>
                     c.Categories.Any(m
-                        => m.CategoryId.ToString() == category)
+                        => m.Category.Name.ToString() == category)
                 );
             }
 

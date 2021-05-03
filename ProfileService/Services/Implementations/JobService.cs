@@ -69,6 +69,7 @@ namespace ProfileService.Services.Implementations
                     var job = JsonConvert.DeserializeObject<Job>(responseStream);
 
                     job.Profile = await _personService.GetByIdAsync(job.ProfileId);
+                    
                     if (string.IsNullOrEmpty(job.CompanyId))
                     {
                         var isGuid = Guid.TryParse(job.CompanyId, out var companyId);
