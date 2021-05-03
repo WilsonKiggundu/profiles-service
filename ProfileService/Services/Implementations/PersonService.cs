@@ -218,6 +218,66 @@ namespace ProfileService.Services.Implementations
             }
         }
 
+        public async Task<IEnumerable<PersonStack>> GetStackAsync(Guid personId)
+        {
+            return await _repository.GetStackAsync(personId);
+        }
+
+        public async Task AddStackAsync(PersonStack stack)
+        {
+            await _repository.AddStackAsync(stack);
+        }
+
+        public async Task UpdateStackAsync(PersonStack stack)
+        {
+            await _repository.UpdateStackAsync(stack);
+        }
+
+        public async Task DeleteStackAsync(Guid stackId, Guid personId)
+        {
+            await _repository.DeleteStackAsync(stackId, personId);
+        }
+
+        public async Task<IEnumerable<PersonProject>> GetProjectsAsync(Guid personId)
+        {
+            return await _repository.GetProjectsAsync(personId);
+        }
+
+        public async Task AddProjectAsync(PersonProject stack)
+        {
+            await _repository.AddProjectAsync(stack);
+        }
+
+        public async Task UpdateProjectAsync(PersonProject stack)
+        {
+            await _repository.UpdateProjectAsync(stack);
+        }
+
+        public async Task DeleteProjectAsync(Guid projectId, Guid personId)
+        {
+            await _repository.DeleteProjectAsync(projectId, personId);
+        }
+
+        public async Task<IEnumerable<PersonEmployment>> GetEmploymentAsync(Guid personId)
+        {
+            return await _repository.GetEmploymentAsync(personId);
+        }
+
+        public async Task AddEmploymentAsync(PersonEmployment stack)
+        {
+            await _repository.AddEmploymentAsync(stack);
+        }
+
+        public async Task UpdateEmploymentAsync(PersonEmployment stack)
+        {
+            await _repository.UpdateEmploymentAsync(stack);
+        }
+
+        public async Task DeleteEmploymentAsync(Guid projectId, Guid personId)
+        {
+            await _repository.DeleteEmploymentAsync(projectId, personId);
+        }
+
         public async Task<UpdatePerson> UpdateAsync(UpdatePerson updatePerson)
         {
             var person = await _repository.GetByIdAsync(updatePerson.Id);
