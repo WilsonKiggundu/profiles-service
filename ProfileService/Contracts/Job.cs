@@ -12,7 +12,7 @@ namespace ProfileService.Contracts
         public string Deadline { get; set; }
         public Guid ProfileId { get; set; }
         public GetPerson Profile { get; set; }
-        public Guid? CompanyId { get; set; }
+        public string CompanyId { get; set; }
         public GetBusiness Company { get; set; }
         public string Details { get; set; }
         public string Experience { get; set; }
@@ -48,6 +48,7 @@ namespace ProfileService.Contracts
     {
         public int? Id { get; set; }
         public Guid? ProfileId { get; set; }
-        public Guid? CompanyId { get; set; }
+        public Guid? CompanyId { get; set; }    
+        public string CompanyName { get; set; }
     }
 }

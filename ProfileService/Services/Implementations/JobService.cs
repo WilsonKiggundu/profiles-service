@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProfileService.Contracts;
+using ProfileService.Contracts.Business;
 using ProfileService.Services.Interfaces;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
@@ -44,6 +45,9 @@ namespace ProfileService.Services.Implementations
             }else if (search?.CompanyId != null)
             {
                 url = $"{url}?companyId={search.CompanyId}";
+            }else if (search?.CompanyId != null)
+            {
+                url = $"{url}?companyId={search.CompanyName}";
             }
             
             var request = new HttpRequestMessage(HttpMethod.Get, url);
@@ -63,9 +67,19 @@ namespace ProfileService.Services.Implementations
                 foreach (var job in jobs)
                 {
                     job.Profile = await _personService.GetByIdAsync(job.ProfileId);
-                    if (job.CompanyId.HasValue)
+                    if (string.IsNullOrEmpty(job.CompanyId)) continue;
+                    
+                    var isGuid = Guid.TryParse(job.CompanyId, out var companyId);
+                    if (isGuid)
                     {
-                        job.Company = await _businessService.GetByIdAsync(job.CompanyId.Value);
+                        job.Company = await _businessService.GetByIdAsync(companyId);
+                    }
+                    else
+                    {
+                        job.Company = new GetBusiness
+                        {
+                            Name = job.CompanyId
+                        };
                     }
                 }
                 
