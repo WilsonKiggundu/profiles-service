@@ -32,7 +32,10 @@ namespace ProfileService.Models.Person
         public virtual IEnumerable<PersonContact> Contacts { get; set; }
         public virtual IEnumerable<PersonAward> Awards { get; set; } 
         public virtual IEnumerable<PersonConnection> Connections { get; set; }
-
+        public virtual IEnumerable<PersonStack> Stacks { get; set; }
+        public virtual IEnumerable<PersonEmployment> Employment { get; set; }
+        public virtual IEnumerable<PersonProject> Projects { get; set; }    
+        
         [NotMapped] public int ConnectionsCount { get; set; }
         [NotMapped] public bool IsConnected { get; set; }
         
