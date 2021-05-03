@@ -8,7 +8,8 @@ using ProfileService.Models.Common;
 namespace ProfileService.Contracts
 {
     public class Job
-    {
+    {    
+        public int Id { get; set; }
         public string Deadline { get; set; }
         public Guid ProfileId { get; set; }
         public GetPerson Profile { get; set; }
