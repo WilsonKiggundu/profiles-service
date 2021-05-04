@@ -7,13 +7,9 @@ namespace ProfileService.Models.Person
 {
     public class PersonStack : BaseModel
     {
-        [Required]
-        public Guid PersonId { get; set; }
-
-        [Required]
-        public Guid StackId { get; set; }
-        public TechStack Stack { get; set; }
-
-        public string Level { get; set; }
+        [Required] public Guid PersonId { get; set; }
+        [Required] public string Stack { get; set; }
+        
+        [Required] public string Level { get; set; }
     }
 }

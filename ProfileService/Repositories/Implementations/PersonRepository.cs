@@ -153,7 +153,6 @@ namespace ProfileService.Repositories.Implementations
         public async Task<IEnumerable<PersonStack>> GetStackAsync(Guid personId)
         {
             return await _context.DeveloperStack
-                .Include(q => q.Stack)
                 .Where(q => q.PersonId == personId)
                 .ToListAsync();
         }
@@ -174,7 +173,7 @@ namespace ProfileService.Repositories.Implementations
         {
             var stack =
                 await _context.DeveloperStack.FirstOrDefaultAsync(c =>
-                    c.StackId == stackId && c.PersonId == personId);
+                    c.Id == stackId && c.PersonId == personId);
 
             _context.DeveloperStack.Remove(stack);
             await _context.SaveChangesAsync();
