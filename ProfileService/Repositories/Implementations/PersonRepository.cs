@@ -221,7 +221,6 @@ namespace ProfileService.Repositories.Implementations
         {
             return await _context.PersonEmploymentHistory
                 .Where(q => q.PersonId == personId)
-                .OrderByDescending(q => q.StartYear)
                 .ToListAsync();
         }
 
