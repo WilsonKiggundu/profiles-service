@@ -7,6 +7,7 @@ namespace ProfileService.Models.Person
     {
         public Guid PersonId { get; set; }
         public string Title { get; set; }
+        public string Client { get; set; }
         public string From { get; set; }
         public string Until { get; set; }
         public string Description { get; set; }   
