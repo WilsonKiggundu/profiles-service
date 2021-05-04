@@ -89,7 +89,6 @@ namespace ProfileService.Repositories.Implementations
                 .Include(c => c.Projects)
                 .Include(c => c.Employment)
                 .Include(c => c.Stacks)
-                .ThenInclude(c => c.Stack)
                 .Skip(skip)
                 .Take(request.PageSize)
                 .ToListAsync();
