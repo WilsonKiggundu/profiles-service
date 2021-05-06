@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using ProfileService.Models;
 using ProfileService.Models.Business;
 using ProfileService.Models.Common;
 using ProfileService.Models.Investor;
@@ -119,6 +120,12 @@ namespace ProfileService.Repositories
 
         public DbSet<Device> Devices { get; set; }
         public DbSet<VapidKeys> VapidKeys { get; set; }    
+
+        #endregion
+
+        #region Freelance Projects
+
+        public DbSet<FreelanceProject> FreelanceProjects { get; set; }
 
         #endregion
     }
