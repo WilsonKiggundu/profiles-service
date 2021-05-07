@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using ProfileService.Contracts.Person;
-using ProfileService.Models.Business;
 using ProfileService.Models.Common;
 using ProfileService.Models.Person;
 using ProfileService.Models.Preferences;
@@ -22,15 +19,17 @@ namespace ProfileService.Repositories.Implementations
     {
         private readonly ProfileServiceContext _context;
         private readonly ILogger<PersonRepository> _logger;
-        
+        private readonly ILookupCategoryRepository _lookupCategoryRepository;
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="context"></param>
-        public PersonRepository(ProfileServiceContext context, ILogger<PersonRepository> logger) : base(context)
+        public PersonRepository(ProfileServiceContext context, ILogger<PersonRepository> logger, ILookupCategoryRepository lookupCategoryRepository) : base(context)
         {
             _context = context;
             _logger = logger;
+            _lookupCategoryRepository = lookupCategoryRepository;
         }
 
         /// <summary>
@@ -43,6 +42,8 @@ namespace ProfileService.Repositories.Implementations
         {
             IQueryable<Person> query = _context.Persons
                 // .Where(p => p.Id != request.UserId)
+                .Include(c => c.Categories)
+                .ThenInclude(d => d.Category)
                 .OrderByDescending(p => p.DateCreated);
 
             if (request.Id.HasValue)
@@ -55,40 +56,52 @@ namespace ProfileService.Repositories.Implementations
             {
                 query = query.Where(q => q.Id != request.UserId);
             }
-            
+
             if (!string.IsNullOrEmpty(request.Name))
             {
-                query = query.Where(p => 
-                    p.Firstname.ToLower().Contains(request.Name.ToLower()) || 
+                var nameParts = request.Name.Split(' ');
+
+                query = query.Where(p =>
+                    p.Firstname.ToLower().Contains(request.Name.ToLower()) ||
                     p.Lastname.ToLower().Contains(request.Name.ToLower()));
             }
-            
+
+            if (!string.IsNullOrEmpty(request.Category))
+            {
+                query = query.Where(c =>
+                    c.Categories.Any(m
+                        => m.Category.Name.ToLower() == request.Category.ToLower())
+                );
+            }
+
             var skip = (request.Page - 1) * request.PageSize;
             var hasMore = await query.Skip(skip).CountAsync() > 0;
 
             var people = await query
                 .Include(s => s.Awards)
                 .ThenInclude(a => a.Institute)
-                .Include(s => s.Categories)
-                .ThenInclude(s => s.Category)
                 .Include(s => s.Interests)
                 .ThenInclude(i => i.Interest)
                 .Include(s => s.Skills)
                 .ThenInclude(s => s.Skill)
                 .Include(s => s.Contacts)
                 .ThenInclude(c => c.Contact)
+                .Include(c => c.Projects)
+                .Include(c => c.Employment)
+                .Include(c => c.Stacks)
                 .Skip(skip)
                 .Take(request.PageSize)
                 .ToListAsync();
-            
+
             people.ForEach(person =>
             {
                 person.Connections = new List<PersonConnection>();
                 person.FullName = $"{person.Firstname} {person.Lastname}";
                 person.ConnectionsCount = _context.PersonConnections.Count(c => c.PersonId == person.Id);
-                person.IsConnected = _context.PersonConnections.Any(c => c.FollowerId == request.UserId && c.PersonId == person.Id);
+                person.IsConnected =
+                    _context.PersonConnections.Any(c => c.FollowerId == request.UserId && c.PersonId == person.Id);
             });
-            
+
             return new SearchPersonResponse
             {
                 Persons = people,
@@ -123,17 +136,118 @@ namespace ProfileService.Repositories.Implementations
         {
             var award = await _context
                 .PersonAwards
-                .FirstOrDefaultAsync(q => 
-                    q.Id == awardId && 
+                .FirstOrDefaultAsync(q =>
+                    q.Id == awardId &&
                     q.PersonId == personId);
 
             _context.PersonAwards.Remove(award);
 
             await _context.SaveChangesAsync();
         }
+        
+        #endregion
+
+        #region Tech Stack
+
+        public async Task<IEnumerable<PersonStack>> GetStackAsync(Guid personId)
+        {
+            return await _context.DeveloperStack
+                .Where(q => q.PersonId == personId)
+                .ToListAsync();
+        }
+
+        public async Task AddStackAsync(PersonStack stack)
+        {
+            await _context.DeveloperStack.AddAsync(stack);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateStackAsync(PersonStack stack)
+        {
+            _context.DeveloperStack.Update(stack);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteStackAsync(Guid stackId, Guid personId)
+        {
+            var stack =
+                await _context.DeveloperStack.FirstOrDefaultAsync(c =>
+                    c.Id == stackId && c.PersonId == personId);
+
+            _context.DeveloperStack.Remove(stack);
+            await _context.SaveChangesAsync();
+        }
 
         #endregion
         
+        #region Project
+
+        public async Task<IEnumerable<PersonProject>> GetProjectsAsync(Guid personId)
+        {
+            return await _context.PersonProjects
+                .Where(q => q.PersonId == personId)
+                .ToListAsync();
+        }
+
+        public async Task AddProjectAsync(PersonProject stack)
+        {
+            await _context.PersonProjects.AddAsync(stack);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateProjectAsync(PersonProject stack)
+        {
+            _context.PersonProjects.Update(stack);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteProjectAsync(Guid projectId, Guid personId)
+        {
+            var project =
+                await _context.PersonProjects.FirstOrDefaultAsync(c =>
+                    c.Id == projectId && c.PersonId == personId);
+
+            _context.PersonProjects.Remove(project);
+            await _context.SaveChangesAsync();
+        }
+
+        #endregion
+
+        #region Employment
+
+        public async Task<IEnumerable<PersonEmployment>> GetEmploymentAsync(Guid personId)
+        {
+            return await _context.PersonEmploymentHistory
+                .Where(q => q.PersonId == personId)
+                .ToListAsync();
+        }
+
+        public async Task AddEmploymentAsync(PersonEmployment employment)
+        {
+            await _context.PersonEmploymentHistory.AddAsync(employment);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateEmploymentAsync(PersonEmployment employment)
+        {
+            _context.PersonEmploymentHistory.Update(employment);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteEmploymentAsync(Guid employmentId, Guid personId)
+        {
+            var employment =
+                await _context.PersonEmploymentHistory.FirstOrDefaultAsync(c =>
+                    c.Id == employmentId && c.PersonId == personId);
+
+            _context.PersonEmploymentHistory.Remove(employment);
+            await _context.SaveChangesAsync();
+        }
+
+        #endregion
+
+        #region Category
+
         public async Task<IEnumerable<PersonCategory>> GetCategoriesAsync(Guid personId)
         {
             return await _context.PersonCategories
@@ -151,7 +265,8 @@ namespace ProfileService.Repositories.Implementations
 
         public async Task UpdateCategoryAsync(PersonCategory category)
         {
-            throw new NotImplementedException();
+            _context.PersonCategories.Update(category);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteCategoryAsync(Guid categoryId, Guid personId)
@@ -163,10 +278,14 @@ namespace ProfileService.Repositories.Implementations
             _context.PersonCategories.Remove(category);
             await _context.SaveChangesAsync();
         }
-    
+        
+        #endregion
+
+        #region Interests
+
         public async Task<IEnumerable<PersonInterest>> GetInterestsAsync(Guid personId)
         {
-            return await 
+            return await
                 _context
                     .PersonInterests
                     .Include(p => p.Interest)
@@ -182,12 +301,13 @@ namespace ProfileService.Repositories.Implementations
             return await _context.PersonInterests
                 .Include(q => q.Interest)
                 .SingleOrDefaultAsync(q =>
-                q.InterestId.Equals(interest.InterestId) && q.PersonId.Equals(interest.PersonId));
+                    q.InterestId.Equals(interest.InterestId) && q.PersonId.Equals(interest.PersonId));
         }
 
         public async Task UpdateInterestAsync(PersonInterest interest)
         {
-            throw new NotImplementedException();
+            _context.PersonInterests.Update(interest);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteInterestAsync(Guid interestId, Guid personId)
@@ -201,6 +321,10 @@ namespace ProfileService.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
+        #endregion
+
+        #region Skills
+
         public async Task<IEnumerable<PersonSkill>> GetSkillsAsync(Guid personId)
         {
             return await _context.PersonSkills
@@ -212,32 +336,37 @@ namespace ProfileService.Repositories.Implementations
         {
             await _context.PersonSkills.AddAsync(skill);
             await _context.SaveChangesAsync();
-            
+
             return await _context
                 .PersonSkills
                 .Include(q => q.Skill)
-                .SingleOrDefaultAsync(q => 
+                .SingleOrDefaultAsync(q =>
                     q.PersonId == skill.PersonId &&
                     q.SkillId == skill.SkillId);
         }
 
         public async Task UpdateSkillAsync(PersonSkill skill)
         {
-            throw new NotImplementedException();
+            _context.PersonSkills.Update(skill);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteSkillAsync(Guid skillId, Guid personId)
         {
             var entity =
                 await _context.PersonSkills
-                    .FirstOrDefaultAsync(s => 
-                        s.SkillId == skillId && 
+                    .FirstOrDefaultAsync(s =>
+                        s.SkillId == skillId &&
                         s.PersonId == personId);
 
             _context.PersonSkills.Remove(entity);
             await _context.SaveChangesAsync();
         }
-        
+
+        #endregion
+
+        #region Connections
+
         public async Task<IEnumerable<PersonConnection>> GetConnectionsAsync(Guid personId)
         {
             return await _context.PersonConnections
@@ -268,19 +397,28 @@ namespace ProfileService.Repositories.Implementations
 
         public async Task UpdateConnectionAsync(PersonConnection connection)
         {
-            throw new NotImplementedException();
+            _context.PersonConnections.Update(connection);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteConnectionAsync(Guid connectionId)
         {
-            throw new NotImplementedException();
+            var connection = await _context.PersonConnections
+                .FirstOrDefaultAsync(q => q.Id == connectionId);
+
+            _context.PersonConnections.Remove(connection);
+            await _context.SaveChangesAsync();
         }
+
+        #endregion
 
         public async Task<EmailSettings> EmailPreferences(Guid personId)
         {
             return await _context.EmailPreferences.SingleOrDefaultAsync(q => q.PersonId == personId);
         }
-        
+    
+        #region Contacts
+
         public async Task<IEnumerable<Contact>> GetContactsAsync(Guid personId)
         {
             var contacts = await _context.Contacts
@@ -313,5 +451,7 @@ namespace ProfileService.Repositories.Implementations
 
             await _context.SaveChangesAsync();
         }
+
+        #endregion
     }
 }

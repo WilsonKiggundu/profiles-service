@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using ProfileService.Contracts;
-using ProfileService.Contracts.Blog.Post;
 using ProfileService.Models.Common;
 using ProfileService.Repositories.Interfaces;
 
@@ -25,9 +23,15 @@ namespace ProfileService.Repositories.Implementations
                 .FirstOrDefaultAsync(q => q.Name.Equals(name));
         }
 
-        public async Task<ICollection<Device>> SearchAsync(string name)
+        public async Task<ICollection<Device>> SearchAsync(string except, string name)
         {
             IQueryable<Device> query = _context.Devices;
+
+            if (!string.IsNullOrEmpty(except))
+            {
+                query = query.Where(q => !q.Name.Equals(except));
+            }
+            
             if (!string.IsNullOrEmpty(name))
             {
                 query = query.Where(q => q.Name.Equals(name));

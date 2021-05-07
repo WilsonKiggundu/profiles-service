@@ -74,11 +74,11 @@ namespace ProfileService.Services.Implementations
             {
                 var payload = new NotificationPayload
                 {
-                    Title = "New post added",
+                    Title = $"{post.Author.Firstname} posted something",
                     Message = post.Details,
                     Data = new
                     {
-                        authorId = post.Author.Id  
+                        profileId = post.Author.Id  
                     },
                     Options = new NotificationOptions
                     {
@@ -89,11 +89,11 @@ namespace ProfileService.Services.Implementations
                                 Action = "view-profile",
                                 Title = "View profile"
                             },
-                            new NotificationAction
-                            {
-                                Action = "follow",
-                                Title = "Follow"
-                            }
+                            // new NotificationAction
+                            // {
+                            //     Action = "follow",
+                            //     Title = "Follow"
+                            // }
                         },
                         Body = post.Details,
                         Tag = post.Id.ToString(),
@@ -101,8 +101,12 @@ namespace ProfileService.Services.Implementations
                     }
                 };
 
-                var devices = await _devices.SearchAsync();
-                Task.Run(() => _notification.SendAsync(devices, payload));
+                var devices = await _devices.SearchAsync(post.AuthorId.ToString());
+                
+                _logger.LogInformation(JsonConvert.SerializeObject(devices, Formatting.Indented));
+                _logger.LogInformation(JsonConvert.SerializeObject(payload, Formatting.Indented));
+                
+                await _notification.SendAsync(devices, payload);
 
             }
             catch (Exception e)

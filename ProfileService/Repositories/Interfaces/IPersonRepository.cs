@@ -26,6 +26,33 @@ namespace ProfileService.Repositories.Interfaces
 
         #endregion    
         
+        #region Person Stack
+    
+        Task<IEnumerable<PersonStack>> GetStackAsync(Guid personId);
+        Task AddStackAsync(PersonStack stack);
+        Task UpdateStackAsync(PersonStack stack);        
+        Task DeleteStackAsync(Guid stackId, Guid personId);            
+
+        #endregion 
+        
+        #region Person Project
+    
+        Task<IEnumerable<PersonProject>> GetProjectsAsync(Guid personId);
+        Task AddProjectAsync(PersonProject stack);
+        Task UpdateProjectAsync(PersonProject stack);            
+        Task DeleteProjectAsync(Guid projectId, Guid personId);            
+
+        #endregion  
+        
+        #region Person Employment
+    
+        Task<IEnumerable<PersonEmployment>> GetEmploymentAsync(Guid personId);
+        Task AddEmploymentAsync(PersonEmployment stack);
+        Task UpdateEmploymentAsync(PersonEmployment stack);                    
+        Task DeleteEmploymentAsync(Guid projectId, Guid personId);            
+
+        #endregion  
+        
         #region Person Categories
     
         Task<IEnumerable<PersonCategory>> GetCategoriesAsync(Guid personId);

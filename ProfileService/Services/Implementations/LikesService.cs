@@ -54,7 +54,7 @@ namespace ProfileService.Services.Implementations
                 PostId = like.EntityId
             })).Posts.First();
             
-            var devices = await _deviceRepository.SearchAsync(post.AuthorId.ToString());
+            var devices = await _deviceRepository.SearchAsync(null, post.AuthorId.ToString());
             
             await _notification.SendAsync(devices, new NotificationPayload
             {
@@ -62,7 +62,8 @@ namespace ProfileService.Services.Implementations
                 Message = post.Details,
                 Data = new
                 {
-                    postId = like.EntityId
+                    postId = like.EntityId,
+                    profileId = like.PersonId
                 },
                 Options = new NotificationOptions
                 {

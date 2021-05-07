@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using ProfileService.Models;
 using ProfileService.Models.Business;
 using ProfileService.Models.Common;
 using ProfileService.Models.Investor;
@@ -59,6 +60,7 @@ namespace ProfileService.Repositories
         public DbSet<Need> LookupNeeds { get; set; }    
         public DbSet<Skill> LookupSkills { get; set; }
         public DbSet<School> LookupSchools { get; set; }
+        public DbSet<TechStack> LookupStacks { get; set; }
         
         #endregion
         
@@ -70,7 +72,10 @@ namespace ProfileService.Repositories
         public DbSet<PersonCategory> PersonCategories { get; set; }
         public DbSet<PersonAward> PersonAwards { get; set; }
         public DbSet<PersonConnection> PersonConnections { get; set; }
-        public DbSet<PersonContact> PersonContacts { get; set; }
+        public DbSet<PersonContact> PersonContacts { get; set; }    
+        public DbSet<PersonEmployment> PersonEmploymentHistory { get; set; }
+        public DbSet<PersonProject> PersonProjects { get; set; }
+        public DbSet<PersonStack> DeveloperStack { get; set; }    
 
         #endregion
 
@@ -115,6 +120,12 @@ namespace ProfileService.Repositories
 
         public DbSet<Device> Devices { get; set; }
         public DbSet<VapidKeys> VapidKeys { get; set; }    
+
+        #endregion
+
+        #region Freelance Projects
+
+        public DbSet<FreelanceProject> FreelanceProjects { get; set; }
 
         #endregion
     }

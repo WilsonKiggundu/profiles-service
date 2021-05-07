@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Repositories;
@@ -9,9 +10,10 @@ using ProfileService.Repositories;
 namespace ProfileService.Migrations
 {
     [DbContext(typeof(ProfileServiceContext))]
-    partial class ProfileServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20210504144215_UpdatedPersonStackModel")]
+    partial class UpdatedPersonStackModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -527,9 +529,6 @@ namespace ProfileService.Migrations
                     b.Property<int>("FileSize")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("FreelanceProjectId")
-                        .HasColumnType("uuid");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -544,8 +543,6 @@ namespace ProfileService.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FreelanceProjectId");
 
                     b.HasIndex("PostId");
 
@@ -579,55 +576,6 @@ namespace ProfileService.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("VapidKeys");
-                });
-
-            modelBuilder.Entity("ProfileService.Models.FreelanceProject", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Budget")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("HiredPersonId")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("OwnerEmail")
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("OwnerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("PaymentOption")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Skills")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HiredPersonId");
-
-                    b.ToTable("FreelanceProjects");
                 });
 
             modelBuilder.Entity("ProfileService.Models.Investor.Investor", b =>
@@ -1458,20 +1406,9 @@ namespace ProfileService.Migrations
 
             modelBuilder.Entity("ProfileService.Models.Common.Upload", b =>
                 {
-                    b.HasOne("ProfileService.Models.FreelanceProject", null)
-                        .WithMany("Uploads")
-                        .HasForeignKey("FreelanceProjectId");
-
                     b.HasOne("ProfileService.Models.Posts.Post", null)
                         .WithMany("Uploads")
                         .HasForeignKey("PostId");
-                });
-
-            modelBuilder.Entity("ProfileService.Models.FreelanceProject", b =>
-                {
-                    b.HasOne("ProfileService.Models.Person.Person", "HiredPerson")
-                        .WithMany()
-                        .HasForeignKey("HiredPersonId");
                 });
 
             modelBuilder.Entity("ProfileService.Models.Investor.Investor", b =>

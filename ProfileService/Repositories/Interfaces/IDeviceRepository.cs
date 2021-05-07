@@ -11,7 +11,7 @@ namespace ProfileService.Repositories.Interfaces
     public interface IDeviceRepository : IGenericRepository<Device>
     {
         Task<Device> GetByName(string name);    
-        Task<ICollection<Device>> SearchAsync(string name = null);
+        Task<ICollection<Device>> SearchAsync(string except = null, string name = null);
         Task<VapidKeys> GetVapidKeysAsync();
     }
 
