@@ -16,11 +16,19 @@ namespace ProfileService.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<Device> GetByName(string profileId)    
+        public async Task<Device> GetByName(string profileId)
         {
             return await _context
                 .Devices
                 .FirstOrDefaultAsync(q => q.ProfileId.Equals(profileId));
+        }
+
+        public async Task<bool> IsRegistered(string profileId, string token)
+        {
+            return await _context.Devices
+                .AnyAsync(d =>
+                    d.ProfileId.Equals(profileId) &&
+                    d.Token.Equals(token));
         }
 
         public async Task<ICollection<Device>> SearchAsync(string except, string profileId)
@@ -31,10 +39,10 @@ namespace ProfileService.Repositories.Implementations
             {
                 query = query.Where(q => !q.ProfileId.Equals(except));
             }
-            
+
             if (!string.IsNullOrEmpty(profileId))
             {
-                query = query.Where(q => q.ProfileId.Equals(profileId));
+                query = query.Where(q => q.ProfileId == profileId);
             }
 
             return await query.ToListAsync();

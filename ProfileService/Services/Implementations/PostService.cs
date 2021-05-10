@@ -78,7 +78,7 @@ namespace ProfileService.Services.Implementations
                     Message = post.Details,
                     Data = new
                     {
-                        profileId = post.Author.Id  
+                        profileId = post.Author.Id
                     },
                     Options = new NotificationOptions
                     {
@@ -100,14 +100,9 @@ namespace ProfileService.Services.Implementations
                         Icon = post.Author.Avatar,
                     }
                 };
-
+                
                 var devices = await _devices.SearchAsync(post.AuthorId.ToString());
-                
-                _logger.LogInformation(JsonConvert.SerializeObject(devices, Formatting.Indented));
-                _logger.LogInformation(JsonConvert.SerializeObject(payload, Formatting.Indented));
-                
                 _notification.Send(devices, payload);
-
             }
             catch (Exception e)
             {
