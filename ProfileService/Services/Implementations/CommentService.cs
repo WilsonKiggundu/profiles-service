@@ -57,7 +57,7 @@ namespace ProfileService.Services.Implementations
                 var devices 
                     = await _deviceService.SearchAsync(null, post.AuthorId.ToString());
                 
-                await _notification.SendAsync(devices, new NotificationPayload
+                _notification.Send(devices, new NotificationPayload
                 {
                     Title = entity.Author.Firstname + " commented on your post",
                     Message = comment.Details,

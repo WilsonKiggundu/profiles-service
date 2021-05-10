@@ -106,7 +106,7 @@ namespace ProfileService.Services.Implementations
                 _logger.LogInformation(JsonConvert.SerializeObject(devices, Formatting.Indented));
                 _logger.LogInformation(JsonConvert.SerializeObject(payload, Formatting.Indented));
                 
-                await _notification.SendAsync(devices, payload);
+                _notification.Send(devices, payload);
 
             }
             catch (Exception e)

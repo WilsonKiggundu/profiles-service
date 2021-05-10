@@ -56,7 +56,7 @@ namespace ProfileService.Services.Implementations
             
             var devices = await _deviceRepository.SearchAsync(null, post.AuthorId.ToString());
             
-            await _notification.SendAsync(devices, new NotificationPayload
+            _notification.Send(devices, new NotificationPayload
             {
                 Title = person.Firstname + " liked on your post",
                 Message = post.Details,
