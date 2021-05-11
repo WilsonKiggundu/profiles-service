@@ -54,12 +54,15 @@ namespace ProfileService.Services.Implementations
                 PostId = like.EntityId
             })).Posts.First();
             
-            var devices = await _deviceRepository.SearchAsync(null, post.AuthorId.ToString());
+            // don't send a notification if I comment on my own post
+            var excludeMe = like.PersonId == post.AuthorId ? post.AuthorId.ToString() : string.Empty;
+            
+            var devices = await _deviceRepository.SearchAsync(excludeMe, post.AuthorId.ToString());
             
             _notification.Send(devices, new NotificationPayload
             {
-                Title = person.Firstname + " liked on your post",
-                Message = post.Details,
+                Title = $"{person.Firstname} {person.Lastname}" + " liked on your post",
+                // Message = post.Details,
                 Data = new
                 {
                     postId = like.EntityId,
@@ -82,7 +85,7 @@ namespace ProfileService.Services.Implementations
                     },
                     // Body = comment.Details,
                     Tag = like.Id.ToString(),
-                    // Icon = entity.Author.Avatar,
+                    Icon = person.Avatar,
                 }
             });
 

@@ -74,7 +74,7 @@ namespace ProfileService.Services.Implementations
             {
                 var payload = new NotificationPayload
                 {
-                    Title = $"{post.Author.Firstname} posted something",
+                    Title = $"{post.Author.Firstname} {post.Author.Lastname} posted something",
                     Message = post.Details,
                     Data = new
                     {

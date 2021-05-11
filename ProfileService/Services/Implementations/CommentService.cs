@@ -54,13 +54,19 @@ namespace ProfileService.Services.Implementations
             if (comment.PostId.HasValue)
             {
                 var post = await _postRepository.GetByIdAsync(comment.PostId.Value);
+                
+                // don't send a notification if I comment on my own post
+                var excludeMe = comment.AuthorId == post.AuthorId ? post.AuthorId.ToString() : string.Empty;
+
                 var devices 
-                    = await _deviceService.SearchAsync(null, post.AuthorId.ToString());
+                    = await _deviceService.SearchAsync(excludeMe, post.AuthorId.ToString());
                 
                 _notification.Send(devices, new NotificationPayload
                 {
-                    Title = entity.Author.Firstname + " commented on your post",
-                    Message = comment.Details,
+                    Title = $"{entity.Author.Firstname} {entity.Author.Lastname}" + " commented on your post",
+                    Message = entity.Details.Substring(0, entity.Details.Length < 60 ? entity.Details.Length : 60),
+                    Icon = entity.Author.Avatar,
+                    Date = DateTime.UtcNow,
                     
                     Data = new
                     {

@@ -40,7 +40,7 @@ namespace ProfileService.Repositories.Implementations
                 query = query.Where(q => !q.ProfileId.Equals(except));
             }
 
-            if (!string.IsNullOrEmpty(profileId))
+            if (!string.IsNullOrEmpty(profileId) && profileId != except)
             {
                 query = query.Where(q => q.ProfileId == profileId);
             }
