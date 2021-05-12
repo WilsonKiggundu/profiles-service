@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProfileService.Contracts.Lookup.Category;
@@ -12,6 +13,7 @@ using ProfileService.Contracts.Person.Connections;
 using ProfileService.Contracts.Person.Contact;
 using ProfileService.Contracts.Person.Interests;
 using ProfileService.Contracts.Person.Skills;
+using ProfileService.Helpers;
 using ProfileService.Models.Common;
 using ProfileService.Models.Person;
 using ProfileService.Repositories.Interfaces;
@@ -29,10 +31,13 @@ namespace ProfileService.Services.Implementations
         private readonly IMapper _mapper;
         private readonly ILogger<PersonService> _logger;
         private readonly IContactRepository _contactRepository;
+        private readonly IDeviceService _deviceService;
+        private readonly IWebNotification _notification;
+        private readonly IConfiguration _configuration;
 
         public PersonService(IPersonRepository repository, IMapper mapper, ILookupInterestRepository interestRepository,
             ILookupCategoryRepository categoryRepository, ILookupSkillRepository skillRepository,
-            ILookupSchoolRepository schoolRepository, ILogger<PersonService> logger, IContactRepository contactRepository)
+            ILookupSchoolRepository schoolRepository, ILogger<PersonService> logger, IContactRepository contactRepository, IDeviceService deviceService, IWebNotification notification, IConfiguration configuration)
         {
             _repository = repository;
             _mapper = mapper;
@@ -42,6 +47,9 @@ namespace ProfileService.Services.Implementations
             _schoolRepository = schoolRepository;
             _logger = logger;
             _contactRepository = contactRepository;
+            _deviceService = deviceService;
+            _notification = notification;
+            _configuration = configuration;
         }
 
         public async Task<SearchPersonResponse> SearchAsync(SearchPersonRequest request)
@@ -94,6 +102,39 @@ namespace ProfileService.Services.Implementations
             try
             {
                 await _repository.InsertAsync(person);
+                
+                var devices 
+                    = await _deviceService.SearchAsync(person.Id.ToString());
+                
+                _notification.Send(devices, new NotificationPayload
+                {
+                    Title = $"{person.Firstname} {person.Lastname}" + " joined My Village",
+                    Icon = person.Avatar,
+                    Date = DateTime.UtcNow,
+                    
+                    Data = new
+                    {
+                        profileId = person.Id,
+                        baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>()
+                    },
+                    
+                    Options = new NotificationOptions
+                    {
+                        Actions = new List<NotificationAction>
+                        {
+                            new NotificationAction
+                            {
+                                Action = "view-profile",
+                                Title = "View profile"
+                            }
+                        },
+                        
+                        // Body = comment.Details,
+                        Tag = person.Id.ToString(),
+                        Icon = person.Avatar,
+                    }
+                });
+                
                 return _mapper.Map<NewPerson>(person);
             }
             catch (Exception e)
