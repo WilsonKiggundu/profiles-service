@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProfileService.Contracts.Common;
 using ProfileService.Helpers.Email;
+using ProfileService.Models;
 using ProfileService.Repositories.Interfaces;
 using ProfileService.Services.Interfaces;
 using SendGrid;
@@ -35,7 +36,7 @@ namespace ProfileService.Services.Implementations
         {
             string content;
 
-            if (details.Template == EmailTemplate.IfYourProfileIsIncomplete)
+            if (details.Template == EmailType.UpdateProfile)
             {
                 var path = Path.Combine(_environment.ContentRootPath, "EmailTemplates", "CompleteProfile.html");
                 content = await File.ReadAllTextAsync(path);

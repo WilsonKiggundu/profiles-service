@@ -74,11 +74,11 @@ namespace ProfileService.Services.Implementations
             {
                 var payload = new NotificationPayload
                 {
-                    Title = $"{post.Author.Firstname} posted something",
+                    Title = $"{post.Author.Firstname} {post.Author.Lastname} posted something",
                     Message = post.Details,
                     Data = new
                     {
-                        profileId = post.Author.Id  
+                        profileId = post.Author.Id
                     },
                     Options = new NotificationOptions
                     {
@@ -100,14 +100,9 @@ namespace ProfileService.Services.Implementations
                         Icon = post.Author.Avatar,
                     }
                 };
-
+                
                 var devices = await _devices.SearchAsync(post.AuthorId.ToString());
-                
-                _logger.LogInformation(JsonConvert.SerializeObject(devices, Formatting.Indented));
-                _logger.LogInformation(JsonConvert.SerializeObject(payload, Formatting.Indented));
-                
-                await _notification.SendAsync(devices, payload);
-
+                _notification.Send(devices, payload);
             }
             catch (Exception e)
             {

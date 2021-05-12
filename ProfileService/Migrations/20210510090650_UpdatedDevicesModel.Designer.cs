@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Repositories;
@@ -9,9 +10,10 @@ using ProfileService.Repositories;
 namespace ProfileService.Migrations
 {
     [DbContext(typeof(ProfileServiceContext))]
-    partial class ProfileServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20210510090650_UpdatedDevicesModel")]
+    partial class UpdatedDevicesModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -567,35 +569,6 @@ namespace ProfileService.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("VapidKeys");
-                });
-
-            modelBuilder.Entity("ProfileService.Models.EmailTemplate", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Body")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Subject")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EmailTemplates");
                 });
 
             modelBuilder.Entity("ProfileService.Models.FreelanceProject", b =>

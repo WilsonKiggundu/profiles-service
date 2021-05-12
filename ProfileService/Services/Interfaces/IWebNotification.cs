@@ -7,6 +7,6 @@ namespace ProfileService.Services.Interfaces
 {
     public interface IWebNotification : IService
     {
-        Task SendAsync(ICollection<Device> devices, NotificationPayload payload);
+        void Send(ICollection<Device> devices, NotificationPayload payload);
     }
 }

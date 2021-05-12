@@ -1,3 +1,4 @@
+using System;
 using Newtonsoft.Json;
 
 namespace ProfileService.Helpers
@@ -10,8 +11,14 @@ namespace ProfileService.Helpers
         [JsonProperty("title")]
         public string Title { get; set; }
         
-        [JsonProperty("message")]
+        [JsonProperty("date")] 
+        public DateTime Date { get; set; }
+        
+        [JsonProperty("body")]
         public string Message { get; set; }
+
+        [JsonProperty("icon")]
+        public string Icon { get; set; }
         
         [JsonProperty("options")]
         public NotificationOptions Options { get; set; }
