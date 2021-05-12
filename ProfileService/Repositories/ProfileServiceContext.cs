@@ -128,5 +128,11 @@ namespace ProfileService.Repositories
         public DbSet<FreelanceProject> FreelanceProjects { get; set; }
 
         #endregion
+
+        #region Email Templates
+
+        public DbSet<EmailTemplate> EmailTemplates { get; set; }
+
+        #endregion
     }
 }
