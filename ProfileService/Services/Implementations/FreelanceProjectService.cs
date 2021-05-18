@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ProfileService.Contracts.FreelanceProject;
 using ProfileService.Models;
@@ -43,6 +44,21 @@ namespace ProfileService.Services.Implementations
         public async Task DeleteAsync(Guid id)
         {
             await _repository.DeleteAsync(id);
+        }
+
+        public async Task<ICollection<FreelanceProjectHire>> GetHiresAsync(Guid projectId)
+        {
+            return await _repository.GetHiresAsync(projectId);
+        }
+
+        public async Task AddHireAsync(FreelanceProjectHire hire)
+        {
+            await _repository.AddHireAsync(hire);
+        }
+
+        public async Task UpdateHireAsync(FreelanceProjectHire hire)
+        {
+            await _repository.UpdateHireAsync(hire);
         }
     }
 }
