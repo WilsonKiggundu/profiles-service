@@ -93,5 +93,25 @@ namespace ProfileService.Repositories.Implementations
                 Projects = projects
             };
         }
+
+        public async Task<ICollection<FreelanceProjectHire>> GetHiresAsync(Guid projectId)
+        {
+            return await _context.FreelanceProjectHires
+                .Include(q => q.Person)
+                .Include(q => q.Project)
+                .ToListAsync();
+        }
+
+        public async Task AddHireAsync(FreelanceProjectHire hire)
+        {
+            await _context.FreelanceProjectHires.AddAsync(hire);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateHireAsync(FreelanceProjectHire hire)
+        {
+            _context.FreelanceProjectHires.Update(hire);
+            await _context.SaveChangesAsync();
+        }
     }
 }

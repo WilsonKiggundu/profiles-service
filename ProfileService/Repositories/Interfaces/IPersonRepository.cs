@@ -44,6 +44,15 @@ namespace ProfileService.Repositories.Interfaces
 
         #endregion  
         
+        #region Person Terms
+    
+        Task<FreelanceTerms> GetFreelanceTermsAsync(Guid personId);
+        Task AddFreelanceTermsAsync(FreelanceTerms terms);
+        Task UpdateFreelanceTermsAsync(FreelanceTerms terms);            
+        Task DeleteFreelanceTermsAsync(Guid personId);            
+
+        #endregion  
+        
         #region Person Employment
     
         Task<IEnumerable<PersonEmployment>> GetEmploymentAsync(Guid personId);

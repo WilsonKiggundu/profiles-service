@@ -35,6 +35,7 @@ namespace ProfileService.Models.Person
         public virtual IEnumerable<PersonStack> Stacks { get; set; }
         public virtual IEnumerable<PersonEmployment> Employment { get; set; }
         public virtual IEnumerable<PersonProject> Projects { get; set; }    
+        public virtual FreelanceTerms FreelanceTerms { get; set; }
         
         [NotMapped] public int ConnectionsCount { get; set; }
         [NotMapped] public bool IsConnected { get; set; }

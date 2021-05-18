@@ -78,6 +78,7 @@ namespace ProfileService.Repositories.Implementations
             var hasMore = await query.Skip(skip).CountAsync() > 0;
 
             var people = await query
+                .Include(s => s.FreelanceTerms)
                 .Include(s => s.Awards)
                 .ThenInclude(a => a.Institute)
                 .Include(s => s.Interests)
@@ -208,6 +209,36 @@ namespace ProfileService.Repositories.Implementations
                     c.Id == projectId && c.PersonId == personId);
 
             _context.PersonProjects.Remove(project);
+            await _context.SaveChangesAsync();
+        }
+        
+        #endregion
+
+        #region Freelance Terms
+
+        public async Task<FreelanceTerms> GetFreelanceTermsAsync(Guid personId)
+        {
+            return await _context.FreelanceTerms.FirstOrDefaultAsync(q => q.PersonId == personId);
+        }
+
+        public async Task AddFreelanceTermsAsync(FreelanceTerms terms)
+        {
+            await _context.FreelanceTerms.AddAsync(terms);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateFreelanceTermsAsync(FreelanceTerms terms)
+        {
+            _context.FreelanceTerms.Update(terms);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteFreelanceTermsAsync(Guid personId)
+        {
+            var toDelete = await _context.FreelanceTerms
+                .FirstOrDefaultAsync(q => q.PersonId == personId);
+
+            _context.FreelanceTerms.Remove(toDelete);
             await _context.SaveChangesAsync();
         }
 

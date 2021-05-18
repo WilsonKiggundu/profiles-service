@@ -75,7 +75,7 @@ namespace ProfileService.Repositories
         public DbSet<PersonContact> PersonContacts { get; set; }    
         public DbSet<PersonEmployment> PersonEmploymentHistory { get; set; }
         public DbSet<PersonProject> PersonProjects { get; set; }
-        public DbSet<PersonStack> DeveloperStack { get; set; }    
+        public DbSet<PersonStack> DeveloperStack { get; set; }        
 
         #endregion
 
@@ -125,7 +125,9 @@ namespace ProfileService.Repositories
 
         #region Freelance Projects
 
-        public DbSet<FreelanceProject> FreelanceProjects { get; set; }
+        public DbSet<FreelanceProject> FreelanceProjects { get; set; }    
+        public DbSet<FreelanceTerms> FreelanceTerms { get; set; }
+        public DbSet<FreelanceProjectHire> FreelanceProjectHires { get; set; }
 
         #endregion
 

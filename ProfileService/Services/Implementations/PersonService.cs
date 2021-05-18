@@ -502,6 +502,31 @@ namespace ProfileService.Services.Implementations
                 throw new Exception(e.Message, e);
             }
         }
+    
+        #region Person Terms
+
+        public async Task<FreelanceTerms> GetFreelanceTermsAsync(Guid personId)
+        {
+            // 1065694950
+            return await _repository.GetFreelanceTermsAsync(personId);
+        }
+
+        public async Task AddFreelanceTermsAsync(FreelanceTerms terms)
+        {
+            await _repository.AddFreelanceTermsAsync(terms);
+        }
+
+        public async Task UpdateFreelanceTermsAsync(FreelanceTerms terms)
+        {
+            await _repository.UpdateFreelanceTermsAsync(terms);
+        }
+
+        public async Task DeleteFreelanceTermsAsync(Guid personId)
+        {
+            await _repository.DeleteFreelanceTermsAsync(personId);
+        }
+
+        #endregion
 
         public async Task<IEnumerable<GetPersonSkill>> GetSkillsAsync(Guid personId)
         {
