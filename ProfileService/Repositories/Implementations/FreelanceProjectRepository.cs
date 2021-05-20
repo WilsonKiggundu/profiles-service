@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ProfileService.Contracts.FreelanceProject;
 using ProfileService.Models;
 using ProfileService.Repositories.Interfaces;
@@ -12,10 +14,12 @@ namespace ProfileService.Repositories.Implementations
     public class FreelanceProjectRepository : IFreelanceProjectRepository
     {
         private readonly ProfileServiceContext _context;
+        private readonly ILogger<FreelanceProjectRepository> _logger;
 
-        public FreelanceProjectRepository(ProfileServiceContext context)
+        public FreelanceProjectRepository(ProfileServiceContext context, ILogger<FreelanceProjectRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public IEnumerable<FreelanceProject> GetAll()

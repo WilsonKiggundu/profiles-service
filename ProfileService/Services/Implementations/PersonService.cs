@@ -85,6 +85,7 @@ namespace ProfileService.Services.Implementations
                 Id = Guid.Parse(newPerson.UserId),
                 Firstname = newPerson.FirstName,
                 Lastname = newPerson.LastName,
+                Email = newPerson.Email,
                 Bio = newPerson.Bio,
                 Avatar = newPerson.Avatar,
                 CoverPhoto = newPerson.CoverPhoto,
@@ -332,6 +333,7 @@ namespace ProfileService.Services.Implementations
             };
             person.Avatar = updatePerson.Avatar;
             person.CoverPhoto = updatePerson.CoverPhoto;
+            person.Email = updatePerson.Email;
 
             try
             {

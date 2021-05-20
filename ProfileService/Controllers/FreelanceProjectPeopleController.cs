@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ProfileService.Contracts.FreelanceProject;
 using ProfileService.Controllers.Common;
 using ProfileService.Models;
@@ -17,14 +19,17 @@ namespace ProfileService.Controllers
     public class FreelanceProjectPeopleController : BaseController
     {
         private readonly IFreelanceProjectService _service;
+        private readonly ILogger<FreelanceProjectPeopleController> _logger;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="service"></param>
-        public FreelanceProjectPeopleController(IFreelanceProjectService service)
+        /// <param name="logger"></param>
+        public FreelanceProjectPeopleController(IFreelanceProjectService service, ILogger<FreelanceProjectPeopleController> logger)
         {
             _service = service;
+            _logger = logger;
         }
 
         /// <summary>
@@ -69,6 +74,7 @@ namespace ProfileService.Controllers
         {
             try
             { 
+                _logger.LogInformation(JsonConvert.SerializeObject(model));
                 await _service.UpdateHireAsync(model);
                 return model;
             }

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using AutoMapper;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -75,7 +77,8 @@ namespace ProfileService
 
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ProfileServiceContext>(options => options.UseNpgsql(connectionString));
-            
+
+            services.AddHangfire(x => x.UsePostgreSqlStorage(connectionString));
             services.AddDependencyInjection();
             services.AddEmailSenders(Configuration);
 
@@ -131,6 +134,9 @@ namespace ProfileService
                 {
                     "Investor", 
                     "Student", 
+                    "Data Scientist",
+                    "Developer",
+                    "Freelancer",
                     "Entrepreneur", 
                     "Professional", 
                     "Intern" 
@@ -174,6 +180,8 @@ namespace ProfileService
             app.UseAuthorization();
 
             app.UseResponseCaching();
+            app.UseHangfireDashboard();
+            app.UseHangfireServer();
 
             app.UseEndpoints(endpoints =>
             {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -46,6 +47,11 @@ namespace ProfileService.Repositories.Implementations
             }
 
             return await query.ToListAsync();
+        }
+
+        public async Task<ICollection<Device>> SearchAsync(List<Guid> deviceIds)
+        {
+            return await _context.Devices.Where(q => deviceIds.Contains(q.Id)).ToListAsync();
         }
 
         public async Task<VapidKeys> GetVapidKeysAsync()

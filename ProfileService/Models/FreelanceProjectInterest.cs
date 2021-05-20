@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using ProfileService.Models.Common;
 
 namespace ProfileService.Models
@@ -12,6 +13,8 @@ namespace ProfileService.Models
         public Person.Person Person { get; set; }
 
         public HireStatus Status { get; set; }
+        
+        [NotMapped] public string Message { get; set; }
     }
 
     public enum HireStatus

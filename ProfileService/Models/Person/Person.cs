@@ -20,6 +20,8 @@ namespace ProfileService.Models.Person
         public string Lastname { get; set; }
         public string DateOfBirth { get; set; }
 
+        public string Email { get; set; }
+
         [Required]
         public Gender? Gender { get; set; }
         public string Bio { get; set; }
