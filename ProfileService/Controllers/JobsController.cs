@@ -22,5 +22,11 @@ namespace ProfileService.Controllers
         {
             return await _jobService.GetAsync(search);
         }
+
+        [HttpPost]
+        public async Task<Job> CreateAsync([FromBody] Job job)
+        {
+            return await _jobService.CreateAsync(job);
+        }
     }
 }

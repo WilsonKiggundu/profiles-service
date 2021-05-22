@@ -106,6 +106,19 @@ namespace ProfileService.Controllers.Person
             }
         }
         
+        [HttpPut("email")]
+        public async Task<UpdatePerson> UpdateEmail(UpdatePerson person)
+        {
+            try
+            {
+                return await _personService.UpdateEmailAsync(person);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+        
         /// <summary>
         /// UPDATE a person
         /// </summary>

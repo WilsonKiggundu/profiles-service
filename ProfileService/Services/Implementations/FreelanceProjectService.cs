@@ -27,10 +27,10 @@ namespace ProfileService.Services.Implementations
     {
         private readonly IFreelanceProjectRepository _repository;
         private readonly IPersonRepository _personRepository;
+        private readonly IWebNotification _notification;
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
         private readonly ILogger<FreelanceProjectService> _logger;
-        private readonly IWebNotification _notification;
 
         public FreelanceProjectService(IFreelanceProjectRepository repository, IWebHostEnvironment environment,
             IConfiguration configuration, IPersonRepository personRepository, IWebNotification notification,
