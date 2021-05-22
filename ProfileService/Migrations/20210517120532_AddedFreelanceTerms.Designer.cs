@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Repositories;
@@ -9,9 +10,10 @@ using ProfileService.Repositories;
 namespace ProfileService.Migrations
 {
     [DbContext(typeof(ProfileServiceContext))]
-    partial class ProfileServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20210517120532_AddedFreelanceTerms")]
+    partial class AddedFreelanceTerms
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -647,39 +649,6 @@ namespace ProfileService.Migrations
                     b.ToTable("FreelanceProjects");
                 });
 
-            modelBuilder.Entity("ProfileService.Models.FreelanceProjectHire", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("PersonId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PersonId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("FreelanceProjectHires");
-                });
-
             modelBuilder.Entity("ProfileService.Models.Investor.Investor", b =>
                 {
                     b.Property<Guid>("Id")
@@ -892,9 +861,6 @@ namespace ProfileService.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PersonId")
-                        .IsUnique();
-
                     b.ToTable("FreelanceTerms");
                 });
 
@@ -920,9 +886,6 @@ namespace ProfileService.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("DateOfBirth")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Email")
                         .HasColumnType("text");
 
                     b.Property<string>("Firstname")
@@ -1565,21 +1528,6 @@ namespace ProfileService.Migrations
                         .HasForeignKey("HiredPersonId");
                 });
 
-            modelBuilder.Entity("ProfileService.Models.FreelanceProjectHire", b =>
-                {
-                    b.HasOne("ProfileService.Models.Person.Person", "Person")
-                        .WithMany()
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProfileService.Models.FreelanceProject", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ProfileService.Models.Investor.Investor", b =>
                 {
                     b.HasOne("ProfileService.Models.Person.Person", "Person")
@@ -1633,15 +1581,6 @@ namespace ProfileService.Migrations
                     b.HasOne("ProfileService.Models.Investor.Investor", "Investor")
                         .WithMany()
                         .HasForeignKey("InvestorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ProfileService.Models.Person.FreelanceTerms", b =>
-                {
-                    b.HasOne("ProfileService.Models.Person.Person", null)
-                        .WithOne("FreelanceTerms")
-                        .HasForeignKey("ProfileService.Models.Person.FreelanceTerms", "PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

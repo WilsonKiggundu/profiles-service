@@ -30,7 +30,7 @@ namespace ProfileService.Models.Common
         /// <summary>
         /// Date and time when record was last updated
         /// </summary>
-        public string DateLastUpdated { get; set; }    
+        public string DateLastUpdated { get; set; } = DateTime.UtcNow.ToString("u");    
         
     }
 }

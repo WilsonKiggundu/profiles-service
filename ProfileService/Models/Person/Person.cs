@@ -20,6 +20,8 @@ namespace ProfileService.Models.Person
         public string Lastname { get; set; }
         public string DateOfBirth { get; set; }
 
+        public string Email { get; set; }
+
         [Required]
         public Gender? Gender { get; set; }
         public string Bio { get; set; }
@@ -35,6 +37,7 @@ namespace ProfileService.Models.Person
         public virtual IEnumerable<PersonStack> Stacks { get; set; }
         public virtual IEnumerable<PersonEmployment> Employment { get; set; }
         public virtual IEnumerable<PersonProject> Projects { get; set; }    
+        public virtual FreelanceTerms FreelanceTerms { get; set; }
         
         [NotMapped] public int ConnectionsCount { get; set; }
         [NotMapped] public bool IsConnected { get; set; }

@@ -45,6 +45,15 @@ namespace ProfileService.Services.Interfaces
         Task DeleteInterestAsync(Guid interestId, Guid personId);
 
         #endregion
+        
+        #region Person Terms
+    
+        Task<FreelanceTerms> GetFreelanceTermsAsync(Guid personId);
+        Task AddFreelanceTermsAsync(FreelanceTerms terms);
+        Task UpdateFreelanceTermsAsync(FreelanceTerms terms);            
+        Task DeleteFreelanceTermsAsync(Guid personId);            
+
+        #endregion  
 
         #region PersonSkills
 

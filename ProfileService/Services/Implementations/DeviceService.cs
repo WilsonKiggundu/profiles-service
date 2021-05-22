@@ -25,6 +25,11 @@ namespace ProfileService.Services.Implementations
             return await _repository.SearchAsync(except, profileId);    
         }
 
+        public async Task<ICollection<Device>> SearchAsync(List<Guid> deviceIds)
+        {
+            return await _repository.SearchAsync(deviceIds);    
+        }
+
         public async Task InsertAsync(Device device)
         {
             var alreadyRegistered = await _repository.IsRegistered(device.ProfileId, device.Token);

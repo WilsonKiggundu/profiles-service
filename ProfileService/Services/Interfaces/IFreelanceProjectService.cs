@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ProfileService.Contracts.FreelanceProject;
 using ProfileService.Models;
@@ -12,5 +13,9 @@ namespace ProfileService.Services.Interfaces
         Task<FreelanceProject> InsertAsync(FreelanceProject project);    
         Task<FreelanceProject> UpdateAsync(FreelanceProject project);
         Task DeleteAsync(Guid id);
+        
+        Task<ICollection<FreelanceProjectHire>> GetHiresAsync(Guid projectId);
+        Task AddHireAsync(FreelanceProjectHire hire);    
+        Task UpdateHireAsync(FreelanceProjectHire hire);
     }
 }
