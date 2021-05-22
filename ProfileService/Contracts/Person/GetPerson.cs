@@ -21,6 +21,7 @@ namespace ProfileService.Contracts.Person
         public string DateOfBirth { get; set; }
         public string Avatar { get; set; }
         public string CoverPhoto { get; set; }
+        public string Email { get; set; }
         public string Gender { get; set; }
 
         public ICollection<GetLookupCategory> Categories { get; set; }

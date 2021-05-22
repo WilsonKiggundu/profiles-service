@@ -83,6 +83,7 @@ namespace ProfileService.Services.Interfaces
         #endregion
 
         Task<UpdatePerson> UpdateAvatarAsync(UpdatePerson person);
+        Task<UpdatePerson> UpdateEmailAsync(UpdatePerson person);
 
         #region PersonContacts
     

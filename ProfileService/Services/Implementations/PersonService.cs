@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Configuration;
@@ -64,9 +65,24 @@ namespace ProfileService.Services.Implementations
             // if (result == null) return new GetPerson();
 
             var person = _mapper.Map<GetPerson>(result);
+            
+            // get categories
+            var categories = await _repository.GetCategoriesAsync(id);
+            var enumerable = categories.ToList();
+            
+            var personCategories = new List<GetLookupCategory>();
+            if (enumerable.Any())
+            {
+                personCategories.AddRange(enumerable.Select(s => new GetLookupCategory
+                {
+                    Id = s.CategoryId,
+                    Name = s.Category.Name
+                }));
+            }
 
             if (person != null)
             {
+                person.Categories = personCategories;
                 person.Gender = result.Gender switch
                 {
                     Gender.Female => "female",
@@ -80,9 +96,12 @@ namespace ProfileService.Services.Implementations
 
         public async Task<NewPerson> InsertAsync(NewPerson newPerson)
         {
+            var profile = await _repository.GetByIdAsync(newPerson.UserId);
+            if (profile != null) return newPerson;
+            
             var person = new Person
             {
-                Id = Guid.Parse(newPerson.UserId),
+                Id = newPerson.UserId,
                 Firstname = newPerson.FirstName,
                 Lastname = newPerson.LastName,
                 Email = newPerson.Email,
@@ -97,7 +116,7 @@ namespace ProfileService.Services.Implementations
                     _ => Gender.Female
                 },
                 DateOfBirth = newPerson.DateOfBirth,
-                UserId = Guid.Parse(newPerson.UserId)
+                UserId = newPerson.UserId
             };
 
             try
@@ -163,6 +182,21 @@ namespace ProfileService.Services.Implementations
         {
             var person = await _repository.GetByIdAsync(updatePerson.UserId);
             person.Avatar = updatePerson.Avatar;
+            try
+            {
+                await _repository.UpdateAsync(person);
+                return _mapper.Map<UpdatePerson>(person);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<UpdatePerson> UpdateEmailAsync(UpdatePerson updatePerson)
+        {
+            var person = await _repository.GetByIdAsync(updatePerson.Id);
+            person.Email = updatePerson.Email;
             try
             {
                 await _repository.UpdateAsync(person);
