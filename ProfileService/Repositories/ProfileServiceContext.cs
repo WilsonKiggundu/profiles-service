@@ -131,6 +131,13 @@ namespace ProfileService.Repositories
 
         #endregion
 
+        #region Jobs
+
+        public DbSet<JobApplication> JobApplications { get; set; }
+        public DbSet<Job> Jobs { get; set; }
+
+        #endregion
+
         #region Email Templates
 
         public DbSet<EmailTemplate> EmailTemplates { get; set; }

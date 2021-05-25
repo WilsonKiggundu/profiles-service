@@ -7,9 +7,12 @@ using ProfileService.Models.Common;
 
 namespace ProfileService.Contracts
 {
-    public class Job
+    public class JobDto
     {    
         public int Id { get; set; }
+        public Guid JobId { get; set; }
+        
+        [JsonProperty("deadline")]
         public string Deadline { get; set; }
         public Guid ProfileId { get; set; }
         public GetPerson Profile { get; set; }
@@ -25,6 +28,7 @@ namespace ProfileService.Contracts
         public string MinSalary { get; set; }
         public string MaxSalary { get; set; }
         public string Skills { get; set; }
+        public string ReplyEmail { get; set; }
         public JobCategory Category { get; set; }
         public List<JobApplicant> Applicants { get; set; }
         public List<JobUpload> Uploads { get; set; }
@@ -47,7 +51,8 @@ namespace ProfileService.Contracts
 
     public class JobSearch
     {
-        public int? Id { get; set; }
+        public int? Id { get; set; }    
+        public Guid? JobId { get; set; }
         public Guid? ProfileId { get; set; }
         public Guid? CompanyId { get; set; }    
         public string CompanyName { get; set; }

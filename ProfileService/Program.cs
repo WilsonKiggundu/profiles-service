@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using ProfileService.Helpers;
 using ProfileService.Helpers.Email;
 using ProfileService.Repositories;
@@ -32,15 +33,15 @@ namespace ProfileService
                     var context = scope.ServiceProvider.GetService<ProfileServiceContext>();
                     context.Database.Migrate();
                     
-                    DataSeeder.SeedEmailPreferences(context);
-                    DataSeeder.GenerateVapidKeys(context);
-
+                    // DataSeeder.SeedEmailPreferences(context);
+                    // DataSeeder.GenerateVapidKeys(context);
                 }
-                
                 
                 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
                 {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                    MissingMemberHandling = MissingMemberHandling.Ignore,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
                 };
 
                 host.Run();
