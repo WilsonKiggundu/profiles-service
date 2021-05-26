@@ -45,17 +45,82 @@ namespace ProfileService.Services.Implementations
             _environment = environment;
             _jobRepository = jobRepository;
         }
+        
+        public async Task<JobDto> GetByIdAsync(int id)
+        {
+            var baseUrl = _configuration.GetSection("JobsService:BaseUrl").Get<string>();
+            var job = await _jobRepository.GetJobAsync(id);
+            
+            _logger.LogInformation(JsonConvert.SerializeObject(job, Formatting.Indented));
+            
+            var search = new JobSearch { Id = id};
+            var url = PrepareUrl(search, baseUrl);
+            
+            using var client = new HttpClient();
+
+            var response = await client.GetAsync(url);
+            if (!response.IsSuccessStatusCode) throw new Exception(response.ReasonPhrase);
+            
+            var responseString = await response.Content.ReadAsStringAsync();
+            
+            var jobDetails = JsonConvert.DeserializeObject<JobDto>(responseString);
+
+            try
+            {
+                jobDetails.Profile = job?.Profile;
+                jobDetails.Company = job?.Company;
+                jobDetails.JobId = job?.Id;
+                jobDetails.Applications = job?.Applications.Select(application => new JobApplicantProfile
+                {
+                    Id = application.ApplicantId,
+                    Name = $"{application.Applicant?.Firstname} {application.Applicant?.Lastname}",
+                    ApplicationId = application.Id,
+                    JobId = application.JobId
+                    
+                }).ToList();
+                
+                return jobDetails;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
 
         public async Task<ICollection<JobDto>> GetAsync(JobSearch search)
         {
             var baseUrl = _configuration.GetSection("JobsService:BaseUrl").Get<string>();
-
-            if (search.JobId.HasValue)
-            {
-                var job = await _jobRepository.GetJobAsync(search.JobId.Value);
-                search.Id = job.Reference;
-            }
             
+            var url = PrepareUrl(search, baseUrl);
+            
+            using var client = new HttpClient();
+
+            var response = await client.GetAsync(url);
+            if (!response.IsSuccessStatusCode) throw new Exception(response.ReasonPhrase);
+            
+            var responseString = await response.Content.ReadAsStringAsync();
+            var jobs = JsonConvert.DeserializeObject<ICollection<JobDto>>(responseString);
+            
+            var jobIds = jobs.Select(s => s.Id).ToList();
+
+            var jobReferences = await _jobRepository.GetManyAsync(jobIds);
+            
+            jobs.ToList().ForEach(job =>
+            {
+                var reference = jobReferences
+                    .FirstOrDefault(q => q.Reference == job.Id);
+                
+                job.JobId = reference?.Id;
+                job.Profile = reference?.Profile;
+                job.Company = reference?.Company;
+            });
+
+            return jobs;
+        }
+
+        private static string PrepareUrl(JobSearch search, string baseUrl)
+        {
             var url = $"{baseUrl}/api/jobs";
 
             if (search.Id != null)
@@ -75,88 +140,13 @@ namespace ProfileService.Services.Implementations
                 url = $"{url}?companyId={search.CompanyName}";
             }
 
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Add("Accept", "application/json");
-
-            var client = _clientFactory.CreateClient();
-            var response = await client.SendAsync(request);
-
-            if (!response.IsSuccessStatusCode) throw new Exception(response.ReasonPhrase);
-
-            try
-            {
-                var responseStream = await response.Content.ReadAsStringAsync();
-                var jobs = new List<JobDto>();
-
-                if (search?.Id != null)
-                {
-                    var job = JsonConvert.DeserializeObject<JobDto>(responseStream);
-
-                    job.Profile = await _personService.GetByIdAsync(job.ProfileId);
-
-                    if (string.IsNullOrEmpty(job.CompanyId))
-                    {
-                        var isGuid = Guid.TryParse(job.CompanyId, out var companyId);
-
-                        if (isGuid)
-                        {
-                            job.Company = await _businessService.GetByIdAsync(companyId);
-                        }
-                        else
-                        {
-                            job.Company = new GetBusiness
-                            {
-                                Name = job.CompanyId
-                            };
-                        }
-                    }
-
-                    jobs.Add(job);
-                }
-                else
-                {
-                    var jobsJson = JsonConvert.DeserializeObject<List<JobDto>>(responseStream);
-
-                    foreach (var job in jobsJson)
-                    {
-                        // _logger.LogInformation(JsonConvert.SerializeObject(job, Formatting.Indented));
-                        //
-                        // job.Profile = await _personService.GetByIdAsync(job.ProfileId);
-                        if (string.IsNullOrEmpty(job.CompanyId)) continue;
-
-                        var isGuid = Guid.TryParse(job.CompanyId, out var companyId);
-
-                        if (isGuid)
-                        {
-                            job.Company = await _businessService.GetByIdAsync(companyId);
-                        }
-                        else
-                        {
-                            job.Company = new GetBusiness
-                            {
-                                Name = job.CompanyId
-                            };
-                        }
-                    }
-
-                    jobs.AddRange(jobsJson);
-                }
-
-                return jobs;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            return url;
         }
 
         public async Task<JobDto> CreateAsync(JobDto job)
         {
-            
             var jobsUrl = _configuration.GetSection("JobsService:BaseUrl").Get<string>();
             jobsUrl = $"{jobsUrl}/api/jobs";
-            
             
             try
             {
@@ -170,14 +160,12 @@ namespace ProfileService.Services.Implementations
                 var responseString = await response.Content.ReadAsStringAsync();
 
                 var newJob = JsonConvert.DeserializeObject<JobDto>(responseString);
-                _logger.LogInformation("============= Reading response ===============");
-                _logger.LogInformation(JsonConvert.SerializeObject(newJob, Formatting.Indented));
                 
                 // Save the job
                 newJob.JobId = Guid.NewGuid();
                 await _jobRepository.InsertAsync(new Job
                 {
-                    Id = newJob.JobId,
+                    Id = newJob.JobId.Value,
                     Title = job.Title,
                     ReplyEmail = job.ReplyEmail,
                     Reference = newJob.Id,

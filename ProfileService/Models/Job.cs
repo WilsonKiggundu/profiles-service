@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ProfileService.Models.Common;
 
 namespace ProfileService.Models
@@ -13,5 +14,7 @@ namespace ProfileService.Models
 
         public Guid? CompanyId { get; set; }    
         public Business.Business Company { get; set; }
+        
+        public ICollection<JobApplication> Applications { get; set; }
     }
 }

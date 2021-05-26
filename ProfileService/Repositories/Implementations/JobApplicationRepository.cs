@@ -60,18 +60,14 @@ namespace ProfileService.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task<ICollection<JobApplication>> SearchAsync(int jobId)
+        public async Task<ICollection<JobApplication>> SearchAsync(Guid jobId)
         {
             return await _context
                 .JobApplications
                 .Include(p => p.Applicant)
                 .OrderByDescending(q => q.DateCreated)
+                .Where(q => q.JobId == jobId)
                 .ToListAsync();
-        }
-
-        public async Task<Job> GetJobById(int jobId)
-        {
-            return await _context.Jobs.FirstOrDefaultAsync(q => q.Reference == jobId);
         }
     }
 }

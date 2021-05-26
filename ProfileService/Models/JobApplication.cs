@@ -7,13 +7,13 @@ namespace ProfileService.Models
 {
     public class JobApplication : BaseModel
     {
-        public int JobId { get; set; }
+        public Guid JobId { get; set; }
+        public Job Job { get; set; }
+        
         public Guid ApplicantId { get; set; }
         public Person.Person Applicant { get; set; }
+        
         public HireStatus Status { get; set; } = HireStatus.ExpressedInterest;
         public string Remarks { get; set; }
-        
-        [NotMapped]
-        public Job Job { get; set; }
     }
 }

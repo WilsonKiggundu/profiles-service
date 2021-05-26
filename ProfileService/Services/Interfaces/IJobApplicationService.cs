@@ -8,7 +8,7 @@ namespace ProfileService.Services.Interfaces
 {
     public interface IJobApplicationService : IService    
     {    
-        Task<ICollection<JobApplication>> SearchAsync(int jobId);
+        Task<ICollection<JobApplication>> SearchAsync(Guid jobId);
         Task<JobApplication> InsertAsync(JobApplication application);    
         Task<JobApplication> UpdateAsync(JobApplication application);
         Task DeleteAsync(Guid id);

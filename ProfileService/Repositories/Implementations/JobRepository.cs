@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using ProfileService.Contracts;
 using ProfileService.Models;
 using ProfileService.Repositories.Interfaces;
 
@@ -50,12 +52,33 @@ namespace ProfileService.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
+        public async Task<ICollection<Job>> GetManyAsync(List<int> ids)
+        {
+            return await _context.Jobs
+                .Include(q => q.Profile)
+                .Include(q => q.Company)
+                .Where(q => ids.Contains(q.Reference))
+                .ToListAsync();
+        }
+        
         public async Task<Job> GetJobAsync(Guid id)
         {
             return await _context.Jobs
                 .Include(q => q.Profile)
                 .Include(q => q.Company)
+                .Include(q => q.Applications)
+                .ThenInclude(a => a.Applicant)
                 .FirstOrDefaultAsync(q => q.Id == id);
+        }
+
+        public async Task<Job> GetJobAsync(int id)
+        {
+            return await _context.Jobs
+                .Include(q => q.Profile)
+                .Include(q => q.Company)
+                .Include(q => q.Applications)
+                .ThenInclude(a => a.Applicant)
+                .FirstOrDefaultAsync(q => q.Reference == id);
         }
     }
 }

@@ -27,6 +27,7 @@ namespace ProfileService.Services.Implementations
     {
         private readonly IJobApplicationRepository _repository;
         private readonly IPersonRepository _personRepository;
+        private readonly IJobRepository _jobRepository;
         private readonly IWebNotification _notification;
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
@@ -34,7 +35,7 @@ namespace ProfileService.Services.Implementations
 
         public JobApplicationService(IJobApplicationRepository repository, IWebHostEnvironment environment,
             IConfiguration configuration, IPersonRepository personRepository, IWebNotification notification,
-            ILogger<FreelanceProjectService> logger)
+            ILogger<FreelanceProjectService> logger, IJobRepository jobRepository)
         {
             _repository = repository;
             _environment = environment;
@@ -42,9 +43,10 @@ namespace ProfileService.Services.Implementations
             _personRepository = personRepository;
             _notification = notification;
             _logger = logger;
+            _jobRepository = jobRepository;
         }
 
-        public async Task<ICollection<JobApplication>> SearchAsync(int jobId)
+        public async Task<ICollection<JobApplication>> SearchAsync(Guid jobId)    
         {
             return await _repository.SearchAsync(jobId);
         }
@@ -75,7 +77,7 @@ namespace ProfileService.Services.Implementations
         // ReSharper disable once MemberCanBePrivate.Global
         public async Task SendNotification(JobApplication application)
         {
-            application.Job = await _repository.GetJobById(application.JobId);
+            application.Job = await _jobRepository.GetJobAsync(application.JobId);
             application.Applicant = await _personRepository.GetByIdAsync(application.ApplicantId);
 
             string title;
