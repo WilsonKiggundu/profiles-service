@@ -206,36 +206,34 @@ namespace ProfileService.Services.Implementations
                 {
                     var baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>();
                     var emailEndpoint = _configuration.GetSection("EmailEndpoint").Get<string>();
-                    var emailTemplatePath = Path.Combine(_environment.ContentRootPath, "EmailTemplates/Jobs", "NewJobPosted.html");
-                    
-                    var body = await File.ReadAllTextAsync(emailTemplatePath);    
-
-                    body = body
-                        .Replace("[PERSON_NAME]", $"{person.Firstname}")
-                        .Replace("[JOB_TITLE]", $"{job.Title}")
-                        .Replace("[JOB_URL]", $"{baseUrl}/jobs/{job.JobId}/details");
-
-                    var emailDetails = new EmailDetailsDto
-                    {
-                        Body = body,
-                        Subject = "New job posted",
-                        Recipient = person.Email
-                    };
-                    
-                    using var client = new HttpClient();
-
-                    var json = JsonConvert.SerializeObject(emailDetails, Formatting.Indented);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+                    var emailTemplatePath = Path.Combine(_environment.ContentRootPath, "EmailTemplates", "Jobs", "NewJobPosted.html");
 
                     try
                     {
+                        var body = await File.ReadAllTextAsync(emailTemplatePath);    
+
+                        body = body
+                            .Replace("[PERSON_NAME]", $"{person.Firstname}")
+                            .Replace("[JOB_TITLE]", $"{job.Title}")
+                            .Replace("[JOB_URL]", $"{baseUrl}/jobs/{job.JobId}/details");
+
+                        var emailDetails = new EmailDetailsDto
+                        {
+                            Body = body,
+                            Subject = "New job posted",
+                            Recipient = person.Email
+                        };
+                    
+                        using var client = new HttpClient();
+
+                        var json = JsonConvert.SerializeObject(emailDetails, Formatting.Indented);
+                        var content = new StringContent(json, Encoding.UTF8, "application/json");
                         await client.PostAsync(emailEndpoint, content);
                     }
                     catch (Exception e)
                     {
                         _logger.LogCritical(e.Message);
-                        Console.WriteLine(e);
-                        throw;
+                        // throw;
                     }
                     
                 });
