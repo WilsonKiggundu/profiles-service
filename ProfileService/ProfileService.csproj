@@ -41,4 +41,21 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.8" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="wwwroot\EmailTemplates\CompleteProfile.html" />
+      <None Include="wwwroot\EmailTemplates\FreelanceProjectInterest.html" />
+      <None Include="wwwroot\EmailTemplates\HireFreelanceProjectInterest.html" />
+      <None Include="wwwroot\EmailTemplates\Jobs\Apply.html" />
+      <None Include="wwwroot\EmailTemplates\Jobs\Consider.html" />
+      <None Include="wwwroot\EmailTemplates\Jobs\Hire.html" />
+      <None Include="wwwroot\EmailTemplates\Jobs\NewJobPosted.html" />
+      <None Include="wwwroot\EmailTemplates\Jobs\Reject.html" />
+      <None Include="wwwroot\EmailTemplates\RejectFreelanceProjectInterest.html" />
+      <None Include="wwwroot\EmailTemplates\RequestMoreInfoFreelanceProjectInterest.html" />
+    </ItemGroup>
+
 </Project>

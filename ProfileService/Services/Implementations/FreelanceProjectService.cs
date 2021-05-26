@@ -189,7 +189,7 @@ namespace ProfileService.Services.Implementations
 
                 var baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>();
                 var emailEndpoint = _configuration.GetSection("EmailEndpoint").Get<string>();
-                var emailTemplatePath = Path.Combine(_environment.ContentRootPath, "EmailTemplates");
+                var emailTemplatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates");
                 var project = await _repository.GetByIdAsync(hire.ProjectId);
 
                 string emailBody;
