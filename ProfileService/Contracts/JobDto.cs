@@ -3,18 +3,22 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using ProfileService.Contracts.Business;
 using ProfileService.Contracts.Person;
+using ProfileService.Models;
 using ProfileService.Models.Common;
 
 namespace ProfileService.Contracts
 {
-    public class Job
+    public class JobDto
     {    
         public int Id { get; set; }
+        public Guid? JobId { get; set; }
+        
+        [JsonProperty("deadline")]
         public string Deadline { get; set; }
         public Guid ProfileId { get; set; }
-        public GetPerson Profile { get; set; }
+        public Models.Person.Person Profile { get; set; }
         public string CompanyId { get; set; }
-        public GetBusiness Company { get; set; }
+        public Models.Business.Business Company { get; set; }
         public string Details { get; set; }
         public string Experience { get; set; }
         public string Benefits { get; set; }
@@ -25,8 +29,10 @@ namespace ProfileService.Contracts
         public string MinSalary { get; set; }
         public string MaxSalary { get; set; }
         public string Skills { get; set; }
+        public string ReplyEmail { get; set; }
         public JobCategory Category { get; set; }
-        public List<JobApplicant> Applicants { get; set; }
+        public ICollection<JobApplicant> Applicants { get; set; }
+        public ICollection<JobApplicantProfile> Applications { get; set; }
         public List<JobUpload> Uploads { get; set; }
     }
 
@@ -47,10 +53,22 @@ namespace ProfileService.Contracts
 
     public class JobSearch
     {
-        public int? Id { get; set; }
+        public int? Id { get; set; }    
+        public Guid? JobId { get; set; }
         public Guid? ProfileId { get; set; }
         public Guid? CompanyId { get; set; }    
         public string CompanyName { get; set; }
+    }
+
+    public class JobApplicantProfile
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Avatar { get; set; }
+        public Guid JobId { get; set; }
+        public Guid ApplicationId { get; set; }
+        public string DateTime { get; set; }
+        public HireStatus Status { get; set; }
     }
 
     public class JobApplicant

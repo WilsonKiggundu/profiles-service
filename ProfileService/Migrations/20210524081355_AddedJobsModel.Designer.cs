@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Repositories;
@@ -9,9 +10,10 @@ using ProfileService.Repositories;
 namespace ProfileService.Migrations
 {
     [DbContext(typeof(ProfileServiceContext))]
-    partial class ProfileServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20210524081355_AddedJobsModel")]
+    partial class AddedJobsModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -866,9 +868,6 @@ namespace ProfileService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("CompanyId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("DateCreated")
                         .HasColumnType("text");
 
@@ -891,8 +890,6 @@ namespace ProfileService.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
 
                     b.HasIndex("ProfileId");
 
@@ -917,8 +914,8 @@ namespace ProfileService.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("JobId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("JobId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("text");
@@ -929,8 +926,6 @@ namespace ProfileService.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicantId");
-
-                    b.HasIndex("JobId");
 
                     b.ToTable("JobApplications");
                 });
@@ -1714,10 +1709,6 @@ namespace ProfileService.Migrations
 
             modelBuilder.Entity("ProfileService.Models.Job", b =>
                 {
-                    b.HasOne("ProfileService.Models.Business.Business", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId");
-
                     b.HasOne("ProfileService.Models.Person.Person", "Profile")
                         .WithMany()
                         .HasForeignKey("ProfileId");
@@ -1728,12 +1719,6 @@ namespace ProfileService.Migrations
                     b.HasOne("ProfileService.Models.Person.Person", "Applicant")
                         .WithMany()
                         .HasForeignKey("ApplicantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProfileService.Models.Job", "Job")
-                        .WithMany()
-                        .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
