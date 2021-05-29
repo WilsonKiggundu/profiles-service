@@ -51,8 +51,6 @@ namespace ProfileService.Services.Implementations
             var baseUrl = _configuration.GetSection("JobsService:BaseUrl").Get<string>();
             var job = await _jobRepository.GetJobAsync(id);
             
-            _logger.LogInformation(JsonConvert.SerializeObject(job, Formatting.Indented));
-            
             var search = new JobSearch { Id = id};
             var url = PrepareUrl(search, baseUrl);
             
@@ -75,7 +73,10 @@ namespace ProfileService.Services.Implementations
                     Id = application.ApplicantId,
                     Name = $"{application.Applicant?.Firstname} {application.Applicant?.Lastname}",
                     ApplicationId = application.Id,
-                    JobId = application.JobId
+                    JobId = application.JobId,
+                    Avatar = application.Applicant?.Avatar,
+                    DateTime = application.DateCreated,
+                    Status = application.Status
                     
                 }).ToList();
                 
