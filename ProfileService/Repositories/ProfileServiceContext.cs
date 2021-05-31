@@ -143,5 +143,12 @@ namespace ProfileService.Repositories
         public DbSet<EmailTemplate> EmailTemplates { get; set; }
 
         #endregion
+
+        #region Blacklists
+
+        public DbSet<PersonBlacklist> PersonBlacklists { get; set; }
+        public DbSet<PostBlacklist> PostBlacklists { get; set; }
+
+        #endregion
     }
 }

@@ -19,7 +19,20 @@ namespace ProfileService.Repositories.Implementations
 
         public async Task<SearchPostResponse> SearchAsync(SearchPostRequest request)
         {
-            IQueryable<Post> query = _context.Posts.OrderByDescending(p => p.DateCreated);
+            var postBlacklist = await _context.PostBlacklists
+                .Where(q => q.PersonId == request.UserId)
+                .Select(s => s.BlacklistId)
+                .ToListAsync();
+
+            var personBlacklist = await _context.PersonBlacklists
+                .Where(p => p.PersonId == request.UserId)
+                .Select(s => s.BlacklistId)
+                .ToListAsync();
+            
+            IQueryable<Post> query = _context.Posts
+                .Where(p => !personBlacklist.Contains(p.AuthorId))
+                .Where(p => !postBlacklist.Contains(p.Id))
+                .OrderByDescending(p => p.DateCreated);
 
             if (request.PostId.HasValue)
             {

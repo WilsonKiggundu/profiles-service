@@ -1,4 +1,5 @@
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -28,6 +29,11 @@ namespace ProfileService.Controllers.Blog
         [HttpGet]
         public async Task<SearchPostResponse> Get([FromQuery] SearchPostRequest request)
         {
+            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
+            var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId != null) request.UserId = Guid.Parse(userId);
+            
             return await _postService.SearchAsync(request);
         }
 
