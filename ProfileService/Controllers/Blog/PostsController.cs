@@ -1,6 +1,7 @@
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -10,6 +11,7 @@ using ProfileService.Services.Interfaces;
 
 namespace ProfileService.Controllers.Blog
 {
+    [Authorize]
     [Route("api/blog/posts")]
     public class PostsController : BaseController
     {

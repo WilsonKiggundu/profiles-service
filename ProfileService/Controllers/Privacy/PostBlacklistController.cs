@@ -18,7 +18,7 @@ namespace ProfileService.Controllers.Privacy
     /// <summary>
     /// Posts Blacklist controller
     /// </summary>
-    [Route("api/posts/blacklist")]
+    [Route("api/blog/posts/blacklist")]
     public class PostBlacklistController : BaseController
     {
         private readonly IPostBlacklistService _service;
