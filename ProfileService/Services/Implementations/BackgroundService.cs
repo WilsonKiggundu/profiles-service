@@ -39,6 +39,7 @@ namespace ProfileService.Services.Implementations
                 .Where(p => p.Email != null)
                 .Include(p => p.Categories)
                 .ThenInclude(c => c.Category)
+                .Include(p => p.Awards)
                 .Include(p => p.Contacts)
                 .Include(p => p.Employment)
                 .Include(p => p.Interests)

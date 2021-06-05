@@ -190,7 +190,7 @@ namespace ProfileService
                 });
 
                 context.SaveChanges();
-                RecurringJob.AddOrUpdate(() => backgroundService.SendProfileUpdateRemindersAsync(1, 100), Cron.Daily);
+                RecurringJob.AddOrUpdate(() => backgroundService.SendProfileUpdateRemindersAsync(1, 100), Cron.Weekly);
                 
             }
             
