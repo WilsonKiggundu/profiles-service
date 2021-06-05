@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using ProfileService.Contracts.Person;
 using ProfileService.Models.Common;
 
@@ -41,6 +42,8 @@ namespace ProfileService.Models.Person
         
         [NotMapped] public int ConnectionsCount { get; set; }
         [NotMapped] public bool IsConnected { get; set; }
+        [NotMapped] public bool IsFreelancer { get; set; }
+        [NotMapped] public bool IsDeveloper { get; set; }
         
         [NotMapped] public string FullName { get; set; }
 
