@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.Json;
 using AutoMapper;
 using Hangfire;
+using Hangfire.Dashboard;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -122,8 +123,44 @@ namespace ProfileService
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IBackgroundService backgroundService)
         {
+            
+            
+            app.UseExceptionHandler(error => error.UseCustomErrors(env));
+
+            app.UseHttpsRedirection();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(context =>
+            {
+                context.SwaggerEndpoint("/swagger/v1/swagger.json", "Version 1.0");
+                context.RoutePrefix = "docs";
+            });
+
+            app.UseCors();
+
+            app.UseReDoc(options =>
+            {
+                options.SpecUrl("/swagger/v1/swagger.json");
+                options.RoutePrefix = string.Empty;
+            });
+
+            app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseResponseCaching();
+            app.UseHangfireServer();
+            app.UseHangfireDashboard("/jobs", new DashboardOptions
+            {
+                Authorization = new List<IDashboardAuthorizationFilter>
+                {
+                    new NoAuthFilter()
+                }
+            });
+
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetService<ProfileServiceContext>();
@@ -153,36 +190,11 @@ namespace ProfileService
                 });
 
                 context.SaveChanges();
+                RecurringJob.AddOrUpdate(() => backgroundService.SendProfileUpdateRemindersAsync(1, 100), Cron.Daily);
+                
             }
             
-            app.UseExceptionHandler(error => error.UseCustomErrors(env));
-
-            app.UseHttpsRedirection();
-
-            app.UseSwagger();
-            app.UseSwaggerUI(context =>
-            {
-                context.SwaggerEndpoint("/swagger/v1/swagger.json", "Version 1.0");
-                context.RoutePrefix = "docs";
-            });
-
-            app.UseCors();
-
-            app.UseReDoc(options =>
-            {
-                options.SpecUrl("/swagger/v1/swagger.json");
-                options.RoutePrefix = string.Empty;
-            });
-
-            app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseResponseCaching();
-            app.UseHangfireDashboard();
-            app.UseHangfireServer();
-
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
