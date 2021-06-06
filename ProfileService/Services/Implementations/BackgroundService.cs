@@ -25,7 +25,8 @@ namespace ProfileService.Services.Implementations
         private readonly IConfiguration _configuration;
         private readonly ILogger<FreelanceProjectService> _logger;
 
-        public BackgroundService(ProfileServiceContext context, IConfiguration configuration, IWebHostEnvironment environment, ILogger<FreelanceProjectService> logger)
+        public BackgroundService(ProfileServiceContext context, IConfiguration configuration,
+            IWebHostEnvironment environment, ILogger<FreelanceProjectService> logger)
         {
             _context = context;
             _configuration = configuration;
@@ -33,96 +34,124 @@ namespace ProfileService.Services.Implementations
             _logger = logger;
         }
 
-        public async Task SendProfileUpdateRemindersAsync(int page, int pageSize)
+        public async Task SendProfileUpdateRemindersAsync()
         {
-            var profiles = await _context.Persons
-                .Where(p => p.Email != null)
-                .Include(p => p.Categories)
-                .ThenInclude(c => c.Category)
-                .Include(p => p.Awards)
-                .Include(p => p.Contacts)
-                .Include(p => p.Employment)
-                .Include(p => p.Interests)
-                .Include(p => p.Projects)
-                .Include(p => p.Skills)
-                .Include(p => p.Stacks)
-                .Include(p => p.FreelanceTerms)
-                // .Skip((page - 1) * pageSize)
-                // .Take(pageSize)
-                .ToListAsync();
-            
-            profiles.ForEach(async profile =>
+            _logger.LogInformation("Getting incomplete profiles...");
+            var count = await _context.Persons.CountAsync();
+            const int batchSize = 10;
+            var batchCount = count < batchSize ? 1 : Math.Ceiling(Convert.ToDecimal(count / batchSize));
+
+            _logger.LogInformation($"Count: {count}, BatchSize: {batchSize}, BatchCount: {batchCount}");
+
+            var emailsSent = 0;
+
+            for (var i = 0; i < batchCount; i++)
             {
-                var whatIsMissing = new List<string>();
+                var profiles = await _context.Persons
+                    .Where(p => p.Email != null)
+                    .Include(p => p.Categories)
+                    .ThenInclude(c => c.Category)
+                    .Include(p => p.Awards)
+                    .Include(p => p.Contacts)
+                    .Include(p => p.Employment)
+                    .Include(p => p.Interests)
+                    .Include(p => p.Projects)
+                    .Include(p => p.Skills)
+                    .Include(p => p.Stacks)
+                    .Include(p => p.FreelanceTerms)
+                    .Skip(i * batchSize)
+                    .Take(batchSize)
+                    .ToListAsync();
 
-                profile.IsDeveloper = profile.Categories.Any(q => q.Category.Name.ToLower() == "developer");
-                profile.IsFreelancer = profile.Categories.Any(q => q.Category.Name.ToLower() == "freelancer");
-                
-                if (string.IsNullOrEmpty(profile.Avatar))
+                profiles.ForEach(async profile =>
                 {
-                    whatIsMissing.Add("Your profile photo");
-                }
-                if (string.IsNullOrEmpty(profile.Bio))
-                {
-                    whatIsMissing.Add("A brief description of you (bio)");
-                }
-                if (profile.Categories == null || profile.Categories?.Count() == 0)
-                {
-                    whatIsMissing.Add("User category");
-                }
-                if (profile.Awards == null || profile.Awards?.Count() == 0)
-                {
-                    whatIsMissing.Add("Your education history or awards");
-                }
-                if (profile.Skills == null || profile.Skills?.Count() == 0)
-                {
-                    whatIsMissing.Add("Your skills");
-                }
-                if (profile.Projects == null || profile.Projects?.Count() == 0)
-                {
-                    whatIsMissing.Add("Projects you have worked on");
-                }
-                if (profile.Contacts == null || profile.Contacts?.Count() == 0)
-                {
-                    whatIsMissing.Add("Contact information");
-                }
-                if (profile.Employment == null || profile.Employment?.Count() == 0)
-                {
-                    whatIsMissing.Add("Employment history");
-                }
-                
-                // for freelancers
-                if (profile.IsFreelancer && profile.FreelanceTerms == null)
-                {
-                    whatIsMissing.Add("Freelance rates");
-                }
-                
-                // for developers
-                if (profile.IsDeveloper && (profile.Stacks == null || profile.Stacks?.Count() == 0))
-                {
-                    whatIsMissing.Add("Developer Tech Stack");
-                }
+                    var whatIsMissing = new List<string>();
 
-                await ProcessEmail(profile, whatIsMissing);
-            });
+                    profile.IsDeveloper = profile.Categories.Any(q => q.Category.Name.ToLower() == "developer");
+                    profile.IsFreelancer = profile.Categories.Any(q => q.Category.Name.ToLower() == "freelancer");
+
+                    if (string.IsNullOrEmpty(profile.Avatar))
+                    {
+                        whatIsMissing.Add("Your profile photo");
+                    }
+
+                    if (string.IsNullOrEmpty(profile.Bio))
+                    {
+                        whatIsMissing.Add("A brief description of you (bio)");
+                    }
+
+                    if (profile.Categories == null || profile.Categories?.Count() == 0)
+                    {
+                        whatIsMissing.Add("User category");
+                    }
+
+                    if (profile.Awards == null || profile.Awards?.Count() == 0)
+                    {
+                        whatIsMissing.Add("Your education history or awards");
+                    }
+
+                    if (profile.Skills == null || profile.Skills?.Count() == 0)
+                    {
+                        whatIsMissing.Add("Your skills");
+                    }
+
+                    if (profile.Projects == null || profile.Projects?.Count() == 0)
+                    {
+                        whatIsMissing.Add("Projects you have worked on");
+                    }
+
+                    if (profile.Contacts == null || profile.Contacts?.Count() == 0)
+                    {
+                        whatIsMissing.Add("Contact information");
+                    }
+
+                    if (profile.Employment == null || profile.Employment?.Count() == 0)
+                    {
+                        whatIsMissing.Add("Employment history");
+                    }
+
+                    // for freelancers
+                    if (profile.IsFreelancer && profile.FreelanceTerms == null)
+                    {
+                        whatIsMissing.Add("Freelance rates");
+                    }
+
+                    // for developers
+                    if (profile.IsDeveloper && (profile.Stacks == null || profile.Stacks?.Count() == 0))
+                    {
+                        whatIsMissing.Add("Developer Tech Stack");
+                    }
+
+                    if (whatIsMissing.Count > 0)
+                    {
+                        _logger.LogInformation($"Sending reminder to {profile.Email}...");
+                        var sent = await ProcessEmail(profile, whatIsMissing);
+                        if (sent)
+                        {
+                            _logger.LogInformation("Email sent");
+                        }
+                    }
+                });
+            }
         }
-        
-        public async Task ProcessEmail(Person person, List<string> checklist)
+
+        public async Task<bool> ProcessEmail(Person person, List<string> checklist)
         {
             var emailDetails = new EmailDetailsDto
             {
                 Subject = "Update your profile"
             };
-            
+
             var baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>();
             var emailEndpoint = _configuration.GetSection("EmailEndpoint").Get<string>();
-            var emailTemplatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", "Reminders", "UpdateProfile.html");
+            var emailTemplatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", "Reminders",
+                "UpdateProfile.html");
 
             var emailBody = await File.ReadAllTextAsync(emailTemplatePath);
 
             var list = string.Empty;
             checklist.ForEach(c => list += $"<li>{c}</li>");
-            
+
             emailBody = emailBody
                 .Replace("[PERSON_NAME]", $"{person.Firstname}")
                 .Replace("[PROFILE_URL]", $"{baseUrl}/profiles/people/{person.UserId}")
@@ -141,12 +170,13 @@ namespace ProfileService.Services.Implementations
             {
                 _logger.LogInformation("Sending email...");
                 await client.PostAsync(emailEndpoint, content);
+                _logger.LogInformation("Reminder sent");
+                return true;
             }
             catch (Exception e)
             {
                 _logger.LogCritical(e.Message);
-                Console.WriteLine(e);
-                throw;
+                return false;
             }
         }
     }
