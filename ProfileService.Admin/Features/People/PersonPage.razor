@@ -1,0 +1,40 @@
+@page "/person/{PersonId}"
+@using ProfileService.Admin.Models.Person
+@using ProfileService.Admin.Utils
+@using ProfileService.Admin.Extensions
+@using Newtonsoft.Json
+@inject HttpClient Http
+
+@if (_response.Persons == null)
+{
+    <p>Loading person...</p>
+}
+else
+{
+    <h3>Person</h3>
+}
+
+@code {
+
+    private Person _person;
+    private SearchPersonResponse _response = new SearchPersonResponse();
+    private SearchPersonRequest _request = new SearchPersonRequest();
+    
+    // Parameters
+    [Parameter] public string PersonId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _request.UserId = Guid.Parse(PersonId);
+        var queryString = _request.GetQueryString();
+        var response = await Http.GetAsync(Endpoints.Person + "?" + queryString);
+
+        if (!response.IsSuccessStatusCode) throw new Exception(response.ReasonPhrase);
+
+        var responseString = await response.Content.ReadAsStringAsync();
+
+        _response = JsonConvert.DeserializeObject<SearchPersonResponse>(responseString);
+        _person = _response.Persons[0];
+    }
+
+}

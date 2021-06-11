@@ -61,4 +61,10 @@
       <None Include="wwwroot\EmailTemplates\RequestMoreInfoFreelanceProjectInterest.html" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="ProfileService.Shared\obj\ProfileService.Shared.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="ProfileService.Shared\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="ProfileService.Shared\obj\project.packagespec.json" />
+    </ItemGroup>
+
 </Project>
