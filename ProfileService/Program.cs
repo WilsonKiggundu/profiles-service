@@ -10,6 +10,7 @@ using ProfileService.Helpers;
 using ProfileService.Helpers.Email;
 using ProfileService.Repositories;
 using Serilog;
+using Serilog.Events;
 
 namespace ProfileService
 {
@@ -20,6 +21,7 @@ namespace ProfileService
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
+                .WriteTo.File("logs/profile-service.txt", restrictedToMinimumLevel: LogEventLevel.Information, rollingInterval: RollingInterval.Hour)
                 .CreateLogger();
             
             try

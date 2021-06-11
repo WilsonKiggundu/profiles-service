@@ -1,0 +1,81 @@
+@page "/person/{PersonId}"
+@using ProfileService.Admin.Models.Person
+@using ProfileService.Admin.Utils
+@using ProfileService.Admin.Extensions
+@using Newtonsoft.Json
+@inject HttpClient Http
+
+@if (_person == null)
+{
+    <p>Loading person...</p>
+}
+else
+{
+    <h3>@_person.Firstname @_person.Lastname</h3>
+    <p>@_person.Email</p>
+
+
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="card">
+                <div class="card-header">Categories</div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var category in _person.Categories)
+                    {
+                        <li class="list-group-item">@category.Category.Name</li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card">
+                <div class="card-header">
+                    Quick Links
+                  </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <a href="#categories">Categories</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#education">Education</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#skills">Skills</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#projects">Projects</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#freelance-terms">Freelance Terms</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    private Person _person;
+    private SearchPersonResponse _response = new SearchPersonResponse();
+    private SearchPersonRequest _request = new SearchPersonRequest();
+
+    // Parameters
+    [Parameter]
+    public string PersonId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _request.Id = Guid.Parse(PersonId);
+        var queryString = _request.GetQueryString();
+        var response = await Http.GetAsync(Endpoints.Person + "?" + queryString);
+
+        if (!response.IsSuccessStatusCode) throw new Exception(response.ReasonPhrase);
+
+        var responseString = await response.Content.ReadAsStringAsync();
+
+        _response = JsonConvert.DeserializeObject<SearchPersonResponse>(responseString);
+        _person = _response.Persons.FirstOrDefault();
+    }
+
+}

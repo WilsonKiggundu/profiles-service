@@ -201,10 +201,13 @@ namespace ProfileService.Services.Implementations
                     s.Email
                 }).ToList();
             
+            _logger.LogInformation($"{emails.Count} email addresses found");
+            
             if (emails.Any())
             {
                 emails.ForEach(async person =>
                 {
+                    _logger.LogInformation($"Sending email to {person.Email}");
                     var baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>();
                     var emailEndpoint = _configuration.GetSection("EmailEndpoint").Get<string>();
                     var emailTemplatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", "Jobs", "NewJobPosted.html");
@@ -230,11 +233,12 @@ namespace ProfileService.Services.Implementations
                         var json = JsonConvert.SerializeObject(emailDetails, Formatting.Indented);
                         var content = new StringContent(json, Encoding.UTF8, "application/json");
                         await client.PostAsync(emailEndpoint, content);
+                        _logger.LogInformation("Email sent");
                     }
                     catch (Exception e)
                     {
-                        _logger.LogCritical(e.Message);
-                        // throw;
+                        _logger.LogCritical($"Error while sending email {e.Message}");
+                        throw new Exception(e.Message, e);
                     }
                     
                 });

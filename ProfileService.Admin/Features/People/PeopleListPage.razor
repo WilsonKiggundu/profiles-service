@@ -1,0 +1,88 @@
+@page "/people"
+@using ProfileService.Admin.Models.Person
+@using Newtonsoft.Json
+@using Microsoft.Extensions.Logging
+@using ProfileService.Admin.Extensions
+@using ProfileService.Admin.Utils
+@inject HttpClient Http
+@inject ILogger<PeopleListPage> _Logger
+
+<h3>People</h3>
+<p>List of all people with a profile</p>
+
+@if (_response.Persons == null)
+{
+    <p>Loading people...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Email Address</th>
+            <th>Date Joined</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var person in _response.Persons)
+        {
+            <tr>
+                <td>@person.UserId</td>
+                <td>
+                    <a href="/person/@person.Id">@person.Firstname @person.Lastname</a>
+                </td>
+                <td>@person.Email</td>
+                <td>@person.DateCreated</td>
+            </tr>
+        }
+        </tbody>
+        @if (_response.HasMore)
+        {
+            <tfoot>
+            <tr>
+                <td class="text-center" colspan="4">
+                    <button @onclick="() => DoPagination(Direction.Previous)" class="btn btn-primary">Prev</button>
+                    <button @onclick="() => DoPagination(Direction.Next)" class="btn btn-primary">Next</button>
+                </td>
+            </tr>
+            </tfoot>
+        }
+    </table>
+}
+
+@code {
+
+    private enum Direction
+    {
+        Previous = 1,
+        Next = 2
+    }
+    private SearchPersonResponse _response = new SearchPersonResponse();
+    private SearchPersonRequest _request = new SearchPersonRequest();
+
+    private async Task DoPagination(Direction direction)
+    {
+        _request.Page = direction == Direction.Next ? _request.Page + 1 : _request.Page - 1;
+        _response = await SearchPersonsAsync(_request);
+    }
+
+    private async Task<SearchPersonResponse> SearchPersonsAsync(SearchPersonRequest request)
+    {
+        var queryString = request.GetQueryString();
+        var response = await Http.GetAsync(Endpoints.Person + "?" + queryString);
+
+        if (!response.IsSuccessStatusCode) throw new Exception(response.ReasonPhrase);
+
+        var responseString = await response.Content.ReadAsStringAsync();
+
+        return JsonConvert.DeserializeObject<SearchPersonResponse>(responseString);
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _response = await SearchPersonsAsync(_request);
+    }
+
+}

@@ -433,3 +433,8 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 out
+
+##
+## Logs
+##
+ProfileService/logs
