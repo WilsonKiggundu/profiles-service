@@ -1,7 +1,7 @@
 using System;
-using ProfileService.Models.Common;
+using ProfileService.Admin.Models.Common;
 
-namespace ProfileService.Models.Person
+namespace ProfileService.Admin.Models.Person
 {
     /// <summary>
     /// Person skill

@@ -1,4 +1,4 @@
-$HEADER$namespace $NAMESPACE$
+namespace ProfileService.Admin.Utils
 {
-  public class $CLASS$ {$END$}
+    
 }

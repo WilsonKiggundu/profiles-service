@@ -1,8 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
-using ProfileService.Models.Common;
+using ProfileService.Admin.Models.Common;
 
-namespace ProfileService.Models.Person
+namespace ProfileService.Admin.Models.Person
 {
     public class PersonContact : BaseModel
     {

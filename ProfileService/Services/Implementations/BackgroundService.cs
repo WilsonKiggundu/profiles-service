@@ -43,8 +43,6 @@ namespace ProfileService.Services.Implementations
 
             _logger.LogInformation($"Count: {count}, BatchSize: {batchSize}, BatchCount: {batchCount}");
 
-            var emailsSent = 0;
-
             for (var i = 0; i < batchCount; i++)
             {
                 var profiles = await _context.Persons

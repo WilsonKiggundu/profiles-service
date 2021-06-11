@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ProfileService.Contracts.Person
+namespace ProfileService.Admin.Models.Person
 {
     /// <summary>
     /// 
@@ -22,6 +22,6 @@ namespace ProfileService.Contracts.Person
     {
         public SearchPersonRequest Request { get; set; }
         public bool HasMore { get; set; }
-        public ICollection<Models.Person.Person> Persons { get; set; }
+        public ICollection<Person> Persons { get; set; }
     }
 }

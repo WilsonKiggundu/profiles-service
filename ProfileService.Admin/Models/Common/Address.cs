@@ -1,4 +1,4 @@
-namespace ProfileService.Models.Common
+namespace ProfileService.Admin.Models.Common
 {
     public abstract class Address : BaseModel
     {

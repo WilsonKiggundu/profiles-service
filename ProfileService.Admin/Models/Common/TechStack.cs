@@ -1,7 +1,6 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace ProfileService.Models.Common
+namespace ProfileService.Admin.Models.Common
 {
     public class TechStack : BaseModel
     {

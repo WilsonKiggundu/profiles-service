@@ -1,6 +1,4 @@
-using System;
-
-namespace ProfileService.Models.Common
+namespace ProfileService.Admin.Models.Common
 {
     public class Device : BaseModel
     {

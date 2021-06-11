@@ -1,7 +1,6 @@
 using System;
-using ProfileService.Models.Common;
 
-namespace ProfileService.Models.Person
+namespace ProfileService.Admin.Models.Person
 {
     public class FreelanceTerms : BaseModel
     {
