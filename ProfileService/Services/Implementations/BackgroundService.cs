@@ -152,7 +152,7 @@ namespace ProfileService.Services.Implementations
 
             emailBody = emailBody
                 .Replace("[PERSON_NAME]", $"{person.Firstname}")
-                .Replace("[PROFILE_URL]", $"{baseUrl}/profiles/people/{person.UserId}")
+                .Replace("[PROFILE_URL]", $"{baseUrl}/profiles/people/{person.Id}")
                 .Replace("[CHECKLIST]", list);
 
             emailDetails.Body = emailBody;
