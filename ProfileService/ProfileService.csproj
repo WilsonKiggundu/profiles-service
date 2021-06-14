@@ -18,6 +18,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Audit.NET.PostgreSql" Version="17.0.6" />
+      <PackageReference Include="Audit.WebApi.Core" Version="17.0.6" />
       <PackageReference Include="AutoMapper" Version="10.0.0" />
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />
       <PackageReference Include="CorePush" Version="3.0.4" />
