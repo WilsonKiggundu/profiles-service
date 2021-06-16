@@ -1,9 +1,5 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-using Audit.PostgreSql.Configuration;
-using DataType = Audit.PostgreSql.Configuration.DataType;
 
 namespace ProfileService.Models.Audit
 {
