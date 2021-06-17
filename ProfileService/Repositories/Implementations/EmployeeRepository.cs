@@ -67,7 +67,20 @@ namespace ProfileService.Repositories.Implementations
                 query = query.Where(q => q.Id == request.EmployeeId);
             }
 
-            return await query.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
+            if (!string.IsNullOrEmpty(request.Name))
+            {
+                var nameArray = request.Name.Split(" ");
+            }
+
+            return await query
+                .OrderBy(q => q.Firstname)
+                .ThenBy(q => q.Lastname)
+                .ThenBy(q => q.Department)
+                .ThenBy(q => q.Unit)
+                .ThenBy(q => q.Position)
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
         }
     }
 }
