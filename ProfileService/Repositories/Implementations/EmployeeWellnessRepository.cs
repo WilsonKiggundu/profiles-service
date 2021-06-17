@@ -55,7 +55,8 @@ namespace ProfileService.Repositories.Implementations
 
         public async Task<IEnumerable<EmployeeWellness>> SearchAsync(SearchEmployeeRequest request)
         {
-            IQueryable<EmployeeWellness> query = _context.EmployeeWellness;
+            IQueryable<EmployeeWellness> query = _context.EmployeeWellness
+                .Include(q => q.Employee);
 
             if (request.Status.HasValue)
             {

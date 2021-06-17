@@ -55,7 +55,9 @@ namespace ProfileService.Repositories.Implementations
 
         public async Task<IEnumerable<EmployeeSchedule>> SearchAsync(SearchEmployeeRequest request)
         {
-            IQueryable<EmployeeSchedule> query = _context.EmployeeSchedules;
+            IQueryable<EmployeeSchedule> query = _context
+                .EmployeeSchedules
+                .Include(q => q.Employee);
             
             if (request.EmployeeId.HasValue)
             {
