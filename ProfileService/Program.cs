@@ -32,9 +32,11 @@ namespace ProfileService
                 var host = CreateHostBuilder(args).Build();
                 using (var scope = host.Services.CreateScope())
                 {
+                    var environment = scope.ServiceProvider.GetService<IWebHostEnvironment>();
                     var context = scope.ServiceProvider.GetService<ProfileServiceContext>();
                     context.Database.Migrate();
                     
+                    // DataSeeder.Employees(context, environment);
                     // DataSeeder.SeedEmailPreferences(context);
                     // DataSeeder.GenerateVapidKeys(context);
                 }

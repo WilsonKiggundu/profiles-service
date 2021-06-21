@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using Audit.Core;
+using Audit.PostgreSql.Configuration;
+using Audit.WebApi;
 using AutoMapper;
 using Hangfire;
 using Hangfire.Dashboard;
@@ -79,6 +82,16 @@ namespace ProfileService
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ProfileServiceContext>(options => options.UseNpgsql(connectionString));
 
+            #region Audit Configuration
+
+            services.AddControllers(configure =>
+            {
+                AuditConfiguration.AddAudit(configure);
+                AuditConfiguration.ConfigureAudit(connectionString);
+            });
+
+            #endregion
+            
             services.AddHangfire(x => x.UsePostgreSqlStorage(connectionString));
             services.AddDependencyInjection();
             services.AddEmailSenders(Configuration);
@@ -131,6 +144,15 @@ namespace ProfileService
 
             app.UseHttpsRedirection();
 
+            // app.UseAuditMiddleware(_ => _
+            //         .FilterByRequest(rq => !rq.Path.Value.EndsWith("favicon.ico"))
+            //         .WithEventType("{verb}:{url}")
+            //         .IncludeHeaders()
+            //         .IncludeResponseHeaders()
+            //         .IncludeRequestBody()
+            //         .IncludeResponseBody()
+            // );
+            
             app.UseSwagger();
             app.UseSwaggerUI(context =>
             {

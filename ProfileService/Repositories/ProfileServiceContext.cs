@@ -4,8 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using ProfileService.Models;
+using ProfileService.Models.Audit;
 using ProfileService.Models.Business;
 using ProfileService.Models.Common;
+using ProfileService.Models.Employees;
 using ProfileService.Models.Investor;
 using ProfileService.Models.Person;
 using ProfileService.Models.Posts;
@@ -148,6 +150,20 @@ namespace ProfileService.Repositories
 
         public DbSet<PersonBlacklist> PersonBlacklists { get; set; }
         public DbSet<PostBlacklist> PostBlacklists { get; set; }
+
+        #endregion
+
+        #region Audit Logs
+
+        public DbSet<AuditLog> AuditLogs { get; set; }
+
+        #endregion
+
+        #region Employees
+
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<EmployeeSchedule> EmployeeSchedules { get; set; }
+        public DbSet<EmployeeWellness> EmployeeWellness { get; set; }
 
         #endregion
     }

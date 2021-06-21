@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Repositories;
@@ -9,9 +10,10 @@ using ProfileService.Repositories;
 namespace ProfileService.Migrations
 {
     [DbContext(typeof(ProfileServiceContext))]
-    partial class ProfileServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20210614081123_AddedAuditLogs")]
+    partial class AddedAuditLogs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,7 +37,7 @@ namespace ProfileService.Migrations
                     b.Property<DateTime>("InsertedDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<DateTime?>("UpdatedDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("User")
@@ -623,115 +625,6 @@ namespace ProfileService.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EmailTemplates");
-                });
-
-            modelBuilder.Entity("ProfileService.Models.Employees.Employee", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("BusinessId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("Department")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("EmailAddress")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Firstname")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Lastname")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Position")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("Unit")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Employees","employees");
-                });
-
-            modelBuilder.Entity("ProfileService.Models.Employees.EmployeeSchedule", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int>("WorkStation")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("Schedules","employees");
-                });
-
-            modelBuilder.Entity("ProfileService.Models.Employees.EmployeeWellness", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("Wellness","employees");
                 });
 
             modelBuilder.Entity("ProfileService.Models.FreelanceProject", b =>
@@ -1825,24 +1718,6 @@ namespace ProfileService.Migrations
                     b.HasOne("ProfileService.Models.Posts.Post", null)
                         .WithMany("Uploads")
                         .HasForeignKey("PostId");
-                });
-
-            modelBuilder.Entity("ProfileService.Models.Employees.EmployeeSchedule", b =>
-                {
-                    b.HasOne("ProfileService.Models.Employees.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ProfileService.Models.Employees.EmployeeWellness", b =>
-                {
-                    b.HasOne("ProfileService.Models.Employees.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ProfileService.Models.FreelanceProject", b =>
