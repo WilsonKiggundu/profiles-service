@@ -21,5 +21,6 @@ namespace ProfileService.Models.Employees
         Remote = 1,
         Office = 2,
         AnnualLeave = 3,
+        SickLeave = 4
     }
 }

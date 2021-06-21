@@ -14,5 +14,7 @@ namespace ProfileService.Services.Interfaces
         Task<Employee> InsertAsync(Employee employee);
         Task<Employee> UpdateAsync(Employee employee);
         Task DeleteAsync(Guid id);
+
+        Task<Dashboard> GetDashboardAsync();
     }
 }

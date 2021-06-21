@@ -53,6 +53,24 @@ namespace ProfileService.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
+        public async Task AddOrUpdateAsync(EmployeeWellness wellness)
+        {
+            var exists = await _context.EmployeeWellness
+                .FirstOrDefaultAsync(q => q.EmployeeId == wellness.EmployeeId);
+
+            if (exists != null)
+            {
+                exists.Status = wellness.Status;
+                _context.EmployeeWellness.Update(exists);
+            }
+            else
+            {
+                await _context.EmployeeWellness.AddAsync(wellness);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<EmployeeWellness>> SearchAsync(SearchEmployeeRequest request)
         {
             IQueryable<EmployeeWellness> query = _context.EmployeeWellness

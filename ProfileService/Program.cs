@@ -36,7 +36,7 @@ namespace ProfileService
                     var context = scope.ServiceProvider.GetService<ProfileServiceContext>();
                     context.Database.Migrate();
                     
-                    DataSeeder.Employees(context, environment);
+                    // DataSeeder.Employees(context, environment);
                     // DataSeeder.SeedEmailPreferences(context);
                     // DataSeeder.GenerateVapidKeys(context);
                 }

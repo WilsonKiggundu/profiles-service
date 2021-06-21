@@ -29,7 +29,6 @@ namespace ProfileService.Services.Implementations
 
         public async Task<Employee> InsertAsync(Employee employee)
         {
-            employee.Id = Guid.NewGuid();
             await _repository.InsertAsync(employee);
             return employee;
         }
@@ -43,6 +42,11 @@ namespace ProfileService.Services.Implementations
         public async Task DeleteAsync(Guid id)
         {
             await _repository.DeleteAsync(id);
+        }
+
+        public async Task<Dashboard> GetDashboardAsync()
+        {
+            return await _repository.GetDashboardAsync();
         }
     }
 }

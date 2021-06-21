@@ -27,11 +27,10 @@ namespace ProfileService.Services.Implementations
             return await _repository.GetByIdAsync(id);
         }
 
-        public async Task<EmployeeWellness> InsertAsync(EmployeeWellness employee)
+        public async Task<EmployeeWellness> InsertAsync(EmployeeWellness wellness)
         {
-            employee.Id = Guid.NewGuid();
-            await _repository.InsertAsync(employee);
-            return employee;
+            await _repository.AddOrUpdateAsync(wellness);
+            return wellness;
         }
 
         public async Task<EmployeeWellness> UpdateAsync(EmployeeWellness employee)

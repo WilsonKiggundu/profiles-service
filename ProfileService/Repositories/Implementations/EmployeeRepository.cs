@@ -82,5 +82,40 @@ namespace ProfileService.Repositories.Implementations
                 .Take(request.PageSize)
                 .ToListAsync();
         }
+
+        public async Task<Dashboard> GetDashboardAsync()
+        {
+            var dashboard = new Dashboard();
+
+            // Departments
+            var departments = await _context
+                .Employees
+                .GroupBy(q => q.Department)
+                .Select(s
+                    => new KeyValue { Key = s.Key.ToString(), Value = s.Count() }).ToListAsync();
+
+            // Wellness
+            var wellness = await _context
+                .EmployeeWellness
+                .GroupBy(q => q.Status)
+                .Select(s
+                    => new KeyValue { Key = s.Key.ToString(), Value = s.Count() }).ToListAsync();
+
+            // schedules
+            var date = DateTime.UtcNow;
+            var schedules = await _context
+                .EmployeeSchedules
+                .Where(q => q.StartDate <= date)
+                .Where(q => q.EndDate >= date)
+                .GroupBy(q => q.WorkStation)
+                .Select(s
+                    => new KeyValue { Key = s.Key.ToString(), Value = s.Count() }).ToListAsync();
+
+            dashboard.Wellness = wellness;
+            dashboard.Schedule = schedules;
+            dashboard.Departments = departments;
+            
+            return dashboard;
+        }
     }
 }

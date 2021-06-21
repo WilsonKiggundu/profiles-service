@@ -78,8 +78,6 @@ namespace ProfileService.Controllers.Employees
         {
             try
             {
-                _logger.LogInformation(JsonConvert.SerializeObject(employee, Formatting.Indented));
-                
                 return await _employeeService.UpdateAsync(employee);
             }
             catch (Exception e)
@@ -106,6 +104,13 @@ namespace ProfileService.Controllers.Employees
             {
                 return BadRequest(e);
             }
+        }
+        
+        // Get dashboard
+        [HttpGet("dashboard")]
+        public async Task<Dashboard> GetDashboard()
+        {
+            return await _employeeService.GetDashboardAsync();
         }
     }
 }

@@ -29,7 +29,6 @@ namespace ProfileService.Services.Implementations
 
         public async Task<EmployeeSchedule> InsertAsync(EmployeeSchedule employee)
         {
-            employee.Id = Guid.NewGuid();
             await _repository.InsertAsync(employee);
             return employee;
         }

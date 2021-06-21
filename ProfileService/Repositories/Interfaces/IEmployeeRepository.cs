@@ -8,5 +8,6 @@ namespace ProfileService.Repositories.Interfaces
     public interface IEmployeeRepository : IGenericRepository<Employee>
     {
         Task<IEnumerable<Employee>> SearchAsync(SearchEmployeeRequest request);
+        Task<Dashboard> GetDashboardAsync();
     }
 }
