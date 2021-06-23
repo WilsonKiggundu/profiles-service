@@ -74,6 +74,7 @@ namespace ProfileService.Repositories.Implementations
         public async Task<IEnumerable<EmployeeWellness>> SearchAsync(SearchEmployeeRequest request)
         {
             IQueryable<EmployeeWellness> query = _context.EmployeeWellness
+                .Where(q => q.ReportingDate == DateTime.Today)
                 .Include(q => q.Employee);
 
             if (request.Status.HasValue)
