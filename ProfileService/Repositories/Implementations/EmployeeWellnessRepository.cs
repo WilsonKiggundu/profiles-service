@@ -56,6 +56,9 @@ namespace ProfileService.Repositories.Implementations
         public async Task AddOrUpdateAsync(EmployeeWellness wellness)
         {
             var exists = await _context.EmployeeWellness
+                .Where(q => q.ReportingDate.Year == DateTime.Today.Year)
+                .Where(q => q.ReportingDate.Month == DateTime.Today.Month)
+                .Where(q => q.ReportingDate.Day == DateTime.Today.Day)
                 .FirstOrDefaultAsync(q => q.EmployeeId == wellness.EmployeeId);
 
             if (exists != null)
@@ -74,6 +77,9 @@ namespace ProfileService.Repositories.Implementations
         public async Task<IEnumerable<EmployeeWellness>> SearchAsync(SearchEmployeeRequest request)
         {
             IQueryable<EmployeeWellness> query = _context.EmployeeWellness
+                .Where(q => q.ReportingDate.Year == DateTime.Today.Year)
+                .Where(q => q.ReportingDate.Month == DateTime.Today.Month)
+                .Where(q => q.ReportingDate.Day == DateTime.Today.Day)
                 .Include(q => q.Employee);
 
             if (request.Status.HasValue)

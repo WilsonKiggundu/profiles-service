@@ -53,6 +53,11 @@ namespace ProfileService.Services.Implementations
             _configuration = configuration;
         }
 
+        public async Task<int> CountAllAsync()
+        {
+            return await _repository.CountAllAsync();
+        }
+
         public async Task<SearchPersonResponse> SearchAsync(SearchPersonRequest request)
         {
             return await _repository.SearchAsync(request);

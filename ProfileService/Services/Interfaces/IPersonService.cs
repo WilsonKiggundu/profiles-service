@@ -19,6 +19,8 @@ namespace ProfileService.Services.Interfaces
     {
         #region Person
 
+        Task<int> CountAllAsync();
+
         Task<SearchPersonResponse> SearchAsync(SearchPersonRequest request);
         Task<GetPerson> GetByIdAsync(Guid id);
         Task<NewPerson> InsertAsync(NewPerson person);
