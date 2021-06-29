@@ -15,6 +15,8 @@ namespace ProfileService.Repositories.Interfaces
     /// </summary>
     public interface IPersonRepository : IGenericRepository<Person>
     {
+
+        Task<int> CountAllAsync();
         Task<SearchPersonResponse> SearchAsync(SearchPersonRequest request);
         
         #region Person Awards

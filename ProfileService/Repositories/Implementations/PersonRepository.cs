@@ -32,6 +32,11 @@ namespace ProfileService.Repositories.Implementations
             _lookupCategoryRepository = lookupCategoryRepository;
         }
 
+        public async Task<int> CountAllAsync()
+        {
+            return await _context.Persons.Where(q => !q.IsDeleted).CountAsync();
+        }
+
         /// <summary>
         /// Search persons
         /// </summary>

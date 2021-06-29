@@ -48,7 +48,7 @@ namespace ProfileService.Services.Implementations
 
         public async Task<EmployeeWellness> InsertAsync(EmployeeWellness wellness)
         {
-            await _repository.InsertAsync(wellness);
+            await _repository.AddOrUpdateAsync(wellness);
             await SendNotification(wellness);
             return wellness;
         }

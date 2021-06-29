@@ -97,9 +97,14 @@ namespace ProfileService.Repositories.Implementations
             // Wellness
             var wellness = await _context
                 .EmployeeWellness
+                .Where(q => q.ReportingDate.Year == DateTime.Today.Year)
+                .Where(q => q.ReportingDate.Month == DateTime.Today.Month)
+                .Where(q => q.ReportingDate.Day == DateTime.Today.Day)
                 .GroupBy(q => q.Status)
-                .Select(s
-                    => new KeyValue { Key = s.Key.ToString(), Value = s.Count() }).ToListAsync();
+                .Select(s => new KeyValue { 
+                        Key = s.Key.ToString(), 
+                        Value = s.Count() }
+                ).ToListAsync();
 
             // schedules
             var date = DateTime.UtcNow;
