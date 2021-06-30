@@ -76,6 +76,12 @@ namespace ProfileService.Services.Implementations
                 case Wellness.Unwell:
                     title = $"{employee.Firstname} is not well";
                     break;
+                case Wellness.InIsolation:
+                    title = $"{employee.Firstname} is in isolation";
+                    break;
+                case Wellness.NursingFamilyMember:
+                    title = $"{employee.Firstname} is nursing a family member";
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -93,14 +99,17 @@ namespace ProfileService.Services.Implementations
 
             var emailEndpoint = _configuration.GetSection("EmailEndpoint").Get<string>();
             var emailTemplatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", "TheSpartans");
-            var recipients = new List<string>()
-            {
-                "wkiggundu@innovationvillage.co.ug"
-            };
+
+            var recipients = _configuration
+                .GetSection("PeopleExperienceTeam")
+                .Get<List<string>>();
 
             switch (wellness.Status)
             {
                 case Wellness.Unwell:
+                case Wellness.InIsolation:
+                case Wellness.NursingFamilyMember:
+                        
                     emailTemplatePath = Path.Combine(emailTemplatePath, "WellnessUpdate.html");
                     var emailBody = await File.ReadAllTextAsync(emailTemplatePath);
 
@@ -113,8 +122,6 @@ namespace ProfileService.Services.Implementations
                     emailDetails.Recipient = string.Join(",", recipients);
 
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
 
             using var client = new HttpClient();

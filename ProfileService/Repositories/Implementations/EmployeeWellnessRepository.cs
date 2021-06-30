@@ -64,6 +64,8 @@ namespace ProfileService.Repositories.Implementations
             if (exists != null)
             {
                 exists.Status = wellness.Status;
+                exists.Details = wellness.Details;
+                exists.IllnessType = wellness.IllnessType;
                 _context.EmployeeWellness.Update(exists);
             }
             else
