@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using ProfileService.Models.Common;
 
 namespace ProfileService.Models.Audit
 {
