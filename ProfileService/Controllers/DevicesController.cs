@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProfileService.Controllers.Common;
 using ProfileService.Models.Common;
-using ProfileService.Services.Implementations;
 using ProfileService.Services.Interfaces;
 
 namespace ProfileService.Controllers

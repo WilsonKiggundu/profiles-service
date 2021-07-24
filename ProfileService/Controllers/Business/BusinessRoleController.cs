@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using ProfileService.Contracts.Business.Role;
 using ProfileService.Controllers.Common;
 using ProfileService.Models.Business;

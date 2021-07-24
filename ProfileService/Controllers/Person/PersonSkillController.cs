@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using ProfileService.Contracts.Person.Skills;
 using ProfileService.Controllers.Common;
 using ProfileService.Models.Person;

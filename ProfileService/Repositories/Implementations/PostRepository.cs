@@ -30,6 +30,7 @@ namespace ProfileService.Repositories.Implementations
                 .ToListAsync();
             
             IQueryable<Post> query = _context.Posts
+                .Where(p => !p.IsDeleted)
                 .Where(p => !personBlacklist.Contains(p.AuthorId))
                 .Where(p => !postBlacklist.Contains(p.Id))
                 .OrderByDescending(p => p.DateCreated);

@@ -2,9 +2,11 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ProfileService.Contracts.Blog.Article;
 using ProfileService.Contracts.Blog.Post;
 using ProfileService.Controllers.Common;
 using ProfileService.Services.Interfaces;
@@ -54,6 +56,46 @@ namespace ProfileService.Controllers.Blog
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+        
+        /// <summary>
+        /// UPDATE a article
+        /// </summary>
+        /// <param name="post"></param>
+        /// <returns></returns>
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<UpdatePost> Update(UpdatePost post)
+        {
+            try
+            {
+                await _postService.UpdateAsync(post);
+                return post;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+        
+        /// <summary>
+        /// DELETE article
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            try
+            {
+                await _postService.DeleteAsync(id);
+                return Ok(id);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
             }
         }
     }

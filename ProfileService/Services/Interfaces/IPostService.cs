@@ -11,5 +11,7 @@ namespace ProfileService.Services.Interfaces
     {    
         Task<SearchPostResponse> SearchAsync(SearchPostRequest request);
         Task<NewPost> InsertAsync(NewPost post);
+        Task UpdateAsync(UpdatePost post);
+        Task DeleteAsync(Guid id);
     }
 }
