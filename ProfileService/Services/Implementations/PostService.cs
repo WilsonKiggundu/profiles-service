@@ -111,5 +111,16 @@ namespace ProfileService.Services.Implementations
 
             return result;
         }
+
+        public async Task UpdateAsync(UpdatePost entity)
+        {
+            var post = _mapper.Map<Post>(entity);
+            await _repository.UpdateAsync(post);
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            await _repository.DeleteAsync(id);
+        }
     }
 }
