@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ProfileService.Contracts.Business.Contact;
 using ProfileService.Contracts.Person.Contact;
 using ProfileService.Controllers.Common;
-using ProfileService.Models.Business;
 using ProfileService.Models.Person;
 using ProfileService.Services.Interfaces;
 

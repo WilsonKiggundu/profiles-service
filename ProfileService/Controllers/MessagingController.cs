@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProfileService.Contracts.Common;
 using ProfileService.Controllers.Common;
-using ProfileService.Helpers.Email;
 using ProfileService.Services.Interfaces;
 using SendGrid;
 

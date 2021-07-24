@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -27,6 +28,7 @@ using ProfileService.Repositories.Implementations;
 using ProfileService.Repositories.Interfaces;
 using ProfileService.Services.Implementations;
 using ProfileService.Services.Interfaces;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace ProfileService
 {
@@ -138,35 +140,21 @@ namespace ProfileService
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IBackgroundService backgroundService)
         {
-            
-            
             app.UseExceptionHandler(error => error.UseCustomErrors(env));
 
             app.UseHttpsRedirection();
 
-            // app.UseAuditMiddleware(_ => _
-            //         .FilterByRequest(rq => !rq.Path.Value.EndsWith("favicon.ico"))
-            //         .WithEventType("{verb}:{url}")
-            //         .IncludeHeaders()
-            //         .IncludeResponseHeaders()
-            //         .IncludeRequestBody()
-            //         .IncludeResponseBody()
-            // );
+            if (env.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(context =>
+                {
+                    context.SwaggerEndpoint("/swagger/v1/swagger.json", "Version 1.0");
+                    context.RoutePrefix = string.Empty;
+                });
+            }
             
-            app.UseSwagger();
-            app.UseSwaggerUI(context =>
-            {
-                context.SwaggerEndpoint("/swagger/v1/swagger.json", "Version 1.0");
-                context.RoutePrefix = "docs";
-            });
-
             app.UseCors();
-
-            app.UseReDoc(options =>
-            {
-                options.SpecUrl("/swagger/v1/swagger.json");
-                options.RoutePrefix = string.Empty;
-            });
 
             app.UseRouting();
 
@@ -189,31 +177,8 @@ namespace ProfileService
                 
                 context.Database.Migrate();
                 
-                var categories = new List<string>
-                {
-                    "Investor", 
-                    "Student", 
-                    "Data Scientist",
-                    "Developer",
-                    "Freelancer",
-                    "Entrepreneur", 
-                    "Professional", 
-                    "Intern" 
-                };
-                
-                categories.ForEach(category =>
-                {
-                    var exists = context.LookupCategories.Any(c => c.Name == category);
-                    if (!exists)
-                        context.LookupCategories.Add(new Category
-                        {
-                            Name = category
-                        });
-                });
-
-                context.SaveChanges();
+                // send profile update reminders
                 RecurringJob.AddOrUpdate(() => backgroundService.SendProfileUpdateRemindersAsync(), Cron.Weekly);
-                
             }
             
             

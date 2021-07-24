@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using ProfileService.Contracts.Blog.Post;
 using ProfileService.Controllers.Common;
 using ProfileService.Services.Interfaces;

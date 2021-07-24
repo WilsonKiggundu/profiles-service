@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ProfileService.Contracts.Person.Awards;
 using ProfileService.Controllers.Common;
 using ProfileService.Models.Person;
 using ProfileService.Services.Interfaces;
