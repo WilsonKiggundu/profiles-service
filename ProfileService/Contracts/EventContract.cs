@@ -6,54 +6,32 @@ namespace ProfileService.Contracts
 {
     public class EventContract
     {
-        [JsonProperty("type")]
-        public string Type { get; set; }
-        
-        [JsonProperty("title")]
-        public string Title { get; set; }
-        
-        [JsonProperty("startDateTime")]
-        public DateTimeOffset StartDateTime { get; set; }
-        
-        [JsonProperty("endDateTime")]
-        public DateTimeOffset EndDateTime { get; set; }
-        
-        [JsonProperty("location")]
-        public string Location { get; set; }
-        
-        [JsonProperty("id")]
-        public int Id { get; set; }
-        
-        [JsonProperty("interval")]
-        public int Interval { get; set; }
-        
-        [JsonProperty("frequency")]
-        public int Frequency { get; set; }
-        
-        [JsonProperty("days")]
-        public int[] Days { get; set; }
-        
-        [JsonProperty("details")]
-        public string Details { get; set; }
-        
-        [JsonProperty("conferenceUrl")]
-        public string ConferenceUrl { get; set; }
-        
-        [JsonProperty("createdBy")]
-        public Guid CreatedBy { get; set; }
-        
-        [JsonProperty("uploads")]
-        public List<EventUpload> Uploads { get; set; }
-        
-        [JsonProperty("featured")]
-        public bool Featured { get; set; }
+        [JsonProperty("title")] public string Title { get; set; }
+        [JsonProperty("startDateTime")] public DateTimeOffset StartDateTime { get; set; }
+        [JsonProperty("endDateTime")] public DateTimeOffset EndDateTime { get; set; }
+        [JsonProperty("tivAffiliation")] public bool TivAffiliation { get; set; }
 
-        public bool IsZoomEvent { get; set; }
+        [JsonProperty("category")] public string Category { get; set; }
+        [JsonProperty("objective")] public string Objective { get; set; }
+        [JsonProperty("region")] public string Region { get; set; }
+        [JsonProperty("partner")] public string Partner { get; set; }
+        [JsonProperty("sector")] public string Sector { get; set; }
+        [JsonProperty("location")] public string Location { get; set; } = "zoom";
+        [JsonProperty("type")] public string Type { get; set; } = "webinar";
+        [JsonProperty("webinarId")] public string WebinarId { get; set; }
+        [JsonProperty("id")] public int? Id { get; set; }
+        [JsonProperty("interval")] public string Interval { get; set; }
 
-        public EventContract()
-        {
-            IsZoomEvent = Location.ToLower().Equals("zoom") && Type.ToLower().Equals("Webinar");
-        }
+        [JsonProperty("frequency")] public string Frequency { get; set; }
+        // [JsonProperty("days")] public int[] Days { get; set; }
+        [JsonProperty("details")] public string Details { get; set; }
+        [JsonProperty("conferenceUrl")] public string ConferenceUrl { get; set; }
+        [JsonProperty("createdBy")] public Guid? CreatedBy { get; set; }
+        [JsonProperty("uploads")] public List<EventUpload> Uploads { get; set; }
+        
+        [JsonProperty("challengesFaced")] public string ChallengesFaced { get; set; }
+        [JsonProperty("lessonsLearnt")] public string LessonsLearnt { get; set; }
+        [JsonProperty("achievements")] public string Achievements { get; set; }
     }
 
     public class EventUpload

@@ -93,6 +93,24 @@ namespace ProfileService.Contracts.Zoom
         public string NextPageToken { get; set; }
     }
 
+    public class WebinarRegistrantsResponse
+    {
+        [JsonProperty("registrants")]
+        public ICollection<WebinarRegistrant> Registrants { get; set; }
+        
+        [JsonProperty("page_count")]
+        public int PageCount { get; set; }
+        
+        [JsonProperty("page_size")]
+        public int PageSize { get; set; }
+        
+        [JsonProperty("total_records")]
+        public int TotalRecords { get; set; }
+        
+        [JsonProperty("next_page_token")]
+        public string NextPageToken { get; set; }
+    }
+
     public class WebinarRegistrationResponse
     {
         [JsonProperty("registrant_id")]

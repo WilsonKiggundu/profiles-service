@@ -38,7 +38,7 @@ namespace ProfileService.Contracts.Zoom
         public string Uuid { get; set; }
         
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public long Id { get; set; }
         
         [JsonProperty("host_id")]
         public string HostId { get; set; }
