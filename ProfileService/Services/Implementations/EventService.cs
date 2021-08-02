@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -242,14 +243,17 @@ namespace ProfileService.Services.Implementations
                 contactEmail = person.Email;
                 contactName = $"{person.Firstname} {person.Lastname}";
             }
+
+            var startDateTime = Convert.ToDateTime(@event.StartDateTime);
+            var endDateTime = Convert.ToDateTime(@event.EndDateTime);
             
             var webinar = new Webinar
             {
                 Agenda = @event.Details,
-                Duration = @event.EndDateTime.Subtract(@event.StartDateTime).TotalMinutes,
+                Duration = endDateTime.Subtract(startDateTime).TotalMinutes,
                 Topic = @event.Title,
                 Type = WebinarType.Webinar,
-                StartTime = @event.StartDateTime,
+                StartTime = startDateTime,
                 Settings = new WebinarSettings
                 {
                     ApprovalType = WebinarApprovalType.Automatic,
@@ -363,7 +367,11 @@ namespace ProfileService.Services.Implementations
                 var url = $"{ZoomApiBaseUrl}/webinars/{webinarId}";
 
                 var response = await client.GetAsync(url);
-                response.EnsureSuccessStatusCode();
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
 
                 var responseString = await response.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<WebinarDetails>(responseString);

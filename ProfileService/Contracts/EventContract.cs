@@ -8,8 +8,8 @@ namespace ProfileService.Contracts
     public class EventContract
     {
         [JsonProperty("title")] public string Title { get; set; }
-        [JsonProperty("startDateTime")] public DateTimeOffset StartDateTime { get; set; }
-        [JsonProperty("endDateTime")] public DateTimeOffset EndDateTime { get; set; }
+        [JsonProperty("startDateTime")] public string StartDateTime { get; set; }
+        [JsonProperty("endDateTime")] public string EndDateTime { get; set; }
         [JsonProperty("tivAffiliation")] public bool TivAffiliation { get; set; }
 
         [JsonProperty("category")] public string Category { get; set; }
