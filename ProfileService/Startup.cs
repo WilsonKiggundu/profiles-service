@@ -144,7 +144,7 @@ namespace ProfileService
 
             app.UseHttpsRedirection();
 
-            if (env.IsDevelopment())
+            if (!env.IsProduction())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(context =>

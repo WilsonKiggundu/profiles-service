@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using ProfileService.Contracts.Zoom;
 
 namespace ProfileService.Contracts
 {
@@ -32,6 +33,8 @@ namespace ProfileService.Contracts
         [JsonProperty("challengesFaced")] public string ChallengesFaced { get; set; }
         [JsonProperty("lessonsLearnt")] public string LessonsLearnt { get; set; }
         [JsonProperty("achievements")] public string Achievements { get; set; }
+        
+        [JsonProperty("webinar")] public WebinarDetails Webinar { get; set; }
     }
 
     public class EventUpload

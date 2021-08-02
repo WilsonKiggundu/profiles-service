@@ -198,7 +198,14 @@ namespace ProfileService.Services.Implementations
                 response.EnsureSuccessStatusCode();
 
                 var responseString = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<EventContract>(responseString);
+                var @event = JsonConvert.DeserializeObject<EventContract>(responseString);
+
+                if (string.IsNullOrEmpty(@event.WebinarId)) return @event;
+                
+                var webinar = await GetWebinarDetails(@event.WebinarId);
+                @event.Webinar = webinar;
+
+                return @event;
             }
             catch (Exception e)
             {
@@ -337,6 +344,29 @@ namespace ProfileService.Services.Implementations
                 var data = JsonConvert.DeserializeObject<WebinarRegistrantsResponse>(responseString);
 
                 return data.Registrants;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+        
+        public async Task<WebinarDetails> GetWebinarDetails(string webinarId)
+        {
+            try
+            {
+                using var client = new HttpClient();
+
+                client.DefaultRequestHeaders.Authorization
+                    = new AuthenticationHeaderValue("Bearer", _zoomApiAccessToken);
+
+                var url = $"{ZoomApiBaseUrl}/webinars/{webinarId}";
+
+                var response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                var responseString = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<WebinarDetails>(responseString);
             }
             catch (Exception e)
             {
