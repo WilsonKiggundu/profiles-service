@@ -35,8 +35,17 @@ namespace ProfileService.Contracts
         [JsonProperty("achievements")] public string Achievements { get; set; }
         
         [JsonProperty("webinar")] public WebinarDetails Webinar { get; set; }
+        [JsonProperty("attendances")] public List<EventAttendance> Attendances { get; set; }
     }
 
+    public class EventAttendance
+    {
+        [JsonProperty("profileId")] public Guid ProfileId { get; set; }
+        [JsonProperty("category")] public string Category { get; set; }
+        [JsonProperty("name")] public string Name { get; set; }
+        [JsonProperty("email")] public string Email { get; set; }
+    }
+    
     public class EventUpload
     {
         [JsonProperty("ownerId")]
