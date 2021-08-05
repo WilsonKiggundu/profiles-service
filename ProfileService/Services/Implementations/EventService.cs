@@ -451,7 +451,7 @@ namespace ProfileService.Services.Implementations
 
             _notification.Send(devices, new NotificationPayload
             {
-                Title = "Upcoming Event",
+                Title = $"Upcoming Event: {@event.Title} on {Convert.ToDateTime(@event.StartDateTime):f}" ,
                 // Icon = person.Avatar,
                 Date = DateTime.UtcNow,
 
@@ -519,7 +519,7 @@ namespace ProfileService.Services.Implementations
                             .Replace("[EVENT_DURATION]", $"{duration} minutes")
                             .Replace("[EVENT_LOCATION]", $"{@event.Location}")
                             .Replace("[EVENT_CONTACT_EMAIL]", $"{contactEmail}")
-                            .Replace("[EVENT_URL]", $"{baseUrl}/events/{@event.Id}");
+                            .Replace("[EVENT_URL]", $"{baseUrl}/events/{@event.Id}/details");
 
                         var emailDetails = new EmailDetailsDto
                         {
