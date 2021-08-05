@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Hangfire;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -31,10 +34,20 @@ namespace ProfileService.Services.Implementations
         private readonly string _eventsApiBaseUrl;
 
         private readonly IPersonRepository _personRepository;
+        private readonly ILogger<EventService> _logger;
+        private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
+        private readonly IDeviceService _deviceService;
+        private readonly IWebNotification _notification;
 
-        public EventService(IConfiguration configuration, IPersonRepository personRepository)
+        public EventService(IConfiguration configuration, IPersonRepository personRepository, ILogger<EventService> logger, IWebHostEnvironment environment, IDeviceService deviceService, IWebNotification notification)
         {
+            _configuration = configuration;
             _personRepository = personRepository;
+            _logger = logger;
+            _environment = environment;
+            _deviceService = deviceService;
+            _notification = notification;
             _eventsApiBaseUrl = configuration.GetSection("EventsService").Get<string>();
             _zoomApiAccessToken = ZoomAuth.GenerateJwtToken(ZoomApiKey, ZoomApiSecret);
         }
@@ -62,16 +75,21 @@ namespace ProfileService.Services.Implementations
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 var url = $"{_eventsApiBaseUrl}/api/events";
 
-                Console.WriteLine(JsonConvert.SerializeObject(eventContract, Formatting.Indented));
-
                 var response = await client.PostAsync(url, content);
 
                 var responseString = await response.Content.ReadAsStringAsync();
-
-                Console.WriteLine(response.ReasonPhrase);
-                Console.WriteLine(responseString);
+                var @event = JsonConvert.DeserializeObject<EventContract>(responseString);
 
                 response.EnsureSuccessStatusCode();
+                
+                BackgroundJob.Enqueue(() => ProcessEmail(@event, false));
+                BackgroundJob.Enqueue(() => SendNotification(@event));
+
+                var startDateTime = Convert.ToDateTime(@event.StartDateTime);
+                var oneDayBefore = startDateTime.AddDays(-1).ToString("s");
+                var oneHourBefore = startDateTime.AddHours(-1).ToString("s");
+                RecurringJob.AddOrUpdate(() => ProcessEmail(@event, true), oneDayBefore);
+                RecurringJob.AddOrUpdate(() => ProcessEmail(@event, true), oneHourBefore);
 
                 return JsonConvert.DeserializeObject<EventContract>(responseString);
             }
@@ -410,6 +428,114 @@ namespace ProfileService.Services.Implementations
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        #endregion
+
+
+        #region Notifications
+
+        public async Task SendNotification(EventContract @event)
+        {
+            var exclude = @event.CreatedBy?.ToString(); 
+            
+            var devices 
+                = await _deviceService.SearchAsync(exclude);
+                
+            _notification.Send(devices, new NotificationPayload
+            {
+                Title = "Upcoming Event",
+                // Icon = person.Avatar,
+                Date = DateTime.UtcNow,
+                    
+                Data = new
+                {
+                    eventId = @event.Id,
+                    baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>()
+                },
+                    
+                Options = new NotificationOptions
+                {
+                    Actions = new List<NotificationAction>
+                    {
+                        new NotificationAction
+                        {
+                            Action = "view-details",
+                            Title = "Event details"
+                        }
+                    },
+                        
+                    Body = @event.Title,
+                    Tag = @event.Id.ToString(),
+                }
+            });
+        }
+
+        public void ProcessEmail(EventContract @event, bool isReminder = false)
+        {
+            var emails = _personRepository
+                .GetAll()
+                .Where(q => !string.IsNullOrEmpty(q.Email))
+                .Select(s => new
+                {
+                    s.Firstname,
+                    s.Lastname,
+                    s.Email,
+                    s.Id
+                }).ToList();
+
+            var contactEmail = emails.FirstOrDefault(q => q.Id.Equals(@event.CreatedBy))?.Email;
+
+            if (emails.Any())
+            {
+                emails.ForEach(async person =>
+                {
+                    var baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>();
+                    var emailEndpoint = _configuration.GetSection("EmailEndpoint").Get<string>();
+
+                    var templateFile = isReminder ? "EventReminder.html" : "EventPosted.html";
+                    
+                    var emailTemplatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", "Events", templateFile);
+
+                    try
+                    {
+                        var body = await File.ReadAllTextAsync(emailTemplatePath);
+                        var startDateTime = Convert.ToDateTime(@event.StartDateTime);
+                        var endDateTime = Convert.ToDateTime(@event.EndDateTime);
+                        var duration = endDateTime.Subtract(startDateTime).TotalMinutes;
+
+                        body = body
+                            .Replace("[PERSON_NAME]", $"{person.Firstname}")
+                            .Replace("[EVENT_TITLE]", $"{@event.Title}")
+                            .Replace("[EVENT_DATE]", $"{startDateTime:f}")
+                            .Replace("[EVENT_DURATION]", $"{duration} minutes")
+                            .Replace("[EVENT_LOCATION]", $"{@event.Location}")
+                            .Replace("[EVENT_CONTACT_EMAIL]", $"{contactEmail}")
+                            .Replace("[EVENT_URL]", $"{baseUrl}/events/{@event.Id}");
+
+                        var emailDetails = new EmailDetailsDto
+                        {
+                            Body = body,
+                            Subject = $"[EVENT] {@event.Title}",
+                            Recipient = person.Email
+                        };
+                    
+                        using var client = new HttpClient();
+
+                        var json = JsonConvert.SerializeObject(emailDetails, Formatting.Indented);
+                        var content = new StringContent(json, Encoding.UTF8, "application/json");
+                        await client.PostAsync(emailEndpoint, content);
+                        _logger.LogInformation("Email sent");
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogCritical($"Error while sending email {e.Message}");
+                        throw new Exception(e.Message, e);
+                    }
+                    
+                });
+                
             }
         }
 
