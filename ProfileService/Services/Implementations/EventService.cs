@@ -40,7 +40,9 @@ namespace ProfileService.Services.Implementations
         private readonly IDeviceService _deviceService;
         private readonly IWebNotification _notification;
 
-        public EventService(IConfiguration configuration, IPersonRepository personRepository, ILogger<EventService> logger, IWebHostEnvironment environment, IDeviceService deviceService, IWebNotification notification)
+        public EventService(IConfiguration configuration, IPersonRepository personRepository,
+            ILogger<EventService> logger, IWebHostEnvironment environment, IDeviceService deviceService,
+            IWebNotification notification)
         {
             _configuration = configuration;
             _personRepository = personRepository;
@@ -81,17 +83,22 @@ namespace ProfileService.Services.Implementations
                 var @event = JsonConvert.DeserializeObject<EventContract>(responseString);
 
                 response.EnsureSuccessStatusCode();
-                
+
                 BackgroundJob.Enqueue(() => ProcessEmail(@event, false));
                 BackgroundJob.Enqueue(() => SendNotification(@event));
 
                 var startDateTime = Convert.ToDateTime(@event.StartDateTime);
-                var oneDayBefore = startDateTime.AddDays(-1).ToString("s");
-                var oneHourBefore = startDateTime.AddHours(-1).ToString("s");
-                RecurringJob.AddOrUpdate(() => ProcessEmail(@event, true), oneDayBefore);
-                RecurringJob.AddOrUpdate(() => ProcessEmail(@event, true), oneHourBefore);
 
-                return JsonConvert.DeserializeObject<EventContract>(responseString);
+                BackgroundJob.Schedule(() => 
+                    ProcessEmail(@event, true), startDateTime.AddHours(-1));
+
+                if (startDateTime.IsMoreThanDaysAway(2))
+                {
+                    BackgroundJob.Schedule(() => 
+                        ProcessEmail(@event, true), startDateTime.AddDays(-1));
+                }
+
+                return @event;
             }
             catch (Exception e)
             {
@@ -438,23 +445,23 @@ namespace ProfileService.Services.Implementations
 
         public async Task SendNotification(EventContract @event)
         {
-            var exclude = @event.CreatedBy?.ToString(); 
-            
-            var devices 
+            var exclude = @event.CreatedBy?.ToString();
+
+            var devices
                 = await _deviceService.SearchAsync(exclude);
-                
+
             _notification.Send(devices, new NotificationPayload
             {
                 Title = "Upcoming Event",
                 // Icon = person.Avatar,
                 Date = DateTime.UtcNow,
-                    
+
                 Data = new
                 {
                     eventId = @event.Id,
                     baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>()
                 },
-                    
+
                 Options = new NotificationOptions
                 {
                     Actions = new List<NotificationAction>
@@ -465,7 +472,7 @@ namespace ProfileService.Services.Implementations
                             Title = "Event details"
                         }
                     },
-                        
+
                     Body = @event.Title,
                     Tag = @event.Id.ToString(),
                 }
@@ -495,8 +502,9 @@ namespace ProfileService.Services.Implementations
                     var emailEndpoint = _configuration.GetSection("EmailEndpoint").Get<string>();
 
                     var templateFile = isReminder ? "EventReminder.html" : "EventPosted.html";
-                    
-                    var emailTemplatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", "Events", templateFile);
+
+                    var emailTemplatePath =
+                        Path.Combine(_environment.WebRootPath, "EmailTemplates", "Events", templateFile);
 
                     try
                     {
@@ -520,7 +528,7 @@ namespace ProfileService.Services.Implementations
                             Subject = $"[EVENT] {@event.Title}",
                             Recipient = person.Email
                         };
-                    
+
                         using var client = new HttpClient();
 
                         var json = JsonConvert.SerializeObject(emailDetails, Formatting.Indented);
@@ -533,9 +541,7 @@ namespace ProfileService.Services.Implementations
                         _logger.LogCritical($"Error while sending email {e.Message}");
                         throw new Exception(e.Message, e);
                     }
-                    
                 });
-                
             }
         }
 
