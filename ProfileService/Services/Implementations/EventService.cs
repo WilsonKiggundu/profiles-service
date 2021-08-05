@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -538,7 +537,7 @@ namespace ProfileService.Services.Implementations
                     }
                     catch (Exception e)
                     {
-                        _logger.LogCritical($"Error while sending email {e.Message}");
+                        _logger.LogCritical("Error while sending email");
                         throw new Exception(e.Message, e);
                     }
                 });
