@@ -115,6 +115,25 @@ namespace ProfileService.Repositories.Implementations
                 HasMore = hasMore
             };
         }
+        
+        public async Task<SearchPersonResponse> GetBatchAsync(List<Guid> ids)
+        {
+            IQueryable<Person> query = _context.Persons
+                .Where(q => ids.Contains(q.Id));
+
+            var people = await query
+                .ToListAsync();
+
+            people.ForEach(person =>
+            {
+                person.FullName = $"{person.Firstname} {person.Lastname}";
+            });
+
+            return new SearchPersonResponse
+            {
+                Persons = people
+            };
+        }
 
         #region Person Awards
 

@@ -29,6 +29,8 @@ namespace ProfileService
                 
                 Log.Information("Starting up");
                 
+                // Console.WriteLine(ZoomAuth.GenerateJwtToken("P1TRDkOcTa6kp0G98KxB-g", "tiG5x6C1eRtlsR9rapDgoE2SRw1PqVkFe3fX"));
+                
                 var host = CreateHostBuilder(args).Build();
                 using (var scope = host.Services.CreateScope())
                 {

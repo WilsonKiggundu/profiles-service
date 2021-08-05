@@ -18,6 +18,7 @@ namespace ProfileService.Repositories.Interfaces
 
         Task<int> CountAllAsync();
         Task<SearchPersonResponse> SearchAsync(SearchPersonRequest request);
+        Task<SearchPersonResponse> GetBatchAsync(List<Guid> ids);
         
         #region Person Awards
     

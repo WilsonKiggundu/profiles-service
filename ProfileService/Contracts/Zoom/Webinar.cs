@@ -38,7 +38,28 @@ namespace ProfileService.Contracts.Zoom
         public string Uuid { get; set; }
         
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public long Id { get; set; }
+        
+        [JsonProperty("host_id")]
+        public string HostId { get; set; }
+        
+        [JsonProperty("host_email")]
+        public string HostEmail { get; set; }
+        
+        [JsonProperty("start_url")]
+        public string StartUrl { get; set; }
+        
+        [JsonProperty("join_url")]
+        public string JoinUrl { get; set; }
+    }
+
+    public class WebinarDetails : Webinar
+    {
+        [JsonProperty("uuid")]
+        public string Uuid { get; set; }
+        
+        [JsonProperty("id")]
+        public long Id { get; set; }
         
         [JsonProperty("host_id")]
         public string HostId { get; set; }
