@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using ProfileService.Contracts.Blog.Article;
 using ProfileService.Models.Posts;
 using ProfileService.Repositories.Interfaces;
 
@@ -14,9 +17,41 @@ namespace ProfileService.Repositories.Implementations
             _context = context;
         }
 
-        public IEnumerable<Article> Search(int page = 1, int limit= 50)
+        public async Task<SearchArticleResponse> SearchAsync(SearchArticleRequest request)
         {
-            return _context.Articles.Skip((page - 1)*limit).Take(limit).ToList();
+            IQueryable<Article> query = _context.Articles
+                .Where(q => !q.IsDeleted)
+                .OrderByDescending(q => q.DateCreated);
+
+            if (request.ArticleId.HasValue)
+            {
+                query = query.Where(q => q.Id.Equals(request.ArticleId.Value));
+            }
+
+            if (request.AuthorId.HasValue)
+            {
+                query = query.Where(q => q.AuthorId.Equals(request.AuthorId.Value));
+            }
+
+            if (!string.IsNullOrEmpty(request.Title))
+            {
+                query = query.Where(q => q.Title.ToLower().Contains(request.Title.ToLower()));
+            }
+            
+            var skip = (request.Page - 1) * request.PageSize;
+            var hasMore = await query.Skip(skip).CountAsync() > 0;
+
+            var articles = await query
+                .Skip(skip)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            return new SearchArticleResponse
+            {
+                Articles = articles,
+                HasMore = hasMore,
+                Request = request
+            };
         }
     }
 }

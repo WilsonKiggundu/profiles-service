@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using ProfileService.Contracts.Blog.Article;
 using ProfileService.Contracts.Blog.Article;
 using ProfileService.Models.Posts;
 using ProfileService.Repositories.Interfaces;
@@ -21,31 +19,31 @@ namespace ProfileService.Services.Implementations
             _mapper = mapper;
         }
 
-        public IEnumerable<GetArticle> GetAll()
+        public async Task<SearchArticleResponse> SearchAsync(SearchArticleRequest request)
         {
-            return _mapper.Map<ICollection<GetArticle>>(_repository.GetAll());
+            return await _repository.SearchAsync(request);
         }
 
         public async Task<GetArticle> GetByIdAsync(Guid id)
         {
-            var comment = await _repository.GetByIdAsync(id);
-            return _mapper.Map<GetArticle>(comment);
+            var article = await _repository.GetByIdAsync(id);
+            return _mapper.Map<GetArticle>(article);
         }
 
-        public async Task InsertAsync(NewArticle comment)
+        public async Task InsertAsync(NewArticle article)
         {
-
-            await _repository.InsertAsync(_mapper.Map<Article>(comment));
+            await _repository.InsertAsync(_mapper.Map<Article>(article));
         }
 
-        public async Task UpdateAsync(UpdateArticle comment)
+        public async Task UpdateAsync(UpdateArticle article)
         {
-            throw new NotImplementedException();
+            var model = _mapper.Map<Article>(article);
+            await _repository.UpdateAsync(model);
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            await _repository.DeleteAsync(id);
         }
     }
 }
