@@ -28,9 +28,18 @@ namespace ProfileService.Controllers.Blog
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<GetArticle> Get()
+        public async Task<IActionResult> Get([FromQuery] SearchArticleRequest request)
         {
-            return _articleService.GetAll();
+            try
+            {
+                var articles = await _articleService.SearchAsync(request);
+
+                return Ok(articles);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
         }
         
         /// <summary>
@@ -68,13 +77,12 @@ namespace ProfileService.Controllers.Blog
         /// </summary>
         /// <param name="article"></param>
         /// <returns></returns>
-        [HttpPut("{id}")]
+        [HttpPut]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<UpdateArticle> Update(UpdateArticle article)
         {
             try
             {
-                _logger.LogCritical(JsonConvert.SerializeObject(article));
                 await _articleService.UpdateAsync(article);
                 return article;
             }

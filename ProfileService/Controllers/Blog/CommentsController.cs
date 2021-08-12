@@ -29,7 +29,6 @@ namespace ProfileService.Controllers.Blog
         [HttpGet]
         public async Task<SearchCommentsResponse> Get([FromQuery] SearchCommentsRequest request)
         {
-            _logger.LogInformation(JsonConvert.SerializeObject(request, Formatting.Indented));
             return await _commentService.SearchAsync(request);
         }
 
@@ -62,7 +61,6 @@ namespace ProfileService.Controllers.Blog
         {
             try
             {
-                _logger.LogCritical(JsonConvert.SerializeObject(comment));
                 await _commentService.UpdateAsync(comment);
                 return comment;
             }

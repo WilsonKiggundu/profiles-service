@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using Hangfire;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -25,7 +26,9 @@ namespace ProfileService.Services.Implementations
         private readonly IConfiguration _configuration;
         private readonly ILogger<CommentService> _logger;
 
-        public CommentService(ICommentRepository repository, IMapper mapper, IPersonRepository personRepository, IWebNotification notification, IDeviceService deviceService, IPostRepository postRepository, ILogger<CommentService> logger, IConfiguration configuration)
+        public CommentService(ICommentRepository repository, IMapper mapper, IPersonRepository personRepository,
+            IWebNotification notification, IDeviceService deviceService, IPostRepository postRepository,
+            ILogger<CommentService> logger, IConfiguration configuration)
         {
             _repository = repository;
             _mapper = mapper;
@@ -36,7 +39,7 @@ namespace ProfileService.Services.Implementations
             _logger = logger;
             _configuration = configuration;
         }
-        
+
         public async Task<SearchCommentsResponse> SearchAsync(SearchCommentsRequest filter)
         {
             return await _repository.SearchAsync(filter);
@@ -45,29 +48,39 @@ namespace ProfileService.Services.Implementations
         public async Task<NewComment> InsertAsync(NewComment comment)
         {
             comment.Id = Guid.NewGuid();
-            
+
             var entity = _mapper.Map<Comment>(comment);
             await _repository.InsertAsync(entity);
+            
+            var author = await _personRepository.GetByIdAsync(comment.AuthorId);
+            entity.Author = author;
 
-            entity.Author = await _personRepository.GetByIdAsync(comment.AuthorId);
+            BackgroundJob.Enqueue(() => NotifyAsync(entity));
+
+            return _mapper.Map<NewComment>(entity);
+        }
+
+        public async Task NotifyAsync(Comment comment)
+        {
+            comment.Author = await _personRepository.GetByIdAsync(comment.AuthorId);
 
             if (comment.PostId.HasValue)
             {
                 var post = await _postRepository.GetByIdAsync(comment.PostId.Value);
-                
+
                 // don't send a notification if I comment on my own post
                 var excludeMe = comment.AuthorId == post.AuthorId ? post.AuthorId.ToString() : string.Empty;
 
-                var devices 
+                var devices
                     = await _deviceService.SearchAsync(excludeMe, post.AuthorId.ToString());
-                
+
                 _notification.Send(devices, new NotificationPayload
                 {
-                    Title = $"{entity.Author.Firstname} {entity.Author.Lastname}" + " commented on your post",
-                    Message = entity.Details.Substring(0, entity.Details.Length < 60 ? entity.Details.Length : 60),
-                    Icon = entity.Author.Avatar,
+                    Title = $"{comment.Author.Firstname} {comment.Author.Lastname}" + " commented on your post",
+                    Message = comment.Details[..(comment.Details.Length < 60 ? comment.Details.Length : 60)],
+                    Icon = comment.Author.Avatar,
                     Date = DateTime.UtcNow,
-                    
+
                     Data = new
                     {
                         postId = comment.PostId,
@@ -75,7 +88,7 @@ namespace ProfileService.Services.Implementations
                         profileId = comment.AuthorId,
                         baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>()
                     },
-                    
+
                     Options = new NotificationOptions
                     {
                         Actions = new List<NotificationAction>
@@ -86,15 +99,13 @@ namespace ProfileService.Services.Implementations
                                 Title = "View profile"
                             }
                         },
-                        
+
                         Body = comment.Details,
                         Tag = comment.Id.ToString(),
-                        Icon = entity.Author.Avatar,
+                        Icon = comment.Author.Avatar,
                     }
                 });
             }
-            
-            return _mapper.Map<NewComment>(entity);
         }
 
         public async Task<UpdateComment> UpdateAsync(UpdateComment comment)

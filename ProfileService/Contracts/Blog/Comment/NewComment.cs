@@ -11,7 +11,5 @@ namespace ProfileService.Contracts.Blog.Comment
         public GetPerson Author { get; set; }
         public Guid? PostId { get; set; }
         public Guid? ArticleId { get; set; }
-        
-        
     }
 }

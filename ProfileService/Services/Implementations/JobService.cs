@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProfileService.Contracts;
+using ProfileService.Contracts.Blog.Post;
 using ProfileService.Contracts.Business;
 using ProfileService.Models;
 using ProfileService.Repositories.Interfaces;
@@ -24,6 +25,7 @@ namespace ProfileService.Services.Implementations
     {
         private readonly IBusinessService _businessService;
         private readonly IPersonService _personService;
+        private readonly IPostService _postService;
         private readonly IPersonRepository _personRepository;
         private readonly IWebNotification _notification;
         private readonly IJobRepository _jobRepository;
@@ -33,7 +35,7 @@ namespace ProfileService.Services.Implementations
         private readonly IWebHostEnvironment _environment;
 
         public JobService(IBusinessService businessService, IPersonService personService,
-            IHttpClientFactory clientFactory, IConfiguration configuration, ILogger<JobService> logger, IPersonRepository personRepository, IWebNotification notification, IWebHostEnvironment environment, IJobRepository jobRepository)
+            IHttpClientFactory clientFactory, IConfiguration configuration, ILogger<JobService> logger, IPersonRepository personRepository, IWebNotification notification, IWebHostEnvironment environment, IJobRepository jobRepository, IPostService postService)
         {
             _businessService = businessService;
             _personService = personService;
@@ -44,6 +46,7 @@ namespace ProfileService.Services.Implementations
             _notification = notification;
             _environment = environment;
             _jobRepository = jobRepository;
+            _postService = postService;
         }
         
         public async Task<JobDto> GetByIdAsync(int id)
@@ -172,6 +175,18 @@ namespace ProfileService.Services.Implementations
                     Reference = newJob.Id,
                     ProfileId = job.ProfileId
                 });
+                
+                var newPost = new NewPost
+                {
+                    Type = PostType.Job,
+                    AuthorId = newJob.ProfileId,
+                    Title = newJob.Title,
+                    Details = newJob.Details,
+                    ReferenceId = newJob.JobId
+                };
+            
+                // add post
+                BackgroundJob.Enqueue(() => _postService.InsertAsync(newPost));
                 
                 // send email notification
                 BackgroundJob.Enqueue(() => ProcessEmail(newJob));

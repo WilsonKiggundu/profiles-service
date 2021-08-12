@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProfileService.Contracts.Blog.Post;
@@ -41,11 +42,15 @@ namespace ProfileService.Services.Implementations
         public async Task<Like> InsertAsync(Like like)
         {
             like.Id = Guid.NewGuid();
-
-            _logger.LogInformation(JsonConvert.SerializeObject(like));
-
             await _repository.InsertAsync(like);
 
+            BackgroundJob.Enqueue(() => SendNotificationAsync(like));
+
+            return like;
+        }
+
+        public async Task SendNotificationAsync(Like like)
+        {
             like = await _repository.GetByIdAsync(like.Id);
             var person = await _personRepository.GetByIdAsync(like.PersonId);
 
@@ -53,12 +58,12 @@ namespace ProfileService.Services.Implementations
             {
                 PostId = like.EntityId
             })).Posts.First();
-            
+
             // don't send a notification if I comment on my own post
             var excludeMe = like.PersonId == post.AuthorId ? post.AuthorId.ToString() : string.Empty;
-            
+
             var devices = await _deviceRepository.SearchAsync(excludeMe, post.AuthorId.ToString());
-            
+
             _notification.Send(devices, new NotificationPayload
             {
                 Title = $"{person.Firstname} {person.Lastname}" + " liked on your post",
@@ -88,8 +93,6 @@ namespace ProfileService.Services.Implementations
                     Icon = person.Avatar,
                 }
             });
-
-            return like;
         }
     }
 }
