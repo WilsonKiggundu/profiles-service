@@ -31,8 +31,6 @@ namespace ProfileService.Controllers
         [HttpGet]
         public async Task<ICollection<JobDto>> GetAsync([FromQuery] JobSearch search)
         {
-            _logger.LogInformation(JsonConvert.SerializeObject(search, Formatting.Indented));
-            
             // if JobId is not null, get job from cache and pick reference
             if (search.JobId.HasValue)
             {

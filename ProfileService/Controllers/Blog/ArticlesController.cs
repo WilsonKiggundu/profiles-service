@@ -33,6 +33,7 @@ namespace ProfileService.Controllers.Blog
             try
             {
                 var articles = await _articleService.SearchAsync(request);
+
                 return Ok(articles);
             }
             catch (Exception e)
@@ -76,7 +77,7 @@ namespace ProfileService.Controllers.Blog
         /// </summary>
         /// <param name="article"></param>
         /// <returns></returns>
-        [HttpPut("{id}")]
+        [HttpPut]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<UpdateArticle> Update(UpdateArticle article)
         {

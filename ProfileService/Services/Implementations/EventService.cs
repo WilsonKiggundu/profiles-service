@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProfileService.Contracts;
+using ProfileService.Contracts.Blog.Post;
 using ProfileService.Contracts.Zoom;
 using ProfileService.Exceptions;
 using ProfileService.Extensions;
@@ -38,10 +39,11 @@ namespace ProfileService.Services.Implementations
         private readonly IWebHostEnvironment _environment;
         private readonly IDeviceService _deviceService;
         private readonly IWebNotification _notification;
+        private readonly IPostService _postService;
 
         public EventService(IConfiguration configuration, IPersonRepository personRepository,
             ILogger<EventService> logger, IWebHostEnvironment environment, IDeviceService deviceService,
-            IWebNotification notification)
+            IWebNotification notification, IPostService postService)
         {
             _configuration = configuration;
             _personRepository = personRepository;
@@ -49,6 +51,7 @@ namespace ProfileService.Services.Implementations
             _environment = environment;
             _deviceService = deviceService;
             _notification = notification;
+            _postService = postService;
             _eventsApiBaseUrl = configuration.GetSection("EventsService").Get<string>();
             _zoomApiAccessToken = ZoomAuth.GenerateJwtToken(ZoomApiKey, ZoomApiSecret);
         }
@@ -82,6 +85,21 @@ namespace ProfileService.Services.Implementations
                 var @event = JsonConvert.DeserializeObject<EventContract>(responseString);
 
                 response.EnsureSuccessStatusCode();
+
+                if (@event.CreatedBy != null)
+                {
+                    var newPost = new NewPost
+                    {
+                        Type = PostType.Event,
+                        AuthorId = @event.CreatedBy.Value,
+                        Title = @event.Title,
+                        Details = @event.Details,
+                        Ref = @event.Id
+                    };
+            
+                    // add post
+                    BackgroundJob.Enqueue(() => _postService.InsertAsync(newPost));
+                }
 
                 BackgroundJob.Enqueue(() => ProcessEmail(@event, false));
                 BackgroundJob.Enqueue(() => SendNotification(@event));
@@ -518,6 +536,7 @@ namespace ProfileService.Services.Implementations
                             .Replace("[EVENT_DATE]", $"{startDateTime:f}")
                             .Replace("[EVENT_DURATION]", $"{duration} minutes")
                             .Replace("[EVENT_LOCATION]", $"{@event.Location}")
+                            .Replace("[EVENT_DETAILS]", $"{@event.Details}")
                             .Replace("[EVENT_CONTACT_EMAIL]", $"{contactEmail}")
                             .Replace("[EVENT_URL]", $"{baseUrl}/events/{@event.Id}/details");
 

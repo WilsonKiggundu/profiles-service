@@ -20,6 +20,8 @@ namespace ProfileService.Repositories.Implementations
         public async Task<SearchArticleResponse> SearchAsync(SearchArticleRequest request)
         {
             IQueryable<Article> query = _context.Articles
+                .Include(q => q.Uploads)
+                .Include(q => q.Author)
                 .Where(q => !q.IsDeleted)
                 .OrderByDescending(q => q.DateCreated);
 

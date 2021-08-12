@@ -5,7 +5,7 @@ namespace ProfileService.Models.Common
 {
     public class Upload : BaseModel
     {
-        [Required]
+        // [Required]
         public Guid OwnerId { get; set; }
 
         public Guid? EntityId { get; set; }
@@ -13,13 +13,13 @@ namespace ProfileService.Models.Common
         [Required]
         public string FileName { get; set; }
         
-        [Required]
+        // [Required]
         public int FileSize { get; set; }
         
         [Required]
         public string Path { get; set; }
         
-        [Required]
+        // [Required]
         public string ContentType { get; set; }
     }
 }

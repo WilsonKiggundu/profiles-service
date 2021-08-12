@@ -8,9 +8,11 @@ namespace ProfileService.Models.Posts
 {
     public class Post : BaseModel
     {
+        public string Title { get; set; }
         public string Details { get; set; }
         public PostType Type { get; set; } = PostType.Post;
         public Guid? ReferenceId { get; set; }
+        public int? Ref { get; set; }
         
         public ICollection<Upload> Uploads { get; set; }
         public ICollection<Comment> Comments { get; set; }

@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Bogus;
 using CsvHelper;
 using Microsoft.AspNetCore.Hosting;
 using ProfileService.Models.Common;
 using ProfileService.Models.Employees;
+using ProfileService.Models.Posts;
 using ProfileService.Models.Preferences;
 using ProfileService.Repositories;
 using WebPush;
@@ -109,6 +111,48 @@ namespace ProfileService.Helpers
                 Subject = keys.Subject
             });
 
+            context.SaveChanges();
+        }
+
+        public static void SeedArticles(ProfileServiceContext context)
+        {
+            if (context.Articles.Any())
+            {
+                return;
+            }
+
+            var people = context.Persons.Select(s => s.Id).ToList();
+
+            // var _faker = new Faker();
+            
+            // var categories = (List<string>) _faker.Make(10, () => _faker.Random.WordsArray(1, 10)).ToList();
+            
+            // var tags = new Faker<string>()
+            //     .RuleFor(q => q, (faker, s) => faker.Lorem.Word())
+            //     .Generate(12)
+            //     .ToList();
+
+            var articles = new Faker<Article>()
+                // .StrictMode(true)
+                .RuleFor(q => q.DateCreated, (faker, article) => faker.Date.Recent().ToString("s"))
+                .RuleFor(q => q.AuthorId, (faker, article) => faker.PickRandom(people))
+                .RuleFor(q => q.Title, (faker, article) => faker.Lorem.Sentence(faker.Random.Number(6, 15)))
+                .RuleFor(q => q.Summary, (faker, article) => faker.Lorem.Paragraph())
+                .RuleFor(q => q.Details, (faker, article) => faker.Lorem.Paragraphs(faker.Random.Number(3, 25)))
+                // .RuleFor(q => q.Category, (faker, article) => faker.PickRandom(categories))
+                .RuleFor(q => q.Uploads, (faker, article) => 
+                    new Faker<Upload>()
+                        .RuleFor(u => u.Path, (f, upload) => f.Image.PicsumUrl())
+                        .RuleFor(u => u.FileName, (f, upload) => f.Image.PicsumUrl())
+                        .RuleFor(u => u.FileSize, (f, upload) => f.Random.Number())
+                        .RuleFor(u => u.ContentType, "image/jpeg")
+                        .RuleFor(u => u.EntityId, Guid.NewGuid())
+                    .Generate(2).ToList()
+                    )
+                // .RuleFor(q => q.Tags, (faker, article) => string.Join(',', faker.Random.ListItems(tags)))
+                .Generate(53).ToList();
+            
+            context.Articles.AddRange(articles);
             context.SaveChanges();
         }
     }

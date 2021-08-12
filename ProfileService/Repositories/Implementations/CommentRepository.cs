@@ -22,9 +22,10 @@ namespace ProfileService.Repositories.Implementations
 
         public async Task<SearchCommentsResponse> SearchAsync(SearchCommentsRequest filter)
         {
-            _logger.LogInformation(JsonConvert.SerializeObject(filter, Formatting.Indented));
+            IQueryable<Comment> query = _context.Comments
+                .Include(c => c.Author)
+                .OrderBy(q => q.DateCreated);
             
-            IQueryable<Comment> query = _context.Comments.Include(c => c.Author);
             if (filter.ArticleId.HasValue)
             {
                 query = query.Where(c => c.ArticleId == filter.ArticleId);

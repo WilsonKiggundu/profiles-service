@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Repositories;
@@ -9,9 +10,10 @@ using ProfileService.Repositories;
 namespace ProfileService.Migrations
 {
     [DbContext(typeof(ProfileServiceContext))]
-    partial class ProfileServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20210807152146_UpdatedArticleModelAddedTagsAndCategory")]
+    partial class UpdatedArticleModelAddedTagsAndCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -526,6 +528,7 @@ namespace ProfileService.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("ContentType")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("DateCreated")
@@ -1498,6 +1501,9 @@ namespace ProfileService.Migrations
                     b.Property<Guid>("AuthorId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Category")
+                        .HasColumnType("text");
+
                     b.Property<string>("DateCreated")
                         .HasColumnType("text");
 
@@ -1516,6 +1522,9 @@ namespace ProfileService.Migrations
                     b.Property<string>("Summary")
                         .HasColumnType("text");
 
+                    b.Property<string>("Tags")
+                        .HasColumnType("text");
+
                     b.Property<string>("Title")
                         .HasColumnType("text");
 
@@ -1524,68 +1533,6 @@ namespace ProfileService.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("Articles");
-                });
-
-            modelBuilder.Entity("ProfileService.Models.Posts.ArticleCategory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ArticleId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Label")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ArticleId");
-
-                    b.ToTable("ArticleCategories");
-                });
-
-            modelBuilder.Entity("ProfileService.Models.Posts.ArticleTag", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ArticleId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Label")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ArticleId");
-
-                    b.ToTable("ArticleTags");
                 });
 
             modelBuilder.Entity("ProfileService.Models.Posts.Comment", b =>
@@ -1685,14 +1632,8 @@ namespace ProfileService.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("Ref")
-                        .HasColumnType("integer");
-
                     b.Property<Guid?>("ReferenceId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
@@ -2160,20 +2101,6 @@ namespace ProfileService.Migrations
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("ProfileService.Models.Posts.ArticleCategory", b =>
-                {
-                    b.HasOne("ProfileService.Models.Posts.Article", null)
-                        .WithMany("Categories")
-                        .HasForeignKey("ArticleId");
-                });
-
-            modelBuilder.Entity("ProfileService.Models.Posts.ArticleTag", b =>
-                {
-                    b.HasOne("ProfileService.Models.Posts.Article", null)
-                        .WithMany("Tags")
-                        .HasForeignKey("ArticleId");
                 });
 
             modelBuilder.Entity("ProfileService.Models.Posts.Comment", b =>
