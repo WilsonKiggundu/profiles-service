@@ -40,7 +40,7 @@ namespace ProfileService
                     
                     // DataSeeder.Employees(context, environment);
                     // DataSeeder.SeedEmailPreferences(context);
-                    DataSeeder.SeedArticles(context);
+                    // DataSeeder.SeedArticles(context);
                 }
                 
                 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
