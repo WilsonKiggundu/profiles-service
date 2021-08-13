@@ -60,7 +60,7 @@ namespace ProfileService.Repositories.Implementations
                 .Where(q => ids.Contains(q.Reference))
                 .ToListAsync();
         }
-        
+
         public async Task<Job> GetJobAsync(Guid id)
         {
             return await _context.Jobs
@@ -69,6 +69,30 @@ namespace ProfileService.Repositories.Implementations
                 .Include(q => q.Applications)
                 .ThenInclude(a => a.Applicant)
                 .FirstOrDefaultAsync(q => q.Id == id);
+        }
+
+        public async Task<ICollection<JobApplicantProfile>> GetApplicantsAsync(Guid? id)
+        {
+            IQueryable<JobApplication> query = _context.JobApplications
+                .Include(q => q.Applicant);
+
+            if (id.HasValue)
+            {
+                query = query.Where(q => q.JobId == id);
+            }
+            
+            return await query.Select(s => new JobApplicantProfile
+                {
+                    Id = s.ApplicantId,
+                    Name = $"{s.Applicant.Firstname} {s.Applicant.Lastname}",
+                    Email = s.Applicant.Email,
+                    Status = s.Status,
+                    DateTime = s.DateCreated,
+                    ApplicationId = s.Id,
+                    JobId = s.JobId,
+                    LastUpdated = s.DateLastUpdated
+                })
+                .ToListAsync();
         }
 
         public async Task<Job> GetJobAsync(int id)
