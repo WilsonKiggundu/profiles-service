@@ -12,6 +12,7 @@ namespace ProfileService.Repositories.Interfaces
     public interface IJobRepository : IGenericRepository<Job>
     {
         Task<Job> GetJobAsync(Guid id);
+        Task<ICollection<JobApplicantProfile>> GetApplicantsAsync(Guid? id);
         Task<Job> GetJobAsync(int id);
         Task<ICollection<Job>> GetManyAsync(List<int> ids);
     }

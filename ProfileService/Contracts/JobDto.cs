@@ -64,10 +64,12 @@ namespace ProfileService.Contracts
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string Email { get; set; }
         public string Avatar { get; set; }
         public Guid JobId { get; set; }
         public Guid ApplicationId { get; set; }
         public string DateTime { get; set; }
+        public string LastUpdated { get; set; }
         public HireStatus Status { get; set; }
     }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -64,6 +65,13 @@ namespace ProfileService.Controllers
         {
             await _jobApplicationService.InsertAsync(application);
             return Ok(application);
+        }
+
+        // GET /api/jobs/applicants
+        [HttpGet("applicants")]
+        public async Task<ICollection<JobApplicantProfile>> GetApplicants(Guid? jobId = null)
+        {
+            return await _jobApplicationService.GetApplicantsAsync(jobId);
         }
     }
 }

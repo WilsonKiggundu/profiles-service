@@ -64,9 +64,16 @@ namespace ProfileService.Services.Implementations
 
         public async Task<JobApplication> UpdateAsync(JobApplication application)
         {
+            application.DateLastUpdated = DateTime.UtcNow.ToString("u");
+            
             await _repository.UpdateAsync(application);
             BackgroundJob.Enqueue(() => SendNotification(application));
             return application;
+        }
+
+        public async Task<ICollection<JobApplicantProfile>> GetApplicantsAsync(Guid? jobId)
+        {
+            return await _jobRepository.GetApplicantsAsync(jobId);
         }
 
         public async Task DeleteAsync(Guid id)
