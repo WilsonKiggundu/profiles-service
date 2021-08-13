@@ -224,7 +224,7 @@ namespace ProfileService.Services.Implementations
                   && @event.Location.Equals("On Zoom");
 
             if (isZoomWebinar)
-                return await GetWebinarParticipants(eventId);
+                return await GetWebinarParticipants(@event.WebinarId);
 
             return new List<WebinarParticipant>();
         }
