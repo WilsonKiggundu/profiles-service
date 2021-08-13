@@ -175,19 +175,22 @@ namespace ProfileService.Services.Implementations
                     Reference = newJob.Id,
                     ProfileId = job.ProfileId
                 });
-                
-                var newPost = new NewPost
+
+                if (newJob.ProfileId != null)
                 {
-                    Type = PostType.Job,
-                    AuthorId = newJob.ProfileId,
-                    Title = newJob.Title,
-                    Details = newJob.Details,
-                    ReferenceId = newJob.JobId
-                };
+                    var newPost = new NewPost
+                    {
+                        Type = PostType.Job,
+                        AuthorId = newJob.ProfileId.Value,
+                        Title = newJob.Title,
+                        Details = newJob.Details,
+                        ReferenceId = newJob.JobId
+                    };
             
-                // add post
-                BackgroundJob.Enqueue(() => _postService.InsertAsync(newPost));
-                
+                    // add post
+                    BackgroundJob.Enqueue(() => _postService.InsertAsync(newPost));
+                }
+
                 // send email notification
                 BackgroundJob.Enqueue(() => ProcessEmail(newJob));
                 

@@ -15,7 +15,7 @@ namespace ProfileService.Contracts
         
         [JsonProperty("deadline")]
         public string Deadline { get; set; }
-        public Guid ProfileId { get; set; }
+        public Guid? ProfileId { get; set; }
         public Models.Person.Person Profile { get; set; }
         public string CompanyId { get; set; }
         public Models.Business.Business Company { get; set; }
