@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProfileService.Repositories;
@@ -9,9 +10,10 @@ using ProfileService.Repositories;
 namespace ProfileService.Migrations
 {
     [DbContext(typeof(ProfileServiceContext))]
-    partial class ProfileServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20210819102222_UpdatedEmailPreferences")]
+    partial class UpdatedEmailPreferences
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1707,37 +1709,16 @@ namespace ProfileService.Migrations
             modelBuilder.Entity("ProfileService.Models.Preferences.EmailSettings", b =>
                 {
                     b.Property<Guid>("PersonId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("ApplyForJobReminder")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("ArticleIsPosted")
-                        .HasColumnType("boolean");
-
                     b.Property<bool>("CommentIsAddedOnYourPost")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("DateCreated")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DateLastUpdated")
-                        .HasColumnType("text");
 
                     b.Property<bool>("EventIsPosted")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("EventReminders")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("JobAppliedForReminder")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("JobIsPosted")
@@ -1764,10 +1745,7 @@ namespace ProfileService.Migrations
                     b.Property<bool>("YouAreFollowed")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("YourPostIsLiked")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("PersonId", "Id");
+                    b.HasKey("PersonId");
 
                     b.ToTable("EmailPreferences");
                 });

@@ -39,8 +39,8 @@ namespace ProfileService
                     context.Database.Migrate();
                     
                     // DataSeeder.Employees(context, environment);
-                    // DataSeeder.SeedEmailPreferences(context);
-                    DataSeeder.SeedArticles(context);
+                    DataSeeder.SeedEmailPreferences(context);
+                    // DataSeeder.SeedArticles(context);
                 }
                 
                 JsonConvert.DefaultSettings = () => new JsonSerializerSettings

@@ -1,11 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Hangfire;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ProfileService.Contracts;
 using ProfileService.Contracts.Lookup.Category;
 using ProfileService.Contracts.Person;
 using ProfileService.Contracts.Person.Awards;
@@ -17,6 +23,7 @@ using ProfileService.Contracts.Person.Skills;
 using ProfileService.Helpers;
 using ProfileService.Models.Common;
 using ProfileService.Models.Person;
+using ProfileService.Models.Preferences;
 using ProfileService.Repositories.Interfaces;
 using ProfileService.Services.Interfaces;
 
@@ -27,6 +34,7 @@ namespace ProfileService.Services.Implementations
         private readonly IPersonRepository _repository;
         private readonly ILookupInterestRepository _interestRepository;
         private readonly ILookupCategoryRepository _categoryRepository;
+        private readonly IPersonPreferencesRepository _preferences;
         private readonly ILookupSkillRepository _skillRepository;
         private readonly ILookupSchoolRepository _schoolRepository;
         private readonly IMapper _mapper;
@@ -35,10 +43,12 @@ namespace ProfileService.Services.Implementations
         private readonly IDeviceService _deviceService;
         private readonly IWebNotification _notification;
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
+        
 
         public PersonService(IPersonRepository repository, IMapper mapper, ILookupInterestRepository interestRepository,
             ILookupCategoryRepository categoryRepository, ILookupSkillRepository skillRepository,
-            ILookupSchoolRepository schoolRepository, ILogger<PersonService> logger, IContactRepository contactRepository, IDeviceService deviceService, IWebNotification notification, IConfiguration configuration)
+            ILookupSchoolRepository schoolRepository, ILogger<PersonService> logger, IContactRepository contactRepository, IDeviceService deviceService, IWebNotification notification, IConfiguration configuration, IWebHostEnvironment environment, IPersonPreferencesRepository preferences)
         {
             _repository = repository;
             _mapper = mapper;
@@ -51,6 +61,8 @@ namespace ProfileService.Services.Implementations
             _deviceService = deviceService;
             _notification = notification;
             _configuration = configuration;
+            _environment = environment;
+            _preferences = preferences;
         }
 
         public async Task<int> CountAllAsync()
@@ -127,39 +139,11 @@ namespace ProfileService.Services.Implementations
             try
             {
                 await _repository.InsertAsync(person);
-                
-                var devices 
-                    = await _deviceService.SearchAsync(person.Id.ToString());
-                
-                _notification.Send(devices, new NotificationPayload
-                {
-                    Title = $"{person.Firstname} {person.Lastname}" + " joined My Village",
-                    Icon = person.Avatar,
-                    Date = DateTime.UtcNow,
-                    
-                    Data = new
-                    {
-                        profileId = person.Id,
-                        baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>()
-                    },
-                    
-                    Options = new NotificationOptions
-                    {
-                        Actions = new List<NotificationAction>
-                        {
-                            new NotificationAction
-                            {
-                                Action = "view-profile",
-                                Title = "View profile"
-                            }
-                        },
-                        
-                        // Body = comment.Details,
-                        Tag = person.Id.ToString(),
-                        Icon = person.Avatar,
-                    }
-                });
-                
+
+                BackgroundJob.Enqueue(() => _preferences.InsertAsync(new EmailSettings{PersonId = person.Id}));
+                BackgroundJob.Enqueue(() => SendWelcomeEmail(person));
+                BackgroundJob.Enqueue(() => SendAppNotification(person));
+
                 return _mapper.Map<NewPerson>(person);
             }
             catch (Exception e)
@@ -254,8 +238,6 @@ namespace ProfileService.Services.Implementations
         {
             try
             {
-                _logger.LogInformation(JsonConvert.SerializeObject(contact, Formatting.Indented));
-                
                 var contactEntity = await _contactRepository.GetByIdAsync(contact.Id);
 
                 contactEntity.Category = contact.Category;
@@ -443,8 +425,6 @@ namespace ProfileService.Services.Implementations
 
         public async Task UpdateAwardAsync(UpdatePersonAward award)
         {
-            _logger.LogInformation(JsonConvert.SerializeObject(award, Formatting.Indented));
-
             try
             {
                 var instituteId = award.Institute.Id;
@@ -765,5 +745,85 @@ namespace ProfileService.Services.Implementations
                 throw new Exception(e.Message, e);
             }
         }
+        
+        #region Notifications
+
+        private async Task SendAppNotification(Person person)
+        {
+            var devices
+                = await _deviceService.SearchAsync(person.Id.ToString());
+
+            _notification.Send(devices, new NotificationPayload
+            {
+                Title = $"{person.Firstname} {person.Lastname}" + " joined My Village",
+                Icon = person.Avatar,
+                Date = DateTime.UtcNow,
+
+                Data = new
+                {
+                    profileId = person.Id,
+                    baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>()
+                },
+
+                Options = new NotificationOptions
+                {
+                    Actions = new List<NotificationAction>
+                    {
+                        new NotificationAction
+                        {
+                            Action = "view-profile",
+                            Title = "View profile"
+                        }
+                    },
+
+                    // Body = comment.Details,
+                    Tag = person.Id.ToString(),
+                    Icon = person.Avatar,
+                }
+            });
+        }
+        
+        public async Task<bool> SendWelcomeEmail(Person person)
+        {
+            var emailDetails = new EmailDetailsDto
+            {
+                Subject = "Welcome to MyVillage"
+            };
+
+            var baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>();
+            var emailEndpoint = _configuration.GetSection("EmailEndpoint").Get<string>();
+            var emailTemplatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", "Reminders",
+                "Welcome.html");
+
+            var emailBody = await File.ReadAllTextAsync(emailTemplatePath);
+
+            emailBody = emailBody
+                .Replace("[PERSON_NAME]", $"{person.Firstname}")
+                .Replace("[PROFILE_URL]", $"{baseUrl}/profiles/people/{person.UserId}");
+
+            emailDetails.Body = emailBody;
+            emailDetails.Recipient = person.Email;
+
+            using var client = new HttpClient();
+
+            var json = JsonConvert.SerializeObject(emailDetails, Formatting.Indented);
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            try
+            {
+                _logger.LogInformation("Sending email...");
+                await client.PostAsync(emailEndpoint, content);
+                _logger.LogInformation("Reminder sent");
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        #endregion
+        
     }
 }
