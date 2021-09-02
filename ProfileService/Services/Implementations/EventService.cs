@@ -128,18 +128,27 @@ namespace ProfileService.Services.Implementations
             var @event = await GetByIdAsync(eventId);
             var person = await _personRepository.GetByIdAsync(personId);
 
-            var isZoomWebinar
+            var isZoomEvent
                 = @event.TivAffiliation
-                  && @event.Type.Equals("webinar")
+                  && (@event.Type.Equals("webinar") || @event.Type.Equals("meeting"))
                   && @event.Location.Equals("On Zoom");
 
-            if (isZoomWebinar)
+            if (isZoomEvent)
             {
-                await RegisterForWebinar(@event.WebinarId, new WebinarRegistrant
+                var eventType = @event.Type.Equals("Webinar") ? EventType.Webinar : EventType.Meeting;
+                await RegisterForZoomEvent(eventType, @event.WebinarId, new Registrant
                 {
                     Email = person.Email,
                     FirstName = person.Firstname,
-                    LastName = person.Lastname
+                    LastName = person.Lastname,
+                    CustomQuestions = new List<CustomQuestion>
+                    {
+                        // new CustomQuestion
+                        // {
+                        //     Title = "age",
+                        //     Value = "12"
+                        // }
+                    }
                 });
             }
 
@@ -214,34 +223,33 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task<ICollection<WebinarParticipant>> GetParticipantsAsync(string eventId)
+        public async Task<ICollection<Participant>> GetParticipantsAsync(EventType type, string id)
         {
-            var @event = await GetByIdAsync(eventId);
+            var @event = await GetByIdAsync(id);
 
-            var isZoomWebinar
+            var isZoomEvent
                 = @event.TivAffiliation
-                  && @event.Type.Equals("webinar")
+                  && (@event.Type.Equals("webinar") || @event.Type.Equals("meeting"))
                   && @event.Location.Equals("On Zoom");
 
-            if (isZoomWebinar)
-                return await GetWebinarParticipants(@event.WebinarId);
+            if (isZoomEvent)
+                return await GetParticipants(type, @event.WebinarId);
 
-            return new List<WebinarParticipant>();
+            return new List<Participant>();
         }
 
-        public async Task<ICollection<WebinarRegistrant>> GetRegistrantsAsync(string eventId)
-        {
+        public async Task<ICollection<Registrant>> GetRegistrantsAsync(EventType type, string eventId)  
+        {   
             var @event = await GetByIdAsync(eventId);
             if (@event is null) throw new NotFoundException();
 
-            // var isZoomWebinar
-            //     = @event.TivAffiliation
-            //       && @event.Type.Equals("webinar")
-            //       && @event.Location.Equals("On Zoom");
-            //
-            // if (isZoomWebinar) return await GetWebinarRegistrants(eventId);
-
-            var registrants = new List<WebinarRegistrant>();
+            var isZoomEvent
+                = @event.TivAffiliation
+                  && (@event.Type.Equals("webinar") || @event.Type.Equals("meeting"))
+                  && @event.Location.Equals("On Zoom");
+            
+            if (isZoomEvent) return await GetRegistrants(type, eventId);
+            var registrants = new List<Registrant>();
 
             @event.Attendances?.ForEach(person =>
             {
@@ -249,7 +257,7 @@ namespace ProfileService.Services.Implementations
 
                 var nameArray = person.Name?.Split(" ");
 
-                registrants.Add(new WebinarRegistrant
+                registrants.Add(new Registrant
                 {
                     Email = person.Email,
                     FirstName = nameArray[0],
@@ -275,7 +283,8 @@ namespace ProfileService.Services.Implementations
 
                 if (string.IsNullOrEmpty(@event.WebinarId)) return @event;
 
-                var webinar = await GetWebinarDetails(@event.WebinarId);
+                var eventType = @event.Type.Equals("webinar") ? EventType.Webinar : EventType.Meeting;
+                var webinar = await GetEventDetails(eventType, @event.WebinarId);
                 @event.Webinar = webinar;
 
                 return @event;
@@ -302,8 +311,64 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        #region Zoom Webinars
+        #region Zoom Webinars and Meetings
+        public async Task<MeetingResponse> CreateMeeting(EventContract @event)
+        {
+            var contactName = string.Empty;
+            var contactEmail = string.Empty;
 
+            if (@event.CreatedBy.HasValue)
+            {
+                var person = await _personRepository.GetByIdAsync(@event.CreatedBy.Value);
+                contactEmail = person.Email;
+                contactName = $"{person.Firstname} {person.Lastname}";
+            }
+
+            var startDateTime = Convert.ToDateTime(@event.StartDateTime);
+            var endDateTime = Convert.ToDateTime(@event.EndDateTime);
+
+            var meeting = new Meeting
+            {
+                Agenda = @event.Details,
+                Duration = endDateTime.Subtract(startDateTime).TotalMinutes,
+                Topic = @event.Title,
+                Type = MeetingType.Scheduled,
+                StartTime = startDateTime,
+                Settings = new MeetingSettings
+                {
+                    ContactEmail = contactEmail,
+                    ContactName = contactName
+                }
+            };
+
+            if (@event.IsRecurring)
+            {
+                meeting.Recurrence = new WebinarRecurrence
+                {
+                    // Type = @event.Frequency,
+                    // RepeatInterval = ,
+                    // WeeklyDays = ,
+                };
+            }
+
+            using var client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _zoomApiAccessToken);
+
+            var json = JsonConvert.SerializeObject(meeting);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var url = $"{ZoomApiBaseUrl}/users/{ZoomId}/meetings";
+
+            var response = await client.PostAsync(url, content);
+            response.EnsureSuccessStatusCode();
+
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<MeetingResponse>(responseString);
+        }
+        
         public async Task<WebinarResponse> CreateWebinar(EventContract @event)
         {
             var contactName = string.Empty;
@@ -329,8 +394,7 @@ namespace ProfileService.Services.Implementations
                 Settings = new WebinarSettings
                 {
                     ApprovalType = WebinarApprovalType.Automatic,
-                    RegistrationType = WebinarRegistrationType.RegisterOnceAttendAnySession,
-                    // SurveyUrl = "",
+                    RegistrationType = WebinarRegistrationType.RegisterOnceChooseOneOrMoreSessions,
                     RegistrantsEmailNotification = true,
                     MeetingAuthentication = true,
                     ContactEmail = contactEmail,
@@ -355,9 +419,7 @@ namespace ProfileService.Services.Implementations
 
             return JsonConvert.DeserializeObject<WebinarResponse>(responseString);
         }
-
-        public async Task<WebinarRegistrationResponse> RegisterForWebinar(string webinarId,
-            WebinarRegistrant registrant)
+        public async Task RegisterForZoomEvent(EventType type, string eventId, Registrant registrant)
         {
             using var client = new HttpClient();
 
@@ -367,17 +429,15 @@ namespace ProfileService.Services.Implementations
             var json = JsonConvert.SerializeObject(registrant);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var url = $"{ZoomApiBaseUrl}/webinars/{webinarId}/registrants";
+            var url = $"{ZoomApiBaseUrl}/{type.ToString().ToLower()}s/{eventId}/registrants";
 
             var response = await client.PostAsync(url, content);
             response.EnsureSuccessStatusCode();
 
-            var responseString = await response.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<WebinarRegistrationResponse>(responseString);
+            await response.Content.ReadAsStringAsync();
         }
 
-        public async Task<ICollection<WebinarParticipant>> GetWebinarParticipants(string webinarId)
+        private async Task<ICollection<Participant>> GetParticipants(EventType type, string id)
         {
             try
             {
@@ -386,24 +446,24 @@ namespace ProfileService.Services.Implementations
                 client.DefaultRequestHeaders.Authorization
                     = new AuthenticationHeaderValue("Bearer", _zoomApiAccessToken);
 
-                var url = $"{ZoomApiBaseUrl}/past_webinars/{webinarId}/participants";
+                var url = $"{ZoomApiBaseUrl}/past_{type.ToString().ToLower()}s/{id}/participants";
 
                 var response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var responseString = await response.Content.ReadAsStringAsync();
-                var data = JsonConvert.DeserializeObject<WebinarParticipantsResponse>(responseString);
+                var data = JsonConvert.DeserializeObject<ParticipantsResponse>(responseString);
 
                 return data.Participants;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message, e);
-                return new List<WebinarParticipant>();
+                return new List<Participant>();
             }
         }
 
-        public async Task<ICollection<WebinarRegistrant>> GetWebinarRegistrants(string webinarId)
+        private async Task<ICollection<Registrant>> GetRegistrants(EventType type, string eventId)
         {
             try
             {
@@ -412,13 +472,13 @@ namespace ProfileService.Services.Implementations
                 client.DefaultRequestHeaders.Authorization
                     = new AuthenticationHeaderValue("Bearer", _zoomApiAccessToken);
 
-                var url = $"{ZoomApiBaseUrl}/webinars/{webinarId}/registrants";
+                var url = $"{ZoomApiBaseUrl}/{type.ToString().ToLower()}s/{eventId}/registrants";
 
                 var response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var responseString = await response.Content.ReadAsStringAsync();
-                var data = JsonConvert.DeserializeObject<WebinarRegistrantsResponse>(responseString);
+                var data = JsonConvert.DeserializeObject<RegistrantsResponse>(responseString);
 
                 return data.Registrants;
             }
@@ -428,7 +488,7 @@ namespace ProfileService.Services.Implementations
             }
         }
 
-        public async Task<WebinarDetails> GetWebinarDetails(string webinarId)
+        public async Task<WebinarDetails> GetEventDetails(EventType type, string id)
         {
             try
             {
@@ -437,7 +497,7 @@ namespace ProfileService.Services.Implementations
                 client.DefaultRequestHeaders.Authorization
                     = new AuthenticationHeaderValue("Bearer", _zoomApiAccessToken);
 
-                var url = $"{ZoomApiBaseUrl}/webinars/{webinarId}";
+                var url = $"{ZoomApiBaseUrl}/{type.ToString().ToLower()}s/{id}";
 
                 var response = await client.GetAsync(url);
 

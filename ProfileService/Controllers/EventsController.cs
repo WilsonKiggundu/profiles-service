@@ -56,15 +56,15 @@ namespace ProfileService.Controllers
         }
         
         [HttpGet("participants")]
-        public async Task<ICollection<WebinarParticipant>> GetParticipantsAsync(string eventId)
+        public async Task<ICollection<Participant>> GetParticipantsAsync(EventType type, string eventId)
         {
-            return await _eventService.GetParticipantsAsync(eventId);
+            return await _eventService.GetParticipantsAsync(type, eventId);
         }
 
         [HttpGet("registrants")]
-        public async Task<ICollection<WebinarRegistrant>> GetRegistrantsAsync(string eventId)
+        public async Task<ICollection<Registrant>> GetRegistrantsAsync(EventType type, string eventId)
         {
-            return await _eventService.GetRegistrantsAsync(eventId);
+            return await _eventService.GetRegistrantsAsync(type, eventId);
         }
     }
 }

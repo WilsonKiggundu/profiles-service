@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace ProfileService.Contracts.Zoom
 {
-    public class WebinarRegistrant
+    public class Registrant
     {
         [JsonProperty("email")]
         public string Email { get; set; }
@@ -59,11 +59,14 @@ namespace ProfileService.Contracts.Zoom
 
     public class CustomQuestion
     {
+        [JsonProperty("title")]
         public string Title { get; set; }
+        
+        [JsonProperty("value")]
         public string Value { get; set; }
     }
 
-    public class WebinarParticipant
+    public class Participant
     {
         [JsonProperty("id")]
         public string Id { get; set; }
@@ -75,10 +78,10 @@ namespace ProfileService.Contracts.Zoom
         public string UserEmail { get; set; }
     }
 
-    public class WebinarParticipantsResponse
+    public class ParticipantsResponse
     {
         [JsonProperty("participants")]
-        public ICollection<WebinarParticipant> Participants { get; set; }
+        public ICollection<Participant> Participants { get; set; }
         
         [JsonProperty("page_count")]
         public int PageCount { get; set; }
@@ -93,10 +96,10 @@ namespace ProfileService.Contracts.Zoom
         public string NextPageToken { get; set; }
     }
 
-    public class WebinarRegistrantsResponse
+    public class RegistrantsResponse
     {
         [JsonProperty("registrants")]
-        public ICollection<WebinarRegistrant> Registrants { get; set; }
+        public ICollection<Registrant> Registrants { get; set; }
         
         [JsonProperty("page_count")]
         public int PageCount { get; set; }
@@ -111,7 +114,7 @@ namespace ProfileService.Contracts.Zoom
         public string NextPageToken { get; set; }
     }
 
-    public class WebinarRegistrationResponse
+    public class RegistrationResponse
     {
         [JsonProperty("registrant_id")]
         public string RegistrantId { get; set; }
