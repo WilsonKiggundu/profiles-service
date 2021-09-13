@@ -60,18 +60,29 @@ namespace ProfileService.Services.Implementations
         {
             try
             {
-                // if the event is a Zoom Webinar,
+                // if the event is a Zoom Webinar / Meeting,
                 // create the webinar automatically
-
+                
                 var createZoomWebinar
                     = eventContract.TivAffiliation
                       && eventContract.Type.Equals("webinar")
+                      && eventContract.Location.Equals("On Zoom");
+                
+                var createZoomMeeting
+                    = eventContract.TivAffiliation
+                      && eventContract.Type.Equals("meeting")
                       && eventContract.Location.Equals("On Zoom");
 
                 if (createZoomWebinar)
                 {
                     var webinar = await CreateWebinar(eventContract);
                     eventContract.WebinarId = webinar.Id.ToString();
+                }
+                
+                if (createZoomMeeting)
+                {
+                    var meeting = await CreateMeeting(eventContract);
+                    eventContract.WebinarId = meeting.Id.ToString();
                 }
 
                 using var client = new HttpClient();
@@ -128,14 +139,14 @@ namespace ProfileService.Services.Implementations
             var @event = await GetByIdAsync(eventId);
             var person = await _personRepository.GetByIdAsync(personId);
 
+            var eventType = @event.Type.Equals("webinar") ? EventType.Webinar : EventType.Meeting;
+
             var isZoomEvent
                 = @event.TivAffiliation
-                  && (@event.Type.Equals("webinar") || @event.Type.Equals("meeting"))
                   && @event.Location.Equals("On Zoom");
 
             if (isZoomEvent)
             {
-                var eventType = @event.Type.Equals("Webinar") ? EventType.Webinar : EventType.Meeting;
                 await RegisterForZoomEvent(eventType, @event.WebinarId, new Registrant
                 {
                     Email = person.Email,
@@ -143,11 +154,11 @@ namespace ProfileService.Services.Implementations
                     LastName = person.Lastname,
                     CustomQuestions = new List<CustomQuestion>
                     {
-                        // new CustomQuestion
-                        // {
-                        //     Title = "age",
-                        //     Value = "12"
-                        // }
+                        new CustomQuestion
+                        {
+                            Title = "Unique ID",
+                            Value = personId.ToString()
+                        }
                     }
                 });
             }
@@ -337,19 +348,22 @@ namespace ProfileService.Services.Implementations
                 Settings = new MeetingSettings
                 {
                     ContactEmail = contactEmail,
-                    ContactName = contactName
-                }
+                    ContactName = contactName,
+                    RegistrantsEmailNotification = true,
+                    MeetingAuthentication = true,
+                },
+                
             };
 
-            if (@event.IsRecurring)
-            {
-                meeting.Recurrence = new WebinarRecurrence
-                {
-                    // Type = @event.Frequency,
-                    // RepeatInterval = ,
-                    // WeeklyDays = ,
-                };
-            }
+            // if (@event.IsRecurring)
+            // {
+            //     meeting.Recurrence = new WebinarRecurrence
+            //     {
+            //         // Type = @event.Frequency,
+            //         // RepeatInterval = ,
+            //         // WeeklyDays = ,
+            //     };
+            // }
 
             using var client = new HttpClient();
 
@@ -432,6 +446,8 @@ namespace ProfileService.Services.Implementations
             var url = $"{ZoomApiBaseUrl}/{type.ToString().ToLower()}s/{eventId}/registrants";
 
             var response = await client.PostAsync(url, content);
+            Console.WriteLine(response.RequestMessage);
+            
             response.EnsureSuccessStatusCode();
 
             await response.Content.ReadAsStringAsync();

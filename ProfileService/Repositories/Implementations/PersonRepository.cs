@@ -471,7 +471,7 @@ namespace ProfileService.Repositories.Implementations
         {
             return await _context.EmailPreferences.SingleOrDefaultAsync(q => q.PersonId == personId);
         }
-    
+
         #region Contacts
 
         public async Task<IEnumerable<Contact>> GetContactsAsync(Guid personId)
@@ -508,5 +508,20 @@ namespace ProfileService.Repositories.Implementations
         }
 
         #endregion
+
+        public async Task<Person> GetFullProfileAsync(Guid id)
+        {
+            return await _context.Persons
+                .Include(q => q.Awards)
+                .Include(q => q.Categories)
+                .Include(q => q.Contacts)
+                .Include(q => q.Employment)
+                .Include(q => q.Interests)
+                .Include(q => q.Projects)
+                .Include(q => q.Skills)
+                .Include(q => q.Stacks)
+                .Include(q => q.FreelanceTerms)
+                .FirstOrDefaultAsync(q => q.Id == id);
+        }
     }
 }

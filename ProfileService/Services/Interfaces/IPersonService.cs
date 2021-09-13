@@ -23,6 +23,7 @@ namespace ProfileService.Services.Interfaces
 
         Task<SearchPersonResponse> SearchAsync(SearchPersonRequest request);
         Task<GetPerson> GetByIdAsync(Guid id);
+        Task<bool> GetProfileStatusAsync(Guid id);
         Task<NewPerson> InsertAsync(NewPerson person);
         Task<UpdatePerson> UpdateAsync(UpdatePerson person);
         Task<UpdatePerson> UpdateCoverPhotoAsync(UpdatePerson person);

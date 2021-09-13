@@ -44,11 +44,13 @@ namespace ProfileService.Services.Implementations
         private readonly IWebNotification _notification;
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _environment;
-        
+
 
         public PersonService(IPersonRepository repository, IMapper mapper, ILookupInterestRepository interestRepository,
             ILookupCategoryRepository categoryRepository, ILookupSkillRepository skillRepository,
-            ILookupSchoolRepository schoolRepository, ILogger<PersonService> logger, IContactRepository contactRepository, IDeviceService deviceService, IWebNotification notification, IConfiguration configuration, IWebHostEnvironment environment, IPersonPreferencesRepository preferences)
+            ILookupSchoolRepository schoolRepository, ILogger<PersonService> logger,
+            IContactRepository contactRepository, IDeviceService deviceService, IWebNotification notification,
+            IConfiguration configuration, IWebHostEnvironment environment, IPersonPreferencesRepository preferences)
         {
             _repository = repository;
             _mapper = mapper;
@@ -82,11 +84,11 @@ namespace ProfileService.Services.Implementations
             // if (result == null) return new GetPerson();
 
             var person = _mapper.Map<GetPerson>(result);
-            
+
             // get categories
             var categories = await _repository.GetCategoriesAsync(id);
             var enumerable = categories.ToList();
-            
+
             var personCategories = new List<GetLookupCategory>();
             if (enumerable.Any())
             {
@@ -111,11 +113,25 @@ namespace ProfileService.Services.Implementations
             return person;
         }
 
+        public async Task<bool> GetProfileStatusAsync(Guid id)
+        {
+            var profile = await _repository.GetFullProfileAsync(id);
+            
+            return profile.Awards.Any()
+                   && profile.Categories.Any()
+                   && profile.Contacts.Any()
+                   && profile.Employment.Any()
+                   && profile.Interests.Any()
+                   && profile.Projects.Any()
+                   && profile.Skills.Any()
+                   && profile.Stacks.Any();
+        }
+
         public async Task<NewPerson> InsertAsync(NewPerson newPerson)
         {
             var profile = await _repository.GetByIdAsync(newPerson.UserId);
             if (profile != null) return newPerson;
-            
+
             var person = new Person
             {
                 Id = newPerson.UserId,
@@ -140,7 +156,7 @@ namespace ProfileService.Services.Implementations
             {
                 await _repository.InsertAsync(person);
 
-                BackgroundJob.Enqueue(() => _preferences.InsertAsync(new EmailSettings{PersonId = person.Id}));
+                BackgroundJob.Enqueue(() => _preferences.InsertAsync(new EmailSettings {PersonId = person.Id}));
                 BackgroundJob.Enqueue(() => SendWelcomeEmail(person));
                 BackgroundJob.Enqueue(() => SendAppNotification(person));
 
@@ -208,7 +224,7 @@ namespace ProfileService.Services.Implementations
             try
             {
                 var contactId = Guid.NewGuid();
-                
+
                 var personContact = new PersonContact
                 {
                     PersonId = contact.BelongsTo,
@@ -225,7 +241,7 @@ namespace ProfileService.Services.Implementations
                 };
 
                 await _repository.AddContactAsync(personContact);
-                
+
                 return personContact;
             }
             catch (Exception e)
@@ -245,9 +261,9 @@ namespace ProfileService.Services.Implementations
                 contactEntity.Type = contact.Type;
                 // contactEntity.BelongsTo = contact.BelongsTo;
                 contactEntity.Value = contact.Value;
-                
+
                 await _contactRepository.UpdateAsync(contactEntity);
-                
+
                 return new PersonContact
                 {
                     PersonId = contact.BelongsTo,
@@ -523,7 +539,7 @@ namespace ProfileService.Services.Implementations
                 throw new Exception(e.Message, e);
             }
         }
-    
+
         #region Person Terms
 
         public async Task<FreelanceTerms> GetFreelanceTermsAsync(Guid personId)
@@ -580,21 +596,21 @@ namespace ProfileService.Services.Implementations
                 // };
                 //
                 // return await _repository.AddInterestAsync(personInterest);
-                
+
                 var skillId = skill.Id;
                 if (!skill.Id.HasValue)
                 {
                     skillId = Guid.NewGuid();
-                    
+
                     await _skillRepository.InsertAsync(new Skill
                     {
                         Id = skillId.Value,
                         Name = skill.Name
                     });
                 }
-                
+
                 if (!skillId.HasValue) throw new ArgumentNullException(nameof(skillId));
-                
+
                 return await _repository.AddSkillAsync(new PersonSkill
                 {
                     PersonId = personId,
@@ -745,7 +761,7 @@ namespace ProfileService.Services.Implementations
                 throw new Exception(e.Message, e);
             }
         }
-        
+
         #region Notifications
 
         private async Task SendAppNotification(Person person)
@@ -782,7 +798,7 @@ namespace ProfileService.Services.Implementations
                 }
             });
         }
-        
+
         public async Task<bool> SendWelcomeEmail(Person person)
         {
             var emailDetails = new EmailDetailsDto
@@ -824,6 +840,5 @@ namespace ProfileService.Services.Implementations
         }
 
         #endregion
-        
     }
 }
