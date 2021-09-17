@@ -41,8 +41,6 @@ namespace ProfileService.Services.Implementations
             const int batchSize = 10;
             var batchCount = count < batchSize ? 1 : Math.Ceiling(Convert.ToDecimal(count / batchSize));
 
-            _logger.LogInformation($"Count: {count}, BatchSize: {batchSize}, BatchCount: {batchCount}");
-
             for (var i = 0; i < batchCount; i++)
             {
                 var profiles = await _context.Persons
@@ -122,7 +120,6 @@ namespace ProfileService.Services.Implementations
 
                     if (whatIsMissing.Count > 0)
                     {
-                        _logger.LogInformation($"Sending reminder to {profile.Email}...");
                         var sent = await ProcessEmail(profile, whatIsMissing);
                         if (sent)
                         {
@@ -148,7 +145,7 @@ namespace ProfileService.Services.Implementations
             var emailBody = await File.ReadAllTextAsync(emailTemplatePath);
 
             var list = string.Empty;
-            checklist.ForEach(c => list += $"<li>{c}</li>");
+            checklist.ForEach(c => list += $"<li style=\"padding: 5px 0;\">{c}</li>");
 
             emailBody = emailBody
                 .Replace("[PERSON_NAME]", $"{person.Firstname}")

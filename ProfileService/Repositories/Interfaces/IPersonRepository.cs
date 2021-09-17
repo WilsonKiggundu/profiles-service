@@ -115,5 +115,8 @@ namespace ProfileService.Repositories.Interfaces
         Task<EmailSettings> EmailPreferences(Guid personId);
 
         #endregion
+
+
+        Task<Person> GetFullProfileAsync(Guid id);
     }
 }

@@ -5,6 +5,12 @@ using ProfileService.Contracts.Zoom;
 
 namespace ProfileService.Contracts
 {
+    public enum EventType
+    {
+        Webinar = 1,
+        Meeting = 2
+    }
+    
     public class EventContract
     {
         [JsonProperty("title")] public string Title { get; set; }
@@ -18,12 +24,14 @@ namespace ProfileService.Contracts
         [JsonProperty("partner")] public string Partner { get; set; }
         [JsonProperty("sector")] public string Sector { get; set; }
         [JsonProperty("location")] public string Location { get; set; } = "zoom";
-        [JsonProperty("type")] public string Type { get; set; } = "webinar";
+        [JsonProperty("type")] public string Type { get; set; }
         [JsonProperty("webinarId")] public string WebinarId { get; set; }
         [JsonProperty("id")] public int? Id { get; set; }
-        [JsonProperty("interval")] public string Interval { get; set; }
-
         [JsonProperty("frequency")] public string Frequency { get; set; }
+        [JsonProperty("interval")] public string Interval { get; set; }
+        
+        [JsonProperty("is_recurring")] public bool IsRecurring { get; set; }
+
         // [JsonProperty("days")] public int[] Days { get; set; }
         [JsonProperty("details")] public string Details { get; set; }
         [JsonProperty("conferenceUrl")] public string ConferenceUrl { get; set; }
@@ -35,7 +43,11 @@ namespace ProfileService.Contracts
         [JsonProperty("achievements")] public string Achievements { get; set; }
         
         [JsonProperty("webinar")] public WebinarDetails Webinar { get; set; }
+        [JsonProperty("meeting")] public MeetingDetails Meeting { get; set; }   
         [JsonProperty("attendances")] public List<EventAttendance> Attendances { get; set; }
+
+        [JsonProperty("custom_questions")]
+        public string CustomQuestions { get; set; }
     }
 
     public class EventAttendance

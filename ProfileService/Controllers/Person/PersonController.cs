@@ -2,6 +2,7 @@
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -31,6 +32,13 @@ namespace ProfileService.Controllers.Person
             _personService = personService;
             _logger = logger;
         }
+        
+        [HttpGet("status")]
+        public async Task<IActionResult> GetProfileStatus(Guid personId)
+        {
+            var status = await _personService.GetProfileStatusAsync(personId);
+            return Ok(status);
+        }
 
         /// <summary>
         /// SEARCH persons
@@ -56,9 +64,6 @@ namespace ProfileService.Controllers.Person
         public async Task<IActionResult> GetOne(Guid id)
         {
             var profile = await _personService.GetByIdAsync(id);
-            
-            _logger.LogInformation(JsonConvert.SerializeObject(profile, Formatting.Indented));
-
             return Ok(profile);
         }
 

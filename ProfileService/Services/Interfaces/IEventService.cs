@@ -10,8 +10,8 @@ namespace ProfileService.Services.Interfaces
     public interface IEventService : IService
     {
         Task<ICollection<EventContract>> SearchAsync(EventSearch search);  
-        Task<ICollection<WebinarParticipant>> GetParticipantsAsync(string eventId);
-        Task<ICollection<WebinarRegistrant>> GetRegistrantsAsync(string eventId);  
+        Task<ICollection<Participant>> GetParticipantsAsync(EventType type, string eventId);
+        Task<ICollection<Registrant>> GetRegistrantsAsync(EventType type, string eventId);  
         Task<EventContract> CreateAsync(EventContract eventContract);
         Task RegisterAsync(string eventId, Guid personId);
         Task<EventContract> UpdateAsync(EventContract eventContract);

@@ -5,7 +5,7 @@ using ProfileService.Models.Common;
 
 namespace ProfileService.Repositories.Interfaces
 {
-    public interface IGenericRepository<T> where T : BaseModel
+    public interface IGenericRepository<T> where T : IEntity
     {
         IEnumerable<T> GetAll();
         Task<T> GetByIdAsync(Guid id);

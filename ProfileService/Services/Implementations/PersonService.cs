@@ -1,11 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Hangfire;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ProfileService.Contracts;
 using ProfileService.Contracts.Lookup.Category;
 using ProfileService.Contracts.Person;
 using ProfileService.Contracts.Person.Awards;
@@ -17,6 +23,7 @@ using ProfileService.Contracts.Person.Skills;
 using ProfileService.Helpers;
 using ProfileService.Models.Common;
 using ProfileService.Models.Person;
+using ProfileService.Models.Preferences;
 using ProfileService.Repositories.Interfaces;
 using ProfileService.Services.Interfaces;
 
@@ -27,6 +34,7 @@ namespace ProfileService.Services.Implementations
         private readonly IPersonRepository _repository;
         private readonly ILookupInterestRepository _interestRepository;
         private readonly ILookupCategoryRepository _categoryRepository;
+        private readonly IPersonPreferencesRepository _preferences;
         private readonly ILookupSkillRepository _skillRepository;
         private readonly ILookupSchoolRepository _schoolRepository;
         private readonly IMapper _mapper;
@@ -35,10 +43,14 @@ namespace ProfileService.Services.Implementations
         private readonly IDeviceService _deviceService;
         private readonly IWebNotification _notification;
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
+
 
         public PersonService(IPersonRepository repository, IMapper mapper, ILookupInterestRepository interestRepository,
             ILookupCategoryRepository categoryRepository, ILookupSkillRepository skillRepository,
-            ILookupSchoolRepository schoolRepository, ILogger<PersonService> logger, IContactRepository contactRepository, IDeviceService deviceService, IWebNotification notification, IConfiguration configuration)
+            ILookupSchoolRepository schoolRepository, ILogger<PersonService> logger,
+            IContactRepository contactRepository, IDeviceService deviceService, IWebNotification notification,
+            IConfiguration configuration, IWebHostEnvironment environment, IPersonPreferencesRepository preferences)
         {
             _repository = repository;
             _mapper = mapper;
@@ -51,6 +63,8 @@ namespace ProfileService.Services.Implementations
             _deviceService = deviceService;
             _notification = notification;
             _configuration = configuration;
+            _environment = environment;
+            _preferences = preferences;
         }
 
         public async Task<int> CountAllAsync()
@@ -70,11 +84,11 @@ namespace ProfileService.Services.Implementations
             // if (result == null) return new GetPerson();
 
             var person = _mapper.Map<GetPerson>(result);
-            
+
             // get categories
             var categories = await _repository.GetCategoriesAsync(id);
             var enumerable = categories.ToList();
-            
+
             var personCategories = new List<GetLookupCategory>();
             if (enumerable.Any())
             {
@@ -99,11 +113,39 @@ namespace ProfileService.Services.Implementations
             return person;
         }
 
+        public async Task<bool> GetProfileStatusAsync(Guid id)
+        {
+            var profile = await _repository.GetFullProfileAsync(id);
+            
+            var isComplete = 
+                   profile.Categories.Any()
+                   && profile.Awards.Any()
+                   && profile.Contacts.Any()
+                   && profile.Employment.Any()
+                   && profile.Skills.Any();
+
+            if (profile.IsDeveloper)
+            {
+                isComplete = isComplete
+                             && profile.Projects.Any()
+                             && profile.Stacks.Any();
+            }
+            
+            if (profile.IsFreelancer)
+            {
+                isComplete = isComplete
+                             && profile.FreelanceTerms != null;
+            }
+
+            return isComplete;
+
+        }
+
         public async Task<NewPerson> InsertAsync(NewPerson newPerson)
         {
             var profile = await _repository.GetByIdAsync(newPerson.UserId);
             if (profile != null) return newPerson;
-            
+
             var person = new Person
             {
                 Id = newPerson.UserId,
@@ -127,39 +169,11 @@ namespace ProfileService.Services.Implementations
             try
             {
                 await _repository.InsertAsync(person);
-                
-                var devices 
-                    = await _deviceService.SearchAsync(person.Id.ToString());
-                
-                _notification.Send(devices, new NotificationPayload
-                {
-                    Title = $"{person.Firstname} {person.Lastname}" + " joined My Village",
-                    Icon = person.Avatar,
-                    Date = DateTime.UtcNow,
-                    
-                    Data = new
-                    {
-                        profileId = person.Id,
-                        baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>()
-                    },
-                    
-                    Options = new NotificationOptions
-                    {
-                        Actions = new List<NotificationAction>
-                        {
-                            new NotificationAction
-                            {
-                                Action = "view-profile",
-                                Title = "View profile"
-                            }
-                        },
-                        
-                        // Body = comment.Details,
-                        Tag = person.Id.ToString(),
-                        Icon = person.Avatar,
-                    }
-                });
-                
+
+                BackgroundJob.Enqueue(() => _preferences.InsertAsync(new EmailSettings {PersonId = person.Id}));
+                BackgroundJob.Enqueue(() => SendWelcomeEmail(person));
+                BackgroundJob.Enqueue(() => SendAppNotification(person));
+
                 return _mapper.Map<NewPerson>(person);
             }
             catch (Exception e)
@@ -224,7 +238,7 @@ namespace ProfileService.Services.Implementations
             try
             {
                 var contactId = Guid.NewGuid();
-                
+
                 var personContact = new PersonContact
                 {
                     PersonId = contact.BelongsTo,
@@ -241,7 +255,7 @@ namespace ProfileService.Services.Implementations
                 };
 
                 await _repository.AddContactAsync(personContact);
-                
+
                 return personContact;
             }
             catch (Exception e)
@@ -254,8 +268,6 @@ namespace ProfileService.Services.Implementations
         {
             try
             {
-                _logger.LogInformation(JsonConvert.SerializeObject(contact, Formatting.Indented));
-                
                 var contactEntity = await _contactRepository.GetByIdAsync(contact.Id);
 
                 contactEntity.Category = contact.Category;
@@ -263,9 +275,9 @@ namespace ProfileService.Services.Implementations
                 contactEntity.Type = contact.Type;
                 // contactEntity.BelongsTo = contact.BelongsTo;
                 contactEntity.Value = contact.Value;
-                
+
                 await _contactRepository.UpdateAsync(contactEntity);
-                
+
                 return new PersonContact
                 {
                     PersonId = contact.BelongsTo,
@@ -443,8 +455,6 @@ namespace ProfileService.Services.Implementations
 
         public async Task UpdateAwardAsync(UpdatePersonAward award)
         {
-            _logger.LogInformation(JsonConvert.SerializeObject(award, Formatting.Indented));
-
             try
             {
                 var instituteId = award.Institute.Id;
@@ -543,7 +553,7 @@ namespace ProfileService.Services.Implementations
                 throw new Exception(e.Message, e);
             }
         }
-    
+
         #region Person Terms
 
         public async Task<FreelanceTerms> GetFreelanceTermsAsync(Guid personId)
@@ -600,21 +610,21 @@ namespace ProfileService.Services.Implementations
                 // };
                 //
                 // return await _repository.AddInterestAsync(personInterest);
-                
+
                 var skillId = skill.Id;
                 if (!skill.Id.HasValue)
                 {
                     skillId = Guid.NewGuid();
-                    
+
                     await _skillRepository.InsertAsync(new Skill
                     {
                         Id = skillId.Value,
                         Name = skill.Name
                     });
                 }
-                
+
                 if (!skillId.HasValue) throw new ArgumentNullException(nameof(skillId));
-                
+
                 return await _repository.AddSkillAsync(new PersonSkill
                 {
                     PersonId = personId,
@@ -765,5 +775,84 @@ namespace ProfileService.Services.Implementations
                 throw new Exception(e.Message, e);
             }
         }
+
+        #region Notifications
+
+        private async Task SendAppNotification(Person person)
+        {
+            var devices
+                = await _deviceService.SearchAsync(person.Id.ToString());
+
+            _notification.Send(devices, new NotificationPayload
+            {
+                Title = $"{person.Firstname} {person.Lastname}" + " joined My Village",
+                Icon = person.Avatar,
+                Date = DateTime.UtcNow,
+
+                Data = new
+                {
+                    profileId = person.Id,
+                    baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>()
+                },
+
+                Options = new NotificationOptions
+                {
+                    Actions = new List<NotificationAction>
+                    {
+                        new NotificationAction
+                        {
+                            Action = "view-profile",
+                            Title = "View profile"
+                        }
+                    },
+
+                    // Body = comment.Details,
+                    Tag = person.Id.ToString(),
+                    Icon = person.Avatar,
+                }
+            });
+        }
+
+        public async Task<bool> SendWelcomeEmail(Person person)
+        {
+            var emailDetails = new EmailDetailsDto
+            {
+                Subject = "Welcome to MyVillage"
+            };
+
+            var baseUrl = _configuration.GetSection("MyVillageBaseUrl").Get<string>();
+            var emailEndpoint = _configuration.GetSection("EmailEndpoint").Get<string>();
+            var emailTemplatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", "Reminders",
+                "Welcome.html");
+
+            var emailBody = await File.ReadAllTextAsync(emailTemplatePath);
+
+            emailBody = emailBody
+                .Replace("[PERSON_NAME]", $"{person.Firstname}")
+                .Replace("[PROFILE_URL]", $"{baseUrl}/profiles/people/{person.UserId}");
+
+            emailDetails.Body = emailBody;
+            emailDetails.Recipient = person.Email;
+
+            using var client = new HttpClient();
+
+            var json = JsonConvert.SerializeObject(emailDetails, Formatting.Indented);
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            try
+            {
+                _logger.LogInformation("Sending email...");
+                await client.PostAsync(emailEndpoint, content);
+                _logger.LogInformation("Reminder sent");
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        #endregion
     }
 }
