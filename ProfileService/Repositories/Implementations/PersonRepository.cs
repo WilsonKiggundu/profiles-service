@@ -511,9 +511,10 @@ namespace ProfileService.Repositories.Implementations
 
         public async Task<Person> GetFullProfileAsync(Guid id)
         {
-            return await _context.Persons
+            var person = await _context.Persons
                 .Include(q => q.Awards)
                 .Include(q => q.Categories)
+                .ThenInclude(c => c.Category)
                 .Include(q => q.Contacts)
                 .Include(q => q.Employment)
                 .Include(q => q.Interests)
@@ -522,6 +523,14 @@ namespace ProfileService.Repositories.Implementations
                 .Include(q => q.Stacks)
                 .Include(q => q.FreelanceTerms)
                 .FirstOrDefaultAsync(q => q.Id == id);
+
+            person.IsDeveloper = person.Categories.Any(q
+                => q.Category.Name.ToLower().Equals("developer"));
+            
+            person.IsFreelancer = person.Categories.Any(q
+                => q.Category.Name.ToLower().Equals("freelancer"));
+
+            return person;
         }
     }
 }

@@ -117,14 +117,28 @@ namespace ProfileService.Services.Implementations
         {
             var profile = await _repository.GetFullProfileAsync(id);
             
-            return profile.Awards.Any()
-                   && profile.Categories.Any()
+            var isComplete = 
+                   profile.Categories.Any()
+                   && profile.Awards.Any()
                    && profile.Contacts.Any()
                    && profile.Employment.Any()
-                   && profile.Interests.Any()
-                   && profile.Projects.Any()
-                   && profile.Skills.Any()
-                   && profile.Stacks.Any();
+                   && profile.Skills.Any();
+
+            if (profile.IsDeveloper)
+            {
+                isComplete = isComplete
+                             && profile.Projects.Any()
+                             && profile.Stacks.Any();
+            }
+            
+            if (profile.IsFreelancer)
+            {
+                isComplete = isComplete
+                             && profile.FreelanceTerms != null;
+            }
+
+            return isComplete;
+
         }
 
         public async Task<NewPerson> InsertAsync(NewPerson newPerson)
