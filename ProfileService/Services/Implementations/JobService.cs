@@ -15,6 +15,7 @@ using ProfileService.Contracts;
 using ProfileService.Contracts.Blog.Post;
 using ProfileService.Contracts.Business;
 using ProfileService.Models;
+using ProfileService.Models.Posts;
 using ProfileService.Repositories.Interfaces;
 using ProfileService.Services.Interfaces;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -178,7 +179,7 @@ namespace ProfileService.Services.Implementations
 
                 if (newJob.ProfileId != null)
                 {
-                    var newPost = new NewPost
+                    var newPost = new Post
                     {
                         Type = PostType.Job,
                         AuthorId = newJob.ProfileId.Value,

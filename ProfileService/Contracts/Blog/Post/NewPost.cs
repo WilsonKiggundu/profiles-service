@@ -15,6 +15,6 @@ namespace ProfileService.Contracts.Blog.Post
         public int? Ref { get; set; }
         public Guid AuthorId { get; set; }
         public GetPerson Author { get; set; }
-        public ICollection<Upload> Uploads { get; set; }
+        public string Uploads { get; set; }
     }
 }

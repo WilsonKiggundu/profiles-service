@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +9,10 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProfileService.Contracts.Blog.Article;
 using ProfileService.Contracts.Blog.Post;
+using ProfileService.Contracts.Person;
 using ProfileService.Controllers.Common;
+using ProfileService.Models.Common;
+using ProfileService.Models.Posts;
 using ProfileService.Services.Interfaces;
 
 namespace ProfileService.Controllers.Blog
@@ -44,14 +48,34 @@ namespace ProfileService.Controllers.Blog
         /// <summary>
         /// CREATE a post
         /// </summary>
-        /// <param name="post"></param>
+        /// <param name="newPost"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<NewPost> Create(NewPost post)
-        {
+        public async Task<NewPost> Create(NewPost newPost)
+        {   
             try
             {
-                return await _postService.InsertAsync(post);
+                var post = new Post
+                {
+                    AuthorId = newPost.AuthorId,
+                    Details = newPost.Details,
+                    Type = newPost.Type,
+                    Uploads = !string.IsNullOrEmpty(newPost.Uploads) ? 
+                        JsonConvert.DeserializeObject<ICollection<Upload>>(newPost.Uploads) 
+                        : new List<Upload>(),
+                    ReferenceId = newPost.ReferenceId,
+                    Ref = newPost.Ref,
+                    Title = newPost.Title
+                };
+                var result = await _postService.InsertAsync(post);
+
+                newPost.Author = new GetPerson
+                {
+                    Avatar = result.Author.Avatar,
+                    Firstname = result.Author.Firstname,
+                    Lastname = result.Author.Lastname
+                };
+                return newPost;
             }
             catch (Exception e)
             {

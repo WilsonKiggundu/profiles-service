@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Hangfire;
+using Newtonsoft.Json;
 using ProfileService.Contracts.Blog.Article;
 using ProfileService.Contracts.Blog.Post;
 using ProfileService.Models.Common;
@@ -39,13 +40,20 @@ namespace ProfileService.Services.Implementations
 
         public async Task InsertAsync(NewArticle article)
         {
+            
+            var uploads = new List<Upload>();
+            if (!string.IsNullOrEmpty(article.Uploads))
+            {
+                uploads.AddRange(JsonConvert.DeserializeObject<ICollection<Upload>>(article.Uploads));
+            }
+            
             var newArticle = new Article
             {
                 Id = Guid.NewGuid(),
                 Title = article.Title,
                 Details = article.Details,
                 AuthorId = article.AuthorId,
-                Uploads = article.Uploads?.Select(s => new Upload
+                Uploads = uploads.Select(s => new Upload
                 {
                     Path = s.Path,
                     FileName = s.FileName
@@ -68,15 +76,15 @@ namespace ProfileService.Services.Implementations
             };
             
             await _repository.InsertAsync(newArticle);
-
-            var newPost = new NewPost
+            
+            var newPost = new Post
             {
                 Type = PostType.Article,
                 AuthorId = article.AuthorId,
                 Title = article.Title,
                 Details = article.Details,
                 ReferenceId = newArticle.Id,
-                Uploads = article.Uploads?.Select(s => new Upload
+                Uploads = uploads.Select(s => new Upload
                 {
                     Path = s.Path,
                     FileName = s.FileName

@@ -14,7 +14,7 @@ namespace ProfileService.Contracts.Blog.Article
         public string Details { get; set; }
         public List<string> Categories { get; set; }
         public List<string> Tags { get; set; }
-        public List<GetLookupUpload> Uploads { get; set; }
+        public string Uploads { get; set; }
         public PublishStatus Status { get; set; } = PublishStatus.Published;
     }
 }

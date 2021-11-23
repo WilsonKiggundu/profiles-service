@@ -18,6 +18,7 @@ using ProfileService.Contracts.Zoom;
 using ProfileService.Exceptions;
 using ProfileService.Extensions;
 using ProfileService.Helpers;
+using ProfileService.Models.Posts;
 using ProfileService.Repositories.Interfaces;
 using ProfileService.Services.Interfaces;
 
@@ -99,7 +100,7 @@ namespace ProfileService.Services.Implementations
 
                 if (@event.CreatedBy != null)
                 {
-                    var newPost = new NewPost
+                    var newPost = new Post
                     {
                         Type = PostType.Event,
                         AuthorId = @event.CreatedBy.Value,

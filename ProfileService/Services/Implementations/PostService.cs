@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using ProfileService.Contracts.Blog.Post;
 using ProfileService.Contracts.Person;
 using ProfileService.Helpers;
+using ProfileService.Models.Person;
 using ProfileService.Models.Posts;
 using ProfileService.Repositories.Interfaces;
 using ProfileService.Services.Interfaces;
@@ -41,24 +42,14 @@ namespace ProfileService.Services.Implementations
             return await _repository.SearchAsync(request);
         }
 
-        public async Task<NewPost> InsertAsync(NewPost newPost)
+        public async Task<Post> InsertAsync(Post post)
         {
-            var post = new Post
-            {
-                Id = Guid.NewGuid(),
-                AuthorId = newPost.AuthorId,
-                Details = newPost.Details,
-                Uploads = newPost.Uploads,
-                Type = newPost.Type,
-                Ref = newPost.Ref,
-                ReferenceId = newPost.ReferenceId,
-                Title = newPost.Title
-            };
+            post.Id = Guid.NewGuid();
 
             await _repository.InsertAsync(post);
-            var author = await _personRepository.GetByIdAsync(newPost.AuthorId);
+            var author = await _personRepository.GetByIdAsync(post.AuthorId);
             
-            newPost.Author = new GetPerson
+            post.Author = new Person
             {
                 Avatar = author.Avatar,
                 Email = author.Email,
@@ -69,7 +60,7 @@ namespace ProfileService.Services.Implementations
 
             BackgroundJob.Enqueue(() => SendNotification(post));
 
-            return newPost;
+            return post;
         }
 
         public async Task SendNotification(Post post)

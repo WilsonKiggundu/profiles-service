@@ -10,7 +10,7 @@ namespace ProfileService.Services.Interfaces
     public interface IPostService : IService    
     {    
         Task<SearchPostResponse> SearchAsync(SearchPostRequest request);
-        Task<NewPost> InsertAsync(NewPost post);
+        Task<Post> InsertAsync(Post post);
         Task UpdateAsync(UpdatePost post);
         Task DeleteAsync(Guid id);
     }
