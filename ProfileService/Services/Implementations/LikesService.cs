@@ -57,42 +57,45 @@ namespace ProfileService.Services.Implementations
             var post = (await _postRepository.SearchAsync(new SearchPostRequest
             {
                 PostId = like.EntityId
-            })).Posts.First();
+            }))?.Posts?.First();
 
             // don't send a notification if I comment on my own post
-            var excludeMe = like.PersonId == post.AuthorId ? post.AuthorId.ToString() : string.Empty;
+            var excludeMe = post != null && like.PersonId == post.AuthorId ? post.AuthorId.ToString() : string.Empty;
 
-            var devices = await _deviceRepository.SearchAsync(excludeMe, post.AuthorId.ToString());
-
-            _notification.Send(devices, new NotificationPayload
+            if (post != null)
             {
-                Title = $"{person.Firstname} {person.Lastname}" + " liked on your post",
-                // Message = post.Details,
-                Data = new
+                var devices = await _deviceRepository.SearchAsync(excludeMe, post.AuthorId.ToString());
+
+                _notification.Send(devices, new NotificationPayload
                 {
-                    postId = like.EntityId,
-                    profileId = like.PersonId
-                },
-                Options = new NotificationOptions
-                {
-                    Actions = new List<NotificationAction>
+                    Title = $"{person.Firstname} {person.Lastname}" + " liked on your post",
+                    // Message = post.Details,
+                    Data = new
                     {
-                        new NotificationAction
-                        {
-                            Action = "view-profile",
-                            Title = "View profile"
-                        },
-                        new NotificationAction
-                        {
-                            Action = "follow",
-                            Title = "Follow"
-                        }
+                        postId = like.EntityId,
+                        profileId = like.PersonId
                     },
-                    // Body = comment.Details,
-                    Tag = like.Id.ToString(),
-                    Icon = person.Avatar,
-                }
-            });
+                    Options = new NotificationOptions
+                    {
+                        Actions = new List<NotificationAction>
+                        {
+                            new NotificationAction
+                            {
+                                Action = "view-profile",
+                                Title = "View profile"
+                            },
+                            new NotificationAction
+                            {
+                                Action = "follow",
+                                Title = "Follow"
+                            }
+                        },
+                        // Body = comment.Details,
+                        Tag = like.Id.ToString(),
+                        Icon = person.Avatar,
+                    }
+                });
+            }
         }
     }
 }
