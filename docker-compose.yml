@@ -10,7 +10,7 @@ services:
       - 'ConnectionStrings__DefaultConnection=Server=db; User Id=profile_user; Database=profile_db; Port=5432; Password=50m3B1gPassword; SSL Mode=Prefer; Trust Server Certificate=true'
       - AdminConfiguration__RequireHttpsMetadata=false
       - DockerConfiguration__UpdateCaCertificate=true
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Test
     ports:
       - '44404:80'
     depends_on:
