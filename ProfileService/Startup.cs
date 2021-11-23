@@ -108,8 +108,8 @@ namespace ProfileService
                     Description = "A service for managing profiles",
                     Contact = new OpenApiContact
                     {
-                        Name = "Wilson Kiggundu",
-                        Email = "wkiggundu@innovationvillage.co.ug",
+                        Name = "Jude Kajura",
+                        Email = "jkajura@innovationvillage.co.ug",
                         Url = new Uri("https://innovationvillage.co.ug")
                     }
                 });
@@ -178,7 +178,7 @@ namespace ProfileService
                 context.Database.Migrate();
                 
                 // send profile update reminders
-                RecurringJob.AddOrUpdate(() => backgroundService.SendProfileUpdateRemindersAsync(), Cron.Weekly);
+                RecurringJob.AddOrUpdate(() => backgroundService.SendProfileUpdateRemindersAsync(), Cron.Monthly);
             }
             
             

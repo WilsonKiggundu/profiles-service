@@ -77,49 +77,47 @@ namespace ProfileService.Services.Implementations
 
         public void Send(ICollection<Device> devices, NotificationPayload notification)
         {
-            
-            
-            devices.ToList().ForEach(async device =>
-            {
-                // var httpWebRequest = (HttpWebRequest) WebRequest.Create(WebAddress);
-                // httpWebRequest.ContentType = "application/json";
-                // httpWebRequest.Headers.Add($"Authorization: key={ServerKey}");
-                // httpWebRequest.Headers.Add($"Sender: id={SenderId}");
-                // httpWebRequest.Method = "POST";
-                //
-                // var payload = new
-                // {
-                //     to = device.Token,
-                //     priority = "high",
-                //     content_available = true,
-                //     notification
-                // };
-                //
-                // var json = JsonConvert.SerializeObject(payload);
-                //
-                // try
-                // {
-                //     await using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-                //     {
-                //         await streamWriter.WriteAsync(json);
-                //         await streamWriter.FlushAsync();
-                //     }
-                //
-                //     var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                //     var responseStream = httpResponse.GetResponseStream();
-                //     if (responseStream == null) return;
-                //     
-                //     using var streamReader = new StreamReader(responseStream);
-                //     await streamReader.ReadToEndAsync();
-                //
-                // }
-                // catch (Exception e)
-                // {
-                //     Console.WriteLine();
-                //     _logger.LogError(e, e.Message);
-                // }
-
-            });
+            // devices.ToList().ForEach(async device =>
+            // {
+            //     // var httpWebRequest = (HttpWebRequest) WebRequest.Create(WebAddress);
+            //     // httpWebRequest.ContentType = "application/json";
+            //     // httpWebRequest.Headers.Add($"Authorization: key={ServerKey}");
+            //     // httpWebRequest.Headers.Add($"Sender: id={SenderId}");
+            //     // httpWebRequest.Method = "POST";
+            //     //
+            //     // var payload = new
+            //     // {
+            //     //     to = device.Token,
+            //     //     priority = "high",
+            //     //     content_available = true,
+            //     //     notification
+            //     // };
+            //     //
+            //     // var json = JsonConvert.SerializeObject(payload);
+            //     //
+            //     // try
+            //     // {
+            //     //     await using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            //     //     {
+            //     //         await streamWriter.WriteAsync(json);
+            //     //         await streamWriter.FlushAsync();
+            //     //     }
+            //     //
+            //     //     var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            //     //     var responseStream = httpResponse.GetResponseStream();
+            //     //     if (responseStream == null) return;
+            //     //     
+            //     //     using var streamReader = new StreamReader(responseStream);
+            //     //     await streamReader.ReadToEndAsync();
+            //     //
+            //     // }
+            //     // catch (Exception e)
+            //     // {
+            //     //     Console.WriteLine();
+            //     //     _logger.LogError(e, e.Message);
+            //     // }
+            //
+            // });
 
         }
     }

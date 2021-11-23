@@ -115,7 +115,7 @@ namespace ProfileService.Services.Implementations
                 BackgroundJob.Enqueue(() => ProcessEmail(@event, false));
                 BackgroundJob.Enqueue(() => SendNotification(@event));
 
-                var startDateTime = Convert.ToDateTime(@event.StartDateTime);
+                var startDateTime = Convert.ToDateTime(@event.StartDateTime).ToUniversalTime();
 
                 BackgroundJob.Schedule(() => 
                     ProcessEmail(@event, true), startDateTime.AddHours(-1));
@@ -144,6 +144,8 @@ namespace ProfileService.Services.Implementations
             var isZoomEvent
                 = @event.TivAffiliation
                   && @event.Location.Equals("On Zoom");
+            
+            _logger.LogInformation("Is zoom event?: " + isZoomEvent);
 
             if (isZoomEvent)
             {
@@ -350,9 +352,8 @@ namespace ProfileService.Services.Implementations
                     ContactEmail = contactEmail,
                     ContactName = contactName,
                     RegistrantsEmailNotification = true,
-                    MeetingAuthentication = true,
+                    MeetingAuthentication = false,
                 },
-                
             };
 
             // if (@event.IsRecurring)
@@ -412,7 +413,7 @@ namespace ProfileService.Services.Implementations
                     RegistrantsEmailNotification = true,
                     MeetingAuthentication = true,
                     ContactEmail = contactEmail,
-                    ContactName = contactName
+                    ContactName = contactName,
                 }
             };
 
